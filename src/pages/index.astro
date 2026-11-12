@@ -9,8 +9,8 @@ import { getBlogPosts } from '../lib/content/blog';
 
 const posts = await getBlogPosts();
 const siteURL = Astro.site ?? Astro.url;
-const recentPosts = posts.slice(0, 1);
-const hasPosts = posts.length > 0;
+const pinnedPosts = posts.filter((post) => post.data.pinned);
+const recentPosts = posts.filter((post) => !post.data.pinned).slice(0, 1);
 const homeHero = heroConfig.home;
 const webSiteSchema = {
   '@context': 'https://schema.org',
@@ -71,7 +71,7 @@ const webSiteSchema = {
       .status-heading h2 {
         margin: 0;
         line-height: 1.3;
-        font-size: clamp(1.6rem, 2.8vw, 2rem);
+        font-size: 1.625rem;
         color: #f5f6fb;
       }
 
@@ -132,7 +132,7 @@ const webSiteSchema = {
       }
 
       .stats-container :global(.section-title) {
-        font-size: 1.8em;
+        font-size: 1.625rem;
         font-weight: bold;
         margin: 0;
         color: var(--color-text);
@@ -143,6 +143,12 @@ const webSiteSchema = {
         margin-bottom: 2em;
         font-size: 0.9em;
         line-height: 1.6;
+      }
+
+      .pinned-empty {
+        margin: 1.1rem 0 .3rem;
+        color: var(--color-text-secondary);
+        font-size: .95rem;
       }
 
       .blog-link {
@@ -159,9 +165,10 @@ const webSiteSchema = {
         color: var(--accent);
       }
 
+      .pinned-posts-section,
       .recent-posts-section {
-        margin-top: 2.6em;
-        padding-top: 2em;
+        margin-top: 2.1em;
+        padding-top: 1.7em;
         border-top: 1px solid rgba(159, 179, 212, .18);
       }
 
@@ -352,8 +359,32 @@ const webSiteSchema = {
         </div>
         <p class="now-description">最近在整理特殊選才的準備和面試心得，也在慢慢把這個網站做好。</p>
 
+        <div class="pinned-posts-section">
+          <SectionHeader title="置頂文章" />
+          {pinnedPosts.length > 0 ? (
+            <div class="home-posts-list">
+              {pinnedPosts.map((post) => (
+                <PostListItem
+                  post={post}
+                  titleTag="h3"
+                  articleClass="home-post-item"
+                  titleClass="home-post-title"
+                  showExcerpt={false}
+                  metaContainerClass="home-post-meta"
+                  metaItemClass="home-post-meta-item"
+                  metaTagsClass="home-post-tags"
+                  tagLinkClass="home-tag-link hover-scale"
+                  tagLimit={3}
+                />
+              ))}
+            </div>
+          ) : (
+            <p class="pinned-empty">目前還沒有置頂文章。</p>
+          )}
+        </div>
+
         <div class="recent-posts-section">
-          <SectionHeader title="最近更新" intro={hasPosts ? '最新發布的 1 篇文章' : '目前還沒有文章'} />
+          <SectionHeader title="最近更新" />
 
           {recentPosts.length > 0 ? (
             <>
