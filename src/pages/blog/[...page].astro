@@ -474,7 +474,7 @@ if (last > 1) paginationList.push(last);
         font-weight: 600;
         padding-top: .8rem;
       }
-      .blog-posts-list { display: contents; }
+      .blog-posts-list { display: flex; flex-direction: column; }
       .articles-list :global(.blog-post-item) {
         padding: 1.4rem .6rem;
         margin: 0;
@@ -530,7 +530,7 @@ if (last > 1) paginationList.push(last);
           ))}
         </nav>
       )}
-      <div class="articles-list">
+      <div class="articles-list blog-posts-list">
         {page.data.length > 0 ? (
           page.data.map((post) => (
             <div class="scroll-reveal">
