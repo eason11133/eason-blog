@@ -34,7 +34,7 @@ export interface HeroConfig {
 
 export const heroConfig: HeroConfig = {
   home: {
-    text: 'Eason',
+    text: 'Hi 我是 Eason',
     subtitle: '',
     backgroundImage: defaultBackground.src,
   },
