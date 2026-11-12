@@ -29,7 +29,7 @@ if (interactive) heroClass += ' hero-interactive';
     <div class="hero-bg" style={`background-image: url('${backgroundImageSrc}')`}></div>
     <div class="hero-overlay"></div>
     <div class="hero-content">
-        <Typewriter text={text} tag="h1" class="hero-title" disappearAfterTyping={interactive} />
+        {!interactive && <Typewriter text={text} tag="h1" class="hero-title" />}
         {subtitle && <p class="hero-subtitle">{subtitle}</p>}
         <slot />
     </div>
