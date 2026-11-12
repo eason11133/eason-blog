@@ -45,31 +45,24 @@ const webSiteSchema = {
         padding: 2em;
       }
 
-      /* Distinct nebula texture inside the card; the page outside stays black. */
+      /* CC0 Milky Way photograph by Taavi Niittee via Wikimedia Commons.
+         This replaces the former hand-drawn SVG nebula entirely. */
       :global([data-theme="dark"]) .stats-wrapper {
         background: #050608;
       }
 
       :global([data-theme="dark"]) .stats-container {
         position: relative;
-        isolation: isolate;
         overflow: hidden;
-        background:
-          linear-gradient(90deg, rgba(4, 7, 16, .69) 0%, rgba(5, 8, 17, .46) 55%, rgba(6, 8, 18, .31) 100%),
-          url('/galaxy-nebula.svg') center / cover no-repeat,
-          #091020;
+        background-color: #080d1b;
+        background-image:
+          linear-gradient(90deg, rgba(3, 6, 16, .78) 0%, rgba(5, 9, 21, .58) 55%, rgba(5, 8, 19, .47) 100%),
+          url("https://commons.wikimedia.org/wiki/Special:Redirect/file/Milky_way_composition.jpg?width=1920");
+        background-size: cover;
+        background-position: center 48%;
+        background-repeat: no-repeat;
         border: 1px solid rgba(151, 179, 232, .22);
         box-shadow: 0 22px 68px rgba(0,0,0,.38);
-      }
-
-      :global([data-theme="dark"]) .stats-container::before {
-        content: "";
-        position: absolute;
-        inset: 0;
-        border-radius: inherit;
-        z-index: -1;
-        pointer-events: none;
-        background: radial-gradient(ellipse 70% 70% at 15% 22%, rgba(7, 10, 20, .38), transparent 100%);
       }
 
       .status-heading {
