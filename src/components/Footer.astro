@@ -1,69 +1,73 @@
 ---
 import { headerGithubRepoUrl, profileConfig } from '../config';
-import { getRenderableSocials, resolveSocialUrl } from '../lib/profile/social';
+import { resolveSocialUrl } from '../lib/profile/social';
 
-const today = new Date();
-
-const socials = getRenderableSocials(profileConfig.socials).filter((social) => {
-  const url = resolveSocialUrl(social.key, social.url);
-  return url && !url.includes('example.com');
-});
+const year = new Date().getFullYear();
+const socials = profileConfig.socials.map((social) => ({
+  ...social,
+  link: social.url.trim() && !social.url.includes('example.com') ? resolveSocialUrl(social.key, social.url) : '',
+}));
 ---
 
 <footer transition:animate="none">
-	<p class="copyright">&copy; {today.getFullYear()} Eason</p>
-	<div class="social-links">
-		{socials.map((social) => (
-			<a
-				href={resolveSocialUrl(social.key, social.url)}
-				target={social.key === 'email' ? undefined : '_blank'}
-				rel={social.key === 'email' ? undefined : 'noreferrer'}
-			>
-				{social.label}
-			</a>
-		))}
-		{headerGithubRepoUrl && (
-			<a href={headerGithubRepoUrl} target="_blank" rel="noreferrer">Repository</a>
-		)}
-	</div>
+  <div class="footer-line">
+    <span class="copyright">&copy; {year} Eason</span>
+    <nav class="social-links" aria-label="社群連結">
+      {socials.map((social) => (
+        social.link ? (
+          <a href={social.link} target="_blank" rel="noreferrer">{social.label}</a>
+        ) : (
+          <span class="link-placeholder" title="尚未設定連結">{social.label}</span>
+        )
+      ))}
+      {headerGithubRepoUrl && (
+        <a href={headerGithubRepoUrl} target="_blank" rel="noreferrer">Repository</a>
+      )}
+    </nav>
+  </div>
 </footer>
 
 <style>
-	footer {
-		padding: 2.4em 1em 3.6em;
-		background: #050608;
-		border-top: 1px solid rgba(166, 187, 226, .10);
-		color: var(--color-text-secondary);
-		text-align: center;
-	}
-
-	.copyright {
-		margin: 0;
-		font-size: 0.95em;
-	}
-
-	.social-links {
-		display: flex;
-		justify-content: center;
-		gap: 0.85em;
-		flex-wrap: wrap;
-		margin-top: 0.7em;
-	}
-
-	.social-links a {
-		text-decoration: none;
-		color: var(--color-text-secondary);
-		font-size: 0.92em;
-		padding: 0.15em 0.25em;
-		border-radius: 0;
-		border: 0;
-		border-bottom: 1px solid transparent;
-		transition: color 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
-	}
-
-	.social-links a:hover {
-		color: var(--color-text);
-		border-bottom-color: rgba(177, 199, 237, .65);
-		background-color: transparent;
-	}
+  footer {
+    padding: 1.65rem 1rem;
+    background: #050608;
+    border-top: 1px solid rgba(166, 187, 226, .10);
+    color: var(--color-text-secondary);
+    text-align: center;
+  }
+  .footer-line {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1.15rem;
+    flex-wrap: wrap;
+  }
+  .copyright {
+    font-size: .92rem;
+    white-space: nowrap;
+  }
+  .social-links {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: .85rem;
+  }
+  .social-links a,
+  .link-placeholder {
+    color: var(--color-text-secondary);
+    font-size: .92rem;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  .social-links a {
+    transition: color .2s ease;
+  }
+  .social-links a:hover {
+    color: var(--color-text);
+  }
+  .link-placeholder {
+    opacity: .62;
+    cursor: default;
+  }
 </style>
