@@ -63,7 +63,7 @@ export const profileConfig: ProfileConfig = {
   githubProfileUrl: 'https://example.com',
   socials: [
     { key: 'github', label: 'GitHub', url: '' },
-    { key: 'x', label: 'X', url: '' },
+    { key: 'email', label: 'Email', url: '' },
     { key: 'instagram', label: 'Instagram', url: '' },
     { key: 'discord', label: 'Discord', url: '' },
   ],
