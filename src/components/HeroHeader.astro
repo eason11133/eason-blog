@@ -80,7 +80,8 @@ if (interactive) heroClass += ' hero-interactive';
 
     /* Eason homepage portrait cover: prioritize Curry's jersey and number 30. */
     .hero-header.hero-interactive .hero-bg {
-        background-position: center 57%;
+        background-position: center 68%;
+        transform: scale(1.08);
     }
 
     /* Homepage greeting below the top-left logo, clear of Curry's silhouette. */
@@ -190,7 +191,7 @@ if (interactive) heroClass += ' hero-interactive';
     @media (hover: hover) and (pointer: fine) {
         /* 仅在 .hero-interactive 类存在且为桌面指针时启用悬停效果 */
         .hero-header.hero-interactive:has(.hero-content:hover) .hero-bg {
-            transform: scale(1.05);
+            transform: scale(1.12);
         }
 
         .hero-header.hero-interactive:has(.hero-content:hover) .hero-overlay {
@@ -215,7 +216,8 @@ if (interactive) heroClass += ' hero-interactive';
         }
 
         .hero-header.hero-interactive .hero-bg {
-            background-position: center 50%;
+            background-position: center 72%;
+            transform: scale(1.12);
         }
 
         .hero-header {
