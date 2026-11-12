@@ -95,6 +95,11 @@ const { transparent = true } = Astro.props;
 		box-sizing: border-box;
 	}
 
+	/* No progress hairline on the homepage cover. */
+	:global(body[data-page-id='home']) #navigation-progress {
+		display: none;
+	}
+
 	#navigation-progress {
 		position: absolute;
 		top: 0;
