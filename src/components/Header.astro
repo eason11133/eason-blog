@@ -11,7 +11,7 @@ const { transparent = true } = Astro.props;
 
 <header class:list={[{ transparent }]} transition:persist transition:name="header" transition:animate="none">
 	<nav>
-		<h2><a href="/">{siteTitle}</a></h2>
+		<h2><a href="/" class="site-home-link" aria-label="Eason 首頁"><svg class="home-mark" viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 10 9-7 9 7"/><path d="M5.5 9.5V20h13V9.5"/><path d="M10 20v-6h4v6"/></svg><span>{siteTitle}</span></a></h2>
 		<div class="internal-links">
 			<HeaderLink href="/">首頁</HeaderLink>
 			<HeaderLink href="/blog">文章</HeaderLink>
@@ -100,6 +100,28 @@ const { transparent = true } = Astro.props;
         position: relative;
         display: inline-block;
 	}
+
+    /* A clear home cue with a little more presence, without a button outline. */
+    h2 .site-home-link {
+        display: inline-flex;
+        align-items: center;
+        gap: .55rem;
+        font-size: 1.2rem;
+        font-weight: 750;
+        letter-spacing: -.025em;
+    }
+
+    .home-mark {
+        flex: none;
+        color: #bdd7ff;
+        filter: drop-shadow(0 0 5px rgba(119, 171, 255, .22));
+        transition: transform .25s ease, filter .25s ease;
+    }
+
+    h2 .site-home-link:hover .home-mark {
+        transform: translateY(-2px);
+        filter: drop-shadow(0 0 8px rgba(123, 183, 255, .65));
+    }
 
     /* Exquisite Underline Animation (Logo) */
     h2 a::after {
