@@ -73,15 +73,15 @@ if (interactive) heroClass += ' hero-interactive';
 
     /* Show the start of the articles without requiring an initial scroll. */
     .hero-header.hero-interactive {
-        height: 78vh;
-        height: 78dvh;
-        min-height: 540px;
+        height: 108vh;
+        height: 108dvh;
+        min-height: 820px;
     }
 
     /* Eason homepage portrait cover: prioritize Curry's jersey and number 30. */
     .hero-header.hero-interactive .hero-bg {
-        background-position: center 68%;
-        transform: scale(1.08);
+        background-position: center 78%;
+        transform: scale(1.015);
     }
 
     /* Homepage greeting below the top-left logo, clear of Curry's silhouette. */
@@ -130,7 +130,7 @@ if (interactive) heroClass += ' hero-interactive';
             rgba(16, 23, 31, 0.38) 0%,
             rgba(22, 29, 37, 0.32) 45%,
             rgba(29, 36, 45, 0.68) 77%,
-            var(--color-bg) 100%
+            rgba(5, 6, 8, 0.98) 100%
         );
     }
 
@@ -191,7 +191,7 @@ if (interactive) heroClass += ' hero-interactive';
     @media (hover: hover) and (pointer: fine) {
         /* 仅在 .hero-interactive 类存在且为桌面指针时启用悬停效果 */
         .hero-header.hero-interactive:has(.hero-content:hover) .hero-bg {
-            transform: scale(1.12);
+            transform: scale(1.035);
         }
 
         .hero-header.hero-interactive:has(.hero-content:hover) .hero-overlay {
@@ -210,14 +210,14 @@ if (interactive) heroClass += ' hero-interactive';
         }
 
         .hero-header.hero-interactive {
-            height: 80vh;
-            height: 80dvh;
-            min-height: 460px;
+            height: 105vh;
+            height: 105dvh;
+            min-height: 660px;
         }
 
         .hero-header.hero-interactive .hero-bg {
-            background-position: center 72%;
-            transform: scale(1.12);
+            background-position: center 82%;
+            transform: scale(1.015);
         }
 
         .hero-header {
