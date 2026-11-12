@@ -36,7 +36,7 @@ export const heroConfig: HeroConfig = {
   home: {
     text: 'Hi 我是 Eason',
     subtitle: '',
-    backgroundImage: defaultBackground.src,
+    backgroundImage: '/ChatGPT%20%E5%9C%96%E5%83%8F%202026%E5%B9%B411%E6%9C%8812%E6%97%A5%20%E4%B8%8B%E5%8D%8803_47_57.jpg',
   },
   blog: {
     text: 'All Posts',
