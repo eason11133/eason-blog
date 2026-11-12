@@ -76,6 +76,11 @@ if (interactive) heroClass += ' hero-interactive';
         background-position: center 57%;
     }
 
+    /* Move only the homepage headline into the open space above Curry. */
+    .hero-header.hero-interactive .hero-content {
+        transform: translateY(-18vh);
+    }
+
     .hero-header.hero-compact {
         height: 60vh;
         height: 60dvh;
@@ -180,6 +185,10 @@ if (interactive) heroClass += ' hero-interactive';
     }
     
     @media (max-width: 720px) {
+        .hero-header.hero-interactive .hero-content {
+            transform: translateY(-12vh);
+        }
+
         .hero-header.hero-interactive .hero-bg {
             background-position: center 50%;
         }
