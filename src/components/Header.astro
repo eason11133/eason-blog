@@ -13,10 +13,10 @@ const { transparent = true } = Astro.props;
 	<nav>
 		<h2><a href="/">{siteTitle}</a></h2>
 		<div class="internal-links">
-			<HeaderLink href="/">Home</HeaderLink>
-			<HeaderLink href="/blog">Blog</HeaderLink>
-			<HeaderLink href="/tags">Tags</HeaderLink>
-			<HeaderLink href="/about">About</HeaderLink>
+			<HeaderLink href="/">首頁</HeaderLink>
+			<HeaderLink href="/blog">文章</HeaderLink>
+			<HeaderLink href="/experience">作品與經歷</HeaderLink>
+			<HeaderLink href="/about">關於我</HeaderLink>
 			<div class="nav-indicator" id="nav-indicator"></div>
 		</div>
 		<div class="header-actions">
@@ -24,22 +24,6 @@ const { transparent = true } = Astro.props;
 				<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
 					<circle cx="11" cy="11" r="8"></circle>
 					<path d="m21 21-4.35-4.35"></path>
-				</svg>
-			</button>
-			<button id="theme-toggle" class="theme-toggle-btn" aria-label="切换深色模式">
-				<svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-					<circle cx="12" cy="12" r="5"></circle>
-					<line x1="12" y1="1" x2="12" y2="3"></line>
-					<line x1="12" y1="21" x2="12" y2="23"></line>
-					<line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
-					<line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-					<line x1="1" y1="12" x2="3" y2="12"></line>
-					<line x1="21" y1="12" x2="23" y2="12"></line>
-					<line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
-					<line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
-				</svg>
-				<svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-					<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
 				</svg>
 			</button>
 			{headerGithubRepoUrl && (
@@ -69,10 +53,10 @@ const { transparent = true } = Astro.props;
 	<div id="mobile-nav-overlay" class="mobile-nav-overlay" aria-hidden="true"></div>
 	<aside id="mobile-nav-drawer" class="mobile-nav-drawer" aria-hidden="true">
 		<nav class="mobile-nav-links" aria-label="移动端导航">
-			<a href="/" class="mobile-nav-link">Home</a>
-			<a href="/blog" class="mobile-nav-link">Blog</a>
-			<a href="/tags" class="mobile-nav-link">Tags</a>
-			<a href="/about" class="mobile-nav-link">About</a>
+			<a href="/" class="mobile-nav-link">首頁</a>
+			<a href="/blog" class="mobile-nav-link">文章</a>
+			<a href="/experience" class="mobile-nav-link">作品與經歷</a>
+			<a href="/about" class="mobile-nav-link">關於我</a>
 		</nav>
 	</aside>
 </header>
