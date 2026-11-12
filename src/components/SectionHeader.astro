@@ -1,8 +1,11 @@
 ---
+import Typewriter from './Typewriter.astro';
+
 interface Props {
 	number?: string;
 	title: string;
 	intro?: string;
+	typewriter?: boolean;
 	headerClass?: string;
 	numberClass?: string;
 	titleClass?: string;
@@ -13,6 +16,7 @@ const {
 	number,
 	title,
 	intro,
+	typewriter = false,
 	headerClass = 'section-header',
 	numberClass = 'section-number',
 	titleClass = 'section-title',
@@ -23,6 +27,6 @@ const {
 <div class={headerClass}>
 	{number && <span class={numberClass}>{number}</span>}
 </div>
-<h2 class={titleClass}>{title}</h2>
+{typewriter ? <Typewriter text={title} tag="h2" class={titleClass} /> : <h2 class={titleClass}>{title}</h2>}
 {intro && <p class={introClass}>{intro}</p>}
 
