@@ -4,20 +4,29 @@ interface Props {
     tag?: 'h1' | 'h2' | 'h3' | 'span';
     class?: string;
     id?: string;
+    disappearAfterTyping?: boolean;
 }
 
-const { text, tag = 'h1', class: className = '', id } = Astro.props;
+const { text, tag = 'h1', class: className = '', id, disappearAfterTyping = false } = Astro.props;
 const Tag = tag;
 const elementId = id || `typewriter-${Math.random().toString(36).substring(7)}`;
 ---
 
-<Tag class:list={['typewriter', className]} id={elementId} data-text={text}>
+<Tag class:list={['typewriter', className]} id={elementId} data-text={text} data-disappear-after-typing={disappearAfterTyping ? "true" : undefined}>
     <span class="typed-text">{text}</span><span class="cursor" aria-hidden="true">_</span>
 </Tag>
 
 <style>
     .typewriter {
         display: inline-block;
+    }
+
+    .typewriter[data-disappear-after-typing="true"] {
+        transition: opacity 0.8s ease-out;
+    }
+
+    .typewriter[data-disappear-after-typing="true"].typewriter-faded {
+        opacity: 0;
     }
 
     .typed-text {
@@ -51,6 +60,7 @@ const elementId = id || `typewriter-${Math.random().toString(36).substring(7)}`;
             if (!typedTextSpan || !fullText) return;
             const typedTextNode = typedTextSpan;
 
+            element.classList.remove('typewriter-faded');
             // Reset text content for View Transitions
             typedTextNode.textContent = '';
             let i = 0;
@@ -63,6 +73,9 @@ const elementId = id || `typewriter-${Math.random().toString(36).substring(7)}`;
                         // Random typing speed for natural feel (50ms - 150ms)
                         const randomSpeed = Math.floor(Math.random() * 100) + 50;
                         setTimeout(typeWriter, randomSpeed);
+                    } else if (element.getAttribute('data-disappear-after-typing') === 'true') {
+                        // Keep the completed original typewriter text briefly, then fade it away.
+                        setTimeout(() => element.classList.add('typewriter-faded'), 1200);
                     }
                 }
                 typeWriter();
