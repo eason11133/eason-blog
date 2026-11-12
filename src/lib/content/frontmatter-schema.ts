@@ -9,6 +9,7 @@ export const blogFrontmatterSchema = z
 		updated: z.coerce.date().optional(),
 		description: nonEmptyText.optional(),
 		draft: z.boolean().optional().default(false),
+		pinned: z.boolean().optional().default(false),
 		categories: z.array(nonEmptyText),
 		tags: z.array(nonEmptyText),
 	})
