@@ -9,6 +9,7 @@ interface Props {
     backgroundImage?: string | ImageMetadata;
     compact?: boolean;
     interactive?: boolean; // 是否启用悬停交互效果（仅主页）
+    cutoutImage?: string;
 }
 
 const { 
@@ -16,17 +17,23 @@ const {
     subtitle, 
     backgroundImage = heroConfig.postDefaultBackground,
     compact = false,
-    interactive = false
+    interactive = false,
+    cutoutImage
 } = Astro.props;
 const backgroundImageSrc =
     typeof backgroundImage === 'string' ? backgroundImage : backgroundImage.src;
 
 let heroClass = compact ? 'hero-header hero-compact' : 'hero-header';
 if (interactive) heroClass += ' hero-interactive';
+if (cutoutImage) heroClass += ' hero-cutout-mode';
 ---
 
 <div class={heroClass} transition:name="hero">
-    <div class="hero-bg" style={`background-image: url('${backgroundImageSrc}')`}></div>
+    {cutoutImage ? (
+        <img class="hero-cutout" src={cutoutImage} alt="Stephen Curry 背影" />
+    ) : (
+        <div class="hero-bg" style={`background-image: url('${backgroundImageSrc}')`}></div>
+    )}
     <div class="hero-overlay"></div>
     <div class="hero-content">
         <Typewriter text={text} tag="h1" class="hero-title" />
@@ -82,6 +89,45 @@ if (interactive) heroClass += ' hero-interactive';
     .hero-header.hero-interactive .hero-bg {
         background-position: center 68%;
         transform: scale(1.08);
+    }
+
+    /* Use the uploaded transparent Curry PNG on top of the shared galaxy photo. */
+    .hero-cutout-mode {
+        background: transparent;
+    }
+
+    .hero-cutout {
+        position: absolute;
+        z-index: 1;
+        bottom: -17%;
+        left: 50%;
+        transform: translateX(-50%);
+        height: 112%;
+        width: auto;
+        max-width: none;
+        object-fit: contain;
+        object-position: center bottom;
+        filter: brightness(.72) contrast(1.07) drop-shadow(0 28px 35px rgba(0,0,0,.48));
+        pointer-events: none;
+        transition: filter .35s ease;
+    }
+
+    .hero-cutout-mode .hero-overlay {
+        background: linear-gradient(to bottom,
+            rgba(2,5,17,.23) 0%,
+            rgba(2,4,14,.10) 46%,
+            rgba(3,4,12,.38) 80%,
+            rgba(4,6,14,.80) 100%);
+        pointer-events: none;
+        z-index: 2;
+    }
+
+    .hero-header.hero-interactive.hero-cutout-mode .hero-overlay {
+        background: linear-gradient(to bottom,
+            rgba(2,5,17,.25) 0%,
+            rgba(3,5,15,.10) 46%,
+            rgba(4,6,17,.32) 79%,
+            rgba(4,5,13,.66) 100%);
     }
 
     /* Homepage greeting below the top-left logo, clear of Curry's silhouette. */
@@ -200,6 +246,12 @@ if (interactive) heroClass += ' hero-interactive';
     }
     
     @media (max-width: 720px) {
+        .hero-cutout {
+            height: 96%;
+            bottom: -10%;
+        }
+
+
         .hero-header.hero-interactive .hero-content {
             top: 108px;
             left: 47px;
