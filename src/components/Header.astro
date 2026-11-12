@@ -287,6 +287,17 @@ const { transparent = true } = Astro.props;
 		pointer-events: none;
 	}
 
+	/* Match the existing homepage's blue-black palette; keep drawer layout intact. */
+	:global([data-theme="dark"]) .mobile-nav-drawer {
+		background: #151d29;
+		border-left-color: rgba(155, 177, 214, .19);
+	}
+
+	:global([data-theme="dark"]) .mobile-nav-link.active {
+		background: rgba(145, 175, 207, .12);
+		color: #c6dbf6;
+	}
+
 	.mobile-nav-links {
 		display: flex;
 		flex-direction: column;
