@@ -45,29 +45,39 @@ const webSiteSchema = {
         padding: 2em;
       }
 
-      /* CC0 Milky Way photograph by Taavi Niittee via Wikimedia Commons.
-         This replaces the former hand-drawn SVG nebula entirely. */
+      /* Seamless transition from the Curry hero into the real Milky Way photo.
+         Full-bleed background; no floating card edge or top border. */
       :global([data-theme="dark"]) .stats-wrapper {
         background: #050608;
+      }
+
+      .stats-wrapper :global(#stats-card) {
+        width: 100%;
+        max-width: none;
+        margin: 0;
+        padding: 0;
       }
 
       :global([data-theme="dark"]) .stats-container {
         position: relative;
         overflow: hidden;
-        background-color: #080d1b;
+        box-sizing: border-box;
+        border: 0;
+        border-radius: 0;
+        box-shadow: none;
+        padding: clamp(2.5rem, 5vw, 4.5rem) max(1.5rem, calc((100vw - 1100px) / 2));
+        background-color: #050608;
         background-image:
-          linear-gradient(180deg,
-            rgba(5, 7, 14, .88) 0%,
-            rgba(6, 9, 19, .68) 22%,
-            rgba(7, 10, 22, .56) 58%,
-            rgba(5, 7, 15, .79) 100%),
+          linear-gradient(to bottom,
+            #050608 0%,
+            rgba(5, 6, 8, .97) 9%,
+            rgba(5, 6, 8, .83) 25%,
+            rgba(5, 7, 13, .58) 54%,
+            rgba(5, 7, 14, .63) 100%),
           url("https://commons.wikimedia.org/wiki/Special:Redirect/file/Milky_way_composition.jpg?width=1920");
-        /* Crop the foreground buildings: show only the upper sky portion. */
         background-size: cover, auto 162%;
         background-position: center, center top;
         background-repeat: no-repeat;
-        border: 1px solid rgba(151, 179, 232, .22);
-        box-shadow: 0 22px 68px rgba(0,0,0,.38);
       }
 
       .status-heading {
@@ -335,8 +345,7 @@ const webSiteSchema = {
         }
 
         .stats-container {
-          padding: 1.5em;
-          border-radius: 0;
+          padding: 2.25rem 1.5rem 2.5rem;
         }
       }
     </style>
