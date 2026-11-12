@@ -114,38 +114,38 @@
    舒适、质感、高级感
    ═══════════════════════════════════════ */
 [data-theme="dark"] {
-	--accent: #7b8cff;
-	--accent-dark: #5c6ae6;
-	--accent-rgb: 123, 140, 255;
+	--accent: #91afcf;
+	--accent-dark: #7295bd;
+	--accent-rgb: 145, 175, 207;
 	--black: 232, 234, 237;
 	--gray: 140, 155, 185;
-	--gray-light: 35, 40, 56;
-	--gray-dark: 200, 210, 225;
+	--gray-light: 42, 53, 64;
+	--gray-dark: 223, 232, 240;
 	--gray-gradient: rgba(var(--gray-light), 50%), var(--color-bg);
 
 	/* Surfaces */
-	--color-bg: #0f1117;
-	--color-surface: #1a1d28;
-	--color-surface-hover: #22263a;
-	--color-surface-elevated: #1e2230;
-	--color-surface-input: #252836;
+	--color-bg: #1d242d;
+	--color-surface: #29333e;
+	--color-surface-hover: #34424f;
+	--color-surface-elevated: #303c48;
+	--color-surface-input: #35424e;
 
 	/* Text */
-	--color-text: #e0e2e8;
-	--color-text-secondary: #9aa0a6;
-	--color-text-tertiary: #7c8290;
-	--color-text-muted: #5f6874;
-	--color-text-strong: #eef0f4;
+	--color-text: #e6ebf0;
+	--color-text-secondary: #b3c0cc;
+	--color-text-tertiary: #98a8b8;
+	--color-text-muted: #8799a9;
+	--color-text-strong: #f1f5f8;
 
 	/* Borders */
-	--color-border: #2d3244;
-	--color-border-subtle: #252836;
-	--color-border-strong: #3d4253;
+	--color-border: #40505e;
+	--color-border-subtle: #354451;
+	--color-border-strong: #526472;
 
 	/* Interactive */
-	--color-tag-bg: #252836;
-	--color-tag-bg-hover: #2d3244;
-	--color-tag-text: #9aa0a6;
+	--color-tag-bg: #35424e;
+	--color-tag-bg-hover: #40505e;
+	--color-tag-text: #b3c0cc;
 
 	/* Shadows */
 	--shadow-color: 0, 0, 0;
@@ -174,15 +174,15 @@
 	--color-blockquote-text: #8b8fa0;
 
 	/* Header / Glassmorphism */
-	--color-header-bg: #1a1d28;
-	--color-header-glass: rgba(26, 29, 40, 0.85);
+	--color-header-bg: #29333e;
+	--color-header-glass: rgba(29, 36, 45, 0.85);
 	--color-header-glass-border: rgba(255, 255, 255, 0.06);
 	--color-header-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 
 	/* Search */
-	--color-search-bg: #1a1d28;
-	--color-search-footer-bg: #161822;
-	--color-search-result-hover: #22263a;
+	--color-search-bg: #29333e;
+	--color-search-footer-bg: #24303b;
+	--color-search-result-hover: #34424f;
 	--color-search-highlight-text: #f87171;
 	--color-search-highlight-bg: rgba(248, 113, 113, 0.15);
 
@@ -191,9 +191,9 @@
 	--color-scrollbar-hover: rgba(200, 200, 200, 0.3);
 
 	/* Misc */
-	--color-skill-bar-bg: #2d3244;
-	--color-gradient-start: #7b8cff;
-	--color-hobby-gradient: linear-gradient(135deg, #1e2230, #252836);
+	--color-skill-bar-bg: #40505e;
+	--color-gradient-start: #91afcf;
+	--color-hobby-gradient: linear-gradient(135deg, #303c48, #35424e);
 }
 
 @media (prefers-reduced-motion: reduce) {
