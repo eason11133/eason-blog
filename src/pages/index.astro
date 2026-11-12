@@ -64,6 +64,52 @@ function formatDate(date: Date) {
         padding: 2em;
       }
 
+      /* Black exterior, with a subtle starfield only inside the article panel. */
+      :global([data-theme="dark"]) .stats-wrapper {
+        background: #06080c;
+      }
+
+      :global([data-theme="dark"]) .stats-container {
+        position: relative;
+        isolation: isolate;
+        background:
+          radial-gradient(ellipse 70% 52% at 78% 18%, rgba(38, 66, 128, 0.26), transparent 88%),
+          radial-gradient(ellipse 56% 50% at 14% 86%, rgba(69, 48, 111, 0.19), transparent 86%),
+          linear-gradient(145deg, #111727 0%, #0b101c 55%, #0d1120 100%);
+        border: 1px solid rgba(151, 176, 224, 0.18);
+        box-shadow: 0 20px 65px rgba(0, 0, 0, 0.36);
+      }
+
+      :global([data-theme="dark"]) .stats-container::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        z-index: -1;
+        border-radius: inherit;
+        pointer-events: none;
+        opacity: .62;
+        background-image:
+          radial-gradient(circle, rgba(217, 229, 255, .74) .65px, transparent 1.3px),
+          radial-gradient(circle, rgba(178, 199, 255, .45) .8px, transparent 1.5px),
+          radial-gradient(circle, rgba(245, 248, 255, .35) .55px, transparent 1.2px);
+        background-size: 177px 169px, 263px 229px, 113px 137px;
+        background-position: 23px 36px, 112px 79px, 55px 108px;
+      }
+
+      :global([data-theme="dark"]) .stats-grid {
+        background: rgba(126, 151, 192, .25);
+        border-color: rgba(126, 151, 192, .25);
+      }
+
+      :global([data-theme="dark"]) .stat-item {
+        background: rgba(12, 17, 30, .66);
+      }
+
+      :global([data-theme="dark"]) .recent-posts-section {
+        border-top-color: rgba(126, 151, 192, .22);
+      }
+
+
       .stats-container :global(.section-header) {
         display: flex;
         align-items: baseline;
