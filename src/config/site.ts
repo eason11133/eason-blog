@@ -34,11 +34,11 @@ export interface SiteConfig {
 
 export const siteConfig: SiteConfig = {
   siteUrl: 'https://template.ulna520.top',
-  siteTitle: 'ulBo Astro Theme',
-  siteTitleSuffix: '个人博客',
-  siteDescription: 'A configurable Astro blog theme with centralized config and zero-content defaults.',
-  locale: 'zh-CN',
-  headerGithubRepoUrl: 'https://github.com/xxy1103/ulbo-astro-theme-template',
+  siteTitle: 'Eason',
+  siteTitleSuffix: '個人網站',
+  siteDescription: 'Eason 的個人網站，分享特殊選才心得與其他文章。',
+  locale: 'zh-TW',
+  headerGithubRepoUrl: 'https://github.com/eason11133/eason-blog',
   faviconIco: '/favicon.ico',
 };
 
