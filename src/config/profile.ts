@@ -4,7 +4,7 @@ import defaultAvatar from '../assets/profile.jpg';
 /**
  * Allowed social entry keys in profile configuration.
  */
-export type ProfileSocialKey = 'github' | 'x' | 'email' | 'website';
+export type ProfileSocialKey = 'github' | 'x' | 'email' | 'website' | 'instagram' | 'discord';
 
 /**
  * One social link item rendered on `/about`.
@@ -62,8 +62,9 @@ export const profileConfig: ProfileConfig = {
   email: 'you@example.com',
   githubProfileUrl: 'https://example.com',
   socials: [
-    { key: 'github', label: 'GitHub', url: 'https://example.com' },
-    { key: 'x', label: 'X', url: 'https://example.com' },
-    { key: 'website', label: 'Website', url: 'https://example.com' },
+    { key: 'github', label: 'GitHub', url: '' },
+    { key: 'x', label: 'X', url: '' },
+    { key: 'instagram', label: 'Instagram', url: '' },
+    { key: 'discord', label: 'Discord', url: '' },
   ],
 };
