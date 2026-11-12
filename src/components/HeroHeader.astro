@@ -29,7 +29,7 @@ if (interactive) heroClass += ' hero-interactive';
     <div class="hero-bg" style={`background-image: url('${backgroundImageSrc}')`}></div>
     <div class="hero-overlay"></div>
     <div class="hero-content">
-        <Typewriter text={text} tag="h1" class="hero-title" />
+        {interactive ? <h1 class="hero-title hero-title-pass">{text}</h1> : <Typewriter text={text} tag="h1" class="hero-title" />}
         {subtitle && <p class="hero-subtitle">{subtitle}</p>}
         <slot />
     </div>
@@ -76,14 +76,39 @@ if (interactive) heroClass += ' hero-interactive';
         background-position: center 57%;
     }
 
-    /* Move only the homepage headline into the open space above Curry. */
+    /* Homepage only: a single cinematic pass, then leave the cover unobstructed. */
     .hero-header.hero-interactive .hero-content {
         position: absolute;
-        top: 25%;
-        left: clamp(28px, 9vw, 150px);
-        transform: none;
-        text-align: left;
-        max-width: min(72vw, 700px);
+        z-index: 10;
+        top: 23%;
+        left: 0;
+        width: 100%;
+        max-width: none;
+        padding: 0;
+        overflow: visible;
+        pointer-events: none;
+    }
+
+    .hero-header.hero-interactive .hero-title-pass {
+        display: block;
+        width: max-content;
+        max-width: none;
+        margin: 0;
+        white-space: nowrap;
+        font-family: 'PingFang TC', 'Noto Sans TC', 'Microsoft JhengHei', sans-serif;
+        font-size: clamp(1.5rem, 3.4vw, 2.8rem);
+        font-weight: 400;
+        letter-spacing: 0.075em;
+        line-height: 1.5;
+        text-shadow: 0 4px 22px rgba(0, 0, 0, 0.48);
+        animation: eason-title-pass 6.5s cubic-bezier(.36, 0, .64, 1) .25s both;
+    }
+
+    @keyframes eason-title-pass {
+        0% { transform: translate3d(-105%, 0, 0); opacity: 0; }
+        10% { opacity: 1; }
+        78% { opacity: 1; }
+        100% { transform: translate3d(100vw, 0, 0); opacity: 0; }
     }
 
     .hero-header.hero-compact {
@@ -178,6 +203,15 @@ if (interactive) heroClass += ' hero-interactive';
         }
     }
 
+    @media (prefers-reduced-motion: reduce) {
+        .hero-header.hero-interactive .hero-title-pass {
+            animation: none;
+            transform: none;
+            opacity: 1;
+            margin-left: 7vw;
+        }
+    }
+
     @media (hover: hover) and (pointer: fine) {
         /* 仅在 .hero-interactive 类存在且为桌面指针时启用悬停效果 */
         .hero-header.hero-interactive:has(.hero-content:hover) .hero-bg {
@@ -190,12 +224,10 @@ if (interactive) heroClass += ' hero-interactive';
     }
     
     @media (max-width: 720px) {
-        .hero-header.hero-interactive .hero-content {
-            top: 23%;
-            left: 5%;
-            max-width: 90%;
-            padding: 1em;
-            text-align: left;
+        .hero-header.hero-interactive .hero-content { top: 21%; }
+        .hero-header.hero-interactive .hero-title-pass {
+            font-size: clamp(1.3rem, 5vw, 1.8rem);
+            letter-spacing: 0.03em;
         }
 
         .hero-header.hero-interactive .hero-bg {
