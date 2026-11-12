@@ -49,37 +49,89 @@ const elementId = id || `typewriter-${Math.random().toString(36).substring(7)}`;
 </style>
 
 <script>
-    // Initialize all typewriter elements - wrapped for View Transitions
-    document.addEventListener('astro:page-load', () => {
-        const typewriters = document.querySelectorAll('.typewriter[data-text]');
-        
-        typewriters.forEach((element) => {
-            const fullText = element.getAttribute('data-text') || '';
-            const typedTextSpan = element.querySelector('.typed-text') as HTMLElement | null;
-            
-            if (!typedTextSpan || !fullText) return;
-            const typedTextNode = typedTextSpan;
+    // Re-initialize after Astro page transitions and clean up old observers/timers.
+    let cleanups: Array<() => void> = [];
 
-            element.classList.remove('typewriter-faded');
-            // Reset text content for View Transitions
-            typedTextNode.textContent = '';
-            let i = 0;
-            // Delay start slightly to ensure page is rendered
-            setTimeout(() => {
-                function typeWriter() {
-                    if (i < fullText.length) {
-                        typedTextNode.textContent += fullText.charAt(i);
-                        i++;
-                        // Random typing speed for natural feel (50ms - 150ms)
-                        const randomSpeed = Math.floor(Math.random() * 100) + 50;
-                        setTimeout(typeWriter, randomSpeed);
-                    } else if (element.getAttribute('data-disappear-after-typing') === 'true') {
-                        // Keep the completed original typewriter text briefly, then fade it away.
-                        setTimeout(() => element.classList.add('typewriter-faded'), 1200);
+    document.addEventListener('astro:page-load', () => {
+        cleanups.forEach((cleanup) => cleanup());
+        cleanups = [];
+
+        document.querySelectorAll<HTMLElement>('.typewriter[data-text]').forEach((element) => {
+            const fullText = element.dataset.text || '';
+            const typedText = element.querySelector<HTMLElement>('.typed-text');
+            if (!typedText || !fullText) return;
+
+            const autoFade = element.dataset.disappearAfterTyping === 'true';
+            const timers = new Set<ReturnType<typeof setTimeout>>();
+            let disposed = false;
+            let generation = 0;
+
+            function schedule(callback: () => void, delay: number) {
+                const timer = setTimeout(() => {
+                    timers.delete(timer);
+                    if (!disposed) callback();
+                }, delay);
+                timers.add(timer);
+            }
+
+            function replay() {
+                generation++;
+                const currentGeneration = generation;
+                timers.forEach(clearTimeout);
+                timers.clear();
+                element.classList.remove('typewriter-faded');
+                typedText!.textContent = '';
+
+                let index = 0;
+                function typeNext() {
+                    if (currentGeneration !== generation) return;
+                    if (index < fullText.length) {
+                        typedText!.textContent += fullText.charAt(index++);
+                        schedule(typeNext, Math.floor(Math.random() * 100) + 50);
+                    } else if (autoFade) {
+                        schedule(() => {
+                            if (currentGeneration === generation) {
+                                element.classList.add('typewriter-faded');
+                            }
+                        }, 1200);
                     }
                 }
-                typeWriter();
-            }, 300);
+                schedule(typeNext, 300);
+            }
+
+            replay();
+
+            // Only re-arm after the visitor genuinely leaves the cover.
+            // The main-content div is ulBo's actual scrolling container.
+            let observer: IntersectionObserver | undefined;
+            if (autoFade) {
+                const hero = element.closest('.hero-header');
+                const scrollContainer = document.querySelector('#main-content');
+                if (hero && scrollContainer) {
+                    let leftCover = false;
+                    observer = new IntersectionObserver((entries) => {
+                        const ratio = entries[0]?.intersectionRatio ?? 0;
+                        if (ratio <= 0.25) {
+                            leftCover = true;
+                        } else if (ratio >= 0.65 && leftCover) {
+                            leftCover = false;
+                            replay();
+                        }
+                    }, {
+                        root: scrollContainer,
+                        threshold: [0, 0.25, 0.65, 1],
+                    });
+                    observer.observe(hero);
+                }
+            }
+
+            cleanups.push(() => {
+                disposed = true;
+                generation++;
+                observer?.disconnect();
+                timers.forEach(clearTimeout);
+                timers.clear();
+            });
         });
     });
 </script>
