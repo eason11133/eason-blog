@@ -1206,3 +1206,9 @@ hr {
     width: 0;
     height: 0;
 }
+
+/* Homepage: keep the top navigation progress rule completely hidden. */
+body[data-page-id="home"] #navigation-progress,
+body[data-page-id="home"] header #navigation-progress {
+    display: none !important;
+}
