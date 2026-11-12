@@ -98,6 +98,17 @@ if (interactive) heroClass += ' hero-interactive';
         transition: opacity 0.8s var(--ease-out-expo);
     }
 
+    /* Homepage only: fade the cover into the slate-blue page background. */
+    .hero-header.hero-interactive .hero-overlay {
+        background: linear-gradient(
+            to bottom,
+            rgba(16, 23, 31, 0.38) 0%,
+            rgba(22, 29, 37, 0.32) 45%,
+            rgba(29, 36, 45, 0.68) 77%,
+            var(--color-bg) 100%
+        );
+    }
+
     .hero-content {
         position: relative;
         z-index: 10;
@@ -159,7 +170,7 @@ if (interactive) heroClass += ' hero-interactive';
         }
 
         .hero-header.hero-interactive:has(.hero-content:hover) .hero-overlay {
-            opacity: 0.1;
+            opacity: 0.9;
         }
     }
     
