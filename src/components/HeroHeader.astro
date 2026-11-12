@@ -29,7 +29,7 @@ if (interactive) heroClass += ' hero-interactive';
     <div class="hero-bg" style={`background-image: url('${backgroundImageSrc}')`}></div>
     <div class="hero-overlay"></div>
     <div class="hero-content">
-        {!interactive && <Typewriter text={text} tag="h1" class="hero-title" />}
+        <Typewriter text={text} tag="h1" class="hero-title" />
         {subtitle && <p class="hero-subtitle">{subtitle}</p>}
         <slot />
     </div>
@@ -83,15 +83,16 @@ if (interactive) heroClass += ' hero-interactive';
         background-position: center 57%;
     }
 
-    /* Keep the homepage typewriter centered horizontally above Curry. */
+    /* Homepage greeting below the top-left logo, clear of Curry's silhouette. */
     .hero-header.hero-interactive .hero-content {
         position: absolute;
-        top: 25%;
-        left: 50%;
-        transform: translateX(-50%);
-        text-align: center;
+        top: clamp(100px, 14vh, 150px);
+        left: clamp(22px, 4vw, 62px);
+        transform: none;
+        text-align: left;
         width: max-content;
         max-width: calc(100% - 2rem);
+        padding: 0;
     }
 
     .hero-header.hero-compact {
@@ -199,12 +200,12 @@ if (interactive) heroClass += ' hero-interactive';
     
     @media (max-width: 720px) {
         .hero-header.hero-interactive .hero-content {
-            top: 23%;
-            left: 50%;
-            transform: translateX(-50%);
-            max-width: calc(100% - 2rem);
-            padding: 1em;
-            text-align: center;
+            top: 108px;
+            left: 22px;
+            transform: none;
+            max-width: calc(100% - 44px);
+            padding: 0;
+            text-align: left;
         }
 
         .hero-header.hero-interactive {
