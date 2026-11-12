@@ -93,7 +93,7 @@ const fullTitle =
   function getTheme() {
     const stored = localStorage.getItem('theme');
     if (stored) return stored;
-    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    return 'dark'; // Eason: default to the slate-blue palette on first visit
   }
   // 首次加载立即应用
   document.documentElement.setAttribute('data-theme', getTheme());
