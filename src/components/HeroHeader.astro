@@ -87,7 +87,7 @@ if (interactive) heroClass += ' hero-interactive';
     .hero-header.hero-interactive .hero-content {
         position: absolute;
         top: clamp(100px, 14vh, 150px);
-        left: clamp(22px, 4vw, 62px);
+        left: calc(clamp(22px, 4vw, 62px) + 40px);
         transform: none;
         text-align: left;
         width: max-content;
@@ -201,9 +201,9 @@ if (interactive) heroClass += ' hero-interactive';
     @media (max-width: 720px) {
         .hero-header.hero-interactive .hero-content {
             top: 108px;
-            left: 22px;
+            left: 62px;
             transform: none;
-            max-width: calc(100% - 44px);
+            max-width: calc(100% - 84px);
             padding: 0;
             text-align: left;
         }
