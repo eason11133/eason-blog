@@ -10,7 +10,6 @@ const { transparent = true } = Astro.props;
 ---
 
 <header class:list={[{ transparent }]} transition:persist transition:name="header" transition:animate="none">
-	<div id="navigation-progress" aria-hidden="true"></div>
 	<nav>
 		<h2><a href="/">{siteTitle}</a></h2>
 		<div class="internal-links">
@@ -95,36 +94,13 @@ const { transparent = true } = Astro.props;
 		box-sizing: border-box;
 	}
 
-	/* No progress hairline on the homepage cover. */
-	:global(body[data-page-id='home']) #navigation-progress {
-		display: none;
-	}
+	
 
-	#navigation-progress {
-		position: absolute;
-		top: 0;
-		left: 0;
-		width: 100%;
-		height: 2px;
-		z-index: 2;
-		pointer-events: none;
-		background: var(--accent);
-		opacity: 0;
-		transform: scaleX(0);
-		transform-origin: left center;
-	}
+	
 
-	:global(html[data-navigation-state='loading']) #navigation-progress {
-		opacity: 1;
-		transform: scaleX(0.78);
-		transition: transform 8s cubic-bezier(0.1, 0.7, 0.1, 1), opacity 0.12s ease;
-	}
+	
 
-	:global(html[data-navigation-state='finishing']) #navigation-progress {
-		opacity: 0;
-		transform: scaleX(1);
-		transition: transform 0.16s ease-out, opacity 0.18s ease 0.08s;
-	}
+	
 
 	:global(a[data-navigation-pending='true']) {
 		cursor: progress;
@@ -479,9 +455,7 @@ const { transparent = true } = Astro.props;
 		transition: background-color 0.3s, box-shadow 0.3s;
 	}
 
-	header.transparent #navigation-progress {
-		background: white;
-	}
+	
 	
 	header.transparent > nav .internal-links a,
 	header.transparent > nav .header-actions > a,
@@ -531,9 +505,7 @@ const { transparent = true } = Astro.props;
 		background: var(--accent);
 	}
 
-	header.transparent.scrolled #navigation-progress {
-		background: var(--accent);
-	}
+	
 </style>
 
 <script>
