@@ -45,39 +45,46 @@ const webSiteSchema = {
         padding: 2em;
       }
 
-      /* Seamless transition from the Curry hero into the real Milky Way photo.
-         Full-bleed background; no floating card edge or top border. */
+      /* One continuous photographic galaxy backdrop behind both Curry and the content.
+         The photo itself provides the stars; gradients only balance the lighting. */
+      .cosmos-home {
+        position: relative;
+        isolation: isolate;
+        min-height: 100vh;
+        background-color: #050713;
+        background-image:
+          linear-gradient(115deg, rgba(6, 13, 42, .58), rgba(34, 18, 74, .36) 50%, rgba(7, 12, 32, .62)),
+          linear-gradient(to bottom, rgba(1, 4, 13, .05) 0%, rgba(4, 5, 16, .15) 50%, #050713 100%),
+          url("https://commons.wikimedia.org/wiki/Special:Redirect/file/Milky_way_composition.jpg?width=1920");
+        background-size: cover, cover, auto 185%;
+        background-position: center, center, center top;
+        background-repeat: no-repeat;
+      }
+
       :global([data-theme="dark"]) .stats-wrapper {
-        background: #050608;
+        background: transparent;
+        padding: 0 clamp(1rem, 4vw, 2rem) 4rem;
+        min-height: 0;
       }
 
       .stats-wrapper :global(#stats-card) {
-        width: 100%;
-        max-width: none;
-        margin: 0;
+        width: min(1160px, 100%);
+        max-width: 1160px;
+        margin: 0 auto;
         padding: 0;
       }
 
       :global([data-theme="dark"]) .stats-container {
+        box-sizing: border-box;
         position: relative;
         overflow: hidden;
-        box-sizing: border-box;
-        border: 0;
-        border-radius: 0;
-        box-shadow: none;
-        padding: clamp(2.5rem, 5vw, 4.5rem) max(1.5rem, calc((100vw - 1100px) / 2));
-        background-color: #050608;
-        background-image:
-          linear-gradient(to bottom,
-            #050608 0%,
-            rgba(5, 6, 8, .97) 9%,
-            rgba(5, 6, 8, .83) 25%,
-            rgba(5, 7, 13, .58) 54%,
-            rgba(5, 7, 14, .63) 100%),
-          url("https://commons.wikimedia.org/wiki/Special:Redirect/file/Milky_way_composition.jpg?width=1920");
-        background-size: cover, auto 162%;
-        background-position: center, center top;
-        background-repeat: no-repeat;
+        border: 1px solid rgba(178, 195, 244, .36);
+        border-radius: 24px;
+        padding: clamp(2rem, 4vw, 3.5rem);
+        background: rgba(8, 13, 34, .75);
+        box-shadow: 0 18px 65px rgba(1, 4, 16, .46), inset 0 1px 0 rgba(222, 232, 255, .08);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
       }
 
       .status-heading {
@@ -345,19 +352,22 @@ const webSiteSchema = {
         }
 
         .stats-container {
-          padding: 2.25rem 1.5rem 2.5rem;
+          padding: 2rem 1.4rem 2.5rem;
+          border-radius: 18px;
         }
       }
     </style>
 
-  <HeroHeader
-    text={homeHero.text}
-    subtitle={homeHero.subtitle}
-    backgroundImage={homeHero.backgroundImage}
-    interactive={true}
-  />
+  <div class="cosmos-home">
+    <HeroHeader
+      text={homeHero.text}
+      subtitle={homeHero.subtitle}
+      backgroundImage={homeHero.backgroundImage}
+      cutoutImage="/柯瑞背影：海軍藍球衣與金色30號.png"
+      interactive={true}
+    />
 
-  <div class="stats-wrapper">
+    <div class="stats-wrapper">
     <ContentCard id="stats-card">
       <div class="stats-container">
         <div class="status-heading">
@@ -401,6 +411,7 @@ const webSiteSchema = {
         </div>
       </div>
     </ContentCard>
+    </div>
   </div>
 
 </PageShell>
