@@ -76,14 +76,15 @@ if (interactive) heroClass += ' hero-interactive';
         background-position: center 57%;
     }
 
-    /* Move only the homepage headline into the open space above Curry. */
+    /* Keep the homepage typewriter centered horizontally above Curry. */
     .hero-header.hero-interactive .hero-content {
         position: absolute;
         top: 25%;
-        left: clamp(28px, 9vw, 150px);
-        transform: none;
-        text-align: left;
-        max-width: min(72vw, 700px);
+        left: 50%;
+        transform: translateX(-50%);
+        text-align: center;
+        width: max-content;
+        max-width: calc(100% - 2rem);
     }
 
     .hero-header.hero-compact {
@@ -192,10 +193,11 @@ if (interactive) heroClass += ' hero-interactive';
     @media (max-width: 720px) {
         .hero-header.hero-interactive .hero-content {
             top: 23%;
-            left: 5%;
-            max-width: 90%;
+            left: 50%;
+            transform: translateX(-50%);
+            max-width: calc(100% - 2rem);
             padding: 1em;
-            text-align: left;
+            text-align: center;
         }
 
         .hero-header.hero-interactive .hero-bg {
