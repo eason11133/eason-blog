@@ -78,7 +78,12 @@ if (interactive) heroClass += ' hero-interactive';
 
     /* Move only the homepage headline into the open space above Curry. */
     .hero-header.hero-interactive .hero-content {
-        transform: translateY(-20vh);
+        position: absolute;
+        top: 25%;
+        left: clamp(28px, 9vw, 150px);
+        transform: none;
+        text-align: left;
+        max-width: min(72vw, 700px);
     }
 
     .hero-header.hero-compact {
@@ -186,7 +191,11 @@ if (interactive) heroClass += ' hero-interactive';
     
     @media (max-width: 720px) {
         .hero-header.hero-interactive .hero-content {
-            transform: translateY(-12vh);
+            top: 23%;
+            left: 5%;
+            max-width: 90%;
+            padding: 1em;
+            text-align: left;
         }
 
         .hero-header.hero-interactive .hero-bg {
