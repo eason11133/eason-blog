@@ -71,6 +71,11 @@ if (interactive) heroClass += ' hero-interactive';
         transition: transform 0.8s var(--ease-out-expo);
     }
 
+    /* Eason homepage portrait cover: prioritize Curry's jersey and number 30. */
+    .hero-header.hero-interactive .hero-bg {
+        background-position: center 57%;
+    }
+
     .hero-header.hero-compact {
         height: 60vh;
         height: 60dvh;
@@ -175,6 +180,10 @@ if (interactive) heroClass += ' hero-interactive';
     }
     
     @media (max-width: 720px) {
+        .hero-header.hero-interactive .hero-bg {
+            background-position: center 50%;
+        }
+
         .hero-header {
             min-height: 460px;
         }
