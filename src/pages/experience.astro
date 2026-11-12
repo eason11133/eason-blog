@@ -1,0 +1,37 @@
+---
+import PageShell from '../layouts/PageShell.astro';
+import { siteTitle } from '../config';
+---
+
+<PageShell
+  title={`作品與經歷 | ${siteTitle}`}
+  description="作品與經歷，內容整理中。"
+  transparentHeader={false}
+>
+  <main class="experience-page">
+    <div class="content">
+      <span class="eyebrow">WORK & EXPERIENCE</span>
+      <h1>作品與經歷</h1>
+      <p>這個頁面還在整理中，之後會慢慢放上做過的作品和經歷。</p>
+      <a href="/">返回首頁 <span aria-hidden="true">↗</span></a>
+    </div>
+  </main>
+</PageShell>
+
+<style>
+  .experience-page {
+    min-height: 100dvh;
+    width: 100%;
+    max-width: none;
+    box-sizing: border-box;
+    padding: clamp(135px, 20vh, 220px) max(24px, calc((100vw - 900px) / 2)) 90px;
+    background: #08090d;
+    color: #f0f2f6;
+  }
+  .content { max-width: 680px; }
+  .eyebrow { color: #94a7c5; font-size: .75rem; letter-spacing: .2em; }
+  h1 { color: inherit; font-size: clamp(2rem, 5vw, 3.5rem); margin: 1rem 0; }
+  p { color: #aab2bf; line-height: 1.9; }
+  a { display: inline-block; margin-top: 1.5rem; color: #b5c8e8; text-decoration: none; }
+  a:hover { text-decoration: underline; }
+</style>
