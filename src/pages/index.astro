@@ -9,13 +9,8 @@ import { getBlogPosts } from '../lib/content/blog';
 
 const posts = await getBlogPosts();
 const siteURL = Astro.site ?? Astro.url;
-const postCount = posts.length;
-const wordCount = posts.reduce((acc, post) => acc + (post.body ? post.body.length : 0), 0);
-const tagCount = new Set(posts.flatMap((post) => post.data.tags || [])).size;
-const sortedAscPosts = [...posts].sort((a, b) => a.data.pubDate.valueOf() - b.data.pubDate.valueOf());
-const startDate = postCount > 0 ? sortedAscPosts[0].data.pubDate : null;
-const recentPosts = posts.slice(0, 10);
-const hasPosts = postCount > 0;
+const recentPosts = posts.slice(0, 1);
+const hasPosts = posts.length > 0;
 const homeHero = heroConfig.home;
 const webSiteSchema = {
   '@context': 'https://schema.org',
@@ -27,20 +22,6 @@ const webSiteSchema = {
   inLanguage: locale,
 };
 
-function formatWordCount(count: number) {
-  if (count > 10000) {
-    return `${(count / 10000).toFixed(2)} 万`;
-  }
-  return count.toString();
-}
-
-function formatDate(date: Date) {
-  return date.toLocaleDateString('zh-CN', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  });
-}
 ---
 
 <PageShell
@@ -64,51 +45,44 @@ function formatDate(date: Date) {
         padding: 2em;
       }
 
-      /* Black exterior, with a subtle starfield only inside the article panel. */
+      /* Night-sky treatment only within the homepage content panel. */
       :global([data-theme="dark"]) .stats-wrapper {
-        background: #06080c;
+        background: #050608;
       }
 
       :global([data-theme="dark"]) .stats-container {
         position: relative;
         isolation: isolate;
         background:
-          radial-gradient(ellipse 70% 52% at 78% 18%, rgba(38, 66, 128, 0.26), transparent 88%),
-          radial-gradient(ellipse 56% 50% at 14% 86%, rgba(69, 48, 111, 0.19), transparent 86%),
-          linear-gradient(145deg, #111727 0%, #0b101c 55%, #0d1120 100%);
-        border: 1px solid rgba(151, 176, 224, 0.18);
-        box-shadow: 0 20px 65px rgba(0, 0, 0, 0.36);
+          radial-gradient(ellipse at 76% 18%, rgba(36, 57, 95, .13), transparent 62%),
+          linear-gradient(165deg, #0b0d13 0%, #080a11 60%, #090b12 100%);
+        border: 1px solid rgba(162, 182, 216, .15);
+        box-shadow: 0 18px 55px rgba(0,0,0,.32);
       }
 
       :global([data-theme="dark"]) .stats-container::before {
         content: "";
         position: absolute;
         inset: 0;
-        z-index: -1;
         border-radius: inherit;
         pointer-events: none;
-        opacity: .62;
+        z-index: -1;
+        opacity: .95;
         background-image:
-          radial-gradient(circle, rgba(217, 229, 255, .74) .65px, transparent 1.3px),
-          radial-gradient(circle, rgba(178, 199, 255, .45) .8px, transparent 1.5px),
-          radial-gradient(circle, rgba(245, 248, 255, .35) .55px, transparent 1.2px);
-        background-size: 177px 169px, 263px 229px, 113px 137px;
-        background-position: 23px 36px, 112px 79px, 55px 108px;
+          radial-gradient(circle, rgba(236, 244, 255, .93) 1px, transparent 1.7px),
+          radial-gradient(circle, rgba(169, 194, 236, .73) .8px, transparent 1.5px),
+          radial-gradient(circle, rgba(230, 239, 255, .48) .6px, transparent 1.4px);
+        background-size: 151px 173px, 229px 193px, 97px 131px;
+        background-position: 21px 37px, 75px 91px, 47px 15px;
       }
 
-      :global([data-theme="dark"]) .stats-grid {
-        background: rgba(126, 151, 192, .25);
-        border-color: rgba(126, 151, 192, .25);
+      .now-description {
+        max-width: 65ch;
+        color: var(--color-text-secondary);
+        line-height: 1.85;
+        font-size: 1rem;
+        margin: 0;
       }
-
-      :global([data-theme="dark"]) .stat-item {
-        background: rgba(12, 17, 30, .66);
-      }
-
-      :global([data-theme="dark"]) .recent-posts-section {
-        border-top-color: rgba(126, 151, 192, .22);
-      }
-
 
       .stats-container :global(.section-header) {
         display: flex;
@@ -137,46 +111,6 @@ function formatDate(date: Date) {
         line-height: 1.6;
       }
 
-      .stats-grid {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 1px;
-        background: var(--color-border);
-        border: 1px solid var(--color-border);
-        margin-bottom: 2em;
-      }
-
-      .stat-item {
-        background: var(--color-surface);
-        padding: 2em;
-        text-align: center;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-      }
-
-      .stat-item:hover {
-        transform: translateY(-5px);
-        z-index: 1;
-        box-shadow: var(--shadow-card-hover);
-      }
-
-      .stat-value {
-        font-size: 2em;
-        font-weight: bold;
-        color: var(--color-text-strong);
-        margin-bottom: 0.2rem;
-        font-variant-numeric: tabular-nums;
-      }
-
-      .stat-label {
-        color: var(--color-text-secondary);
-        font-size: 0.9em;
-        font-weight: bold;
-      }
-
       .blog-link {
         display: block;
         text-align: center;
@@ -192,9 +126,9 @@ function formatDate(date: Date) {
       }
 
       .recent-posts-section {
-        margin-top: 3em;
+        margin-top: 2.6em;
         padding-top: 2em;
-        border-top: 1px solid var(--color-border);
+        border-top: 1px solid rgba(159, 179, 212, .18);
       }
 
       .home-posts-list.home-stagger-ready :global(.home-post-item) {
@@ -356,10 +290,6 @@ function formatDate(date: Date) {
           font-size: 1.5em;
         }
 
-        .stats-grid {
-          grid-template-columns: 1fr;
-        }
-
         .stats-container {
           padding: 1.5em;
           border-radius: 0;
@@ -377,31 +307,11 @@ function formatDate(date: Date) {
   <div class="stats-wrapper">
     <ContentCard id="stats-card">
       <div class="stats-container">
-        <SectionHeader
-          number="01"
-          title="文章"
-          intro={hasPosts
-            ? `从 ${formatDate(startDate!)} 的第一篇文章开始，本站已经更新了......`
-            : '当前模板未附带文章内容，你可以在 src/content/blog/ 中添加 Markdown 文章后自动显示统计与列表。'}
-        />
-
-        <div class="stats-grid">
-          <div class="stat-item">
-            <span class="stat-value">{postCount} 篇</span>
-            <span class="stat-label">文章</span>
-          </div>
-          <div class="stat-item">
-            <span class="stat-value">{formatWordCount(wordCount)}</span>
-            <span class="stat-label">字数</span>
-          </div>
-          <div class="stat-item">
-            <span class="stat-value">{tagCount} 个</span>
-            <span class="stat-label">标签</span>
-          </div>
-        </div>
+        <SectionHeader number="01" title="目前正在做什麼" />
+        <p class="now-description">最近在整理特殊選才的準備和面試心得，也在慢慢把這個網站做好。</p>
 
         <div class="recent-posts-section">
-          <SectionHeader number="02" title="最近更新" intro={hasPosts ? '最新发布的 10 篇文章' : '暂无文章可展示'} />
+          <SectionHeader number="02" title="最近更新" intro={hasPosts ? '最新發布的 1 篇文章' : '目前還沒有文章'} />
 
           {recentPosts.length > 0 ? (
             <>
@@ -425,7 +335,7 @@ function formatDate(date: Date) {
             </>
           ) : (
             <p class="empty-state">
-              这里还没有文章。请在 <code>src/content/blog/</code> 新建 <code>.md</code> 或 <code>.mdx</code> 文件。
+              目前還沒有文章。
             </p>
           )}
         </div>
