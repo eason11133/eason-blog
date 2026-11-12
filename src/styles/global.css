@@ -1195,3 +1195,14 @@ hr {
 .lightbox-image {
 	filter: none !important;
 }
+
+/* Hide the main page scrollbar while preserving mouse, touch and keyboard scrolling. */
+#main-content {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+#main-content::-webkit-scrollbar {
+    display: none;
+    width: 0;
+    height: 0;
+}
