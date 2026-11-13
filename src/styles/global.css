@@ -1206,3 +1206,222 @@ hr {
     width: 0;
     height: 0;
 }
+
+
+/* Eason night-sky Preview — shared, photo-independent content backdrop.
+   One background asset stays fixed across the page; it is never tiled or split.
+   Remove this block when the preview is discarded. */
+[data-theme="dark"] body[data-page-id="home"],
+[data-theme="dark"] body[data-page-id="about"],
+[data-theme="dark"] body[data-page-id="blog-list"],
+[data-theme="dark"] body[data-page-id="tags-index"],
+[data-theme="dark"] body[data-page-id="tag-detail"] {
+  background-color: #101b2b !important;
+  background-image: url('/background/eason-night.svg') !important;
+  background-position: center 45% !important;
+  background-repeat: no-repeat !important;
+  background-size: cover !important;
+  background-attachment: fixed !important;
+}
+[data-theme="dark"] body[data-page-id] #main-content {
+  background: transparent;
+}
+/* All content sections reveal the same background behind them. */
+[data-theme="dark"] body[data-page-id="home"] .stats-wrapper,
+[data-theme="dark"] body[data-page-id="about"] .about-main,
+[data-theme="dark"] body[data-page-id="blog-list"] .blog-area,
+[data-theme="dark"] body[data-page-id="blog-list"] .posts-area,
+[data-theme="dark"] body[data-page-id="tags-index"] .tag-area,
+[data-theme="dark"] body[data-page-id="tag-detail"] .tag-area {
+  background: transparent !important;
+}
+/* An intentional fade bridges ANY Hero photo to the independent night background. */
+[data-theme="dark"] body[data-page-id] .hero-header {
+  isolation: isolate;
+}
+[data-theme="dark"] body[data-page-id] .hero-header::after {
+  content: "";
+  position: absolute;
+  z-index: 3;
+  inset: auto 0 0;
+  height: clamp(140px, 24vh, 270px);
+  pointer-events: none;
+  background: linear-gradient(to bottom,
+    rgba(16, 27, 43, 0) 0%,
+    rgba(16, 27, 43, .15) 27%,
+    rgba(16, 27, 43, .65) 69%,
+    #101b2b 100%);
+}
+[data-theme="dark"] body[data-page-id="home"] .stats-wrapper::before,
+[data-theme="dark"] body[data-page-id="about"] .about-main::before,
+[data-theme="dark"] body[data-page-id="tags-index"] .tag-area::before,
+[data-theme="dark"] body[data-page-id="tag-detail"] .tag-area::before {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  pointer-events: none;
+  inset: 0 0 auto;
+  height: clamp(150px, 25vh, 270px);
+  background: linear-gradient(to bottom, #101b2b 0%, rgba(16, 27, 43, 0) 100%);
+}
+[data-theme="dark"] body[data-page-id="home"] .stats-wrapper > *,
+[data-theme="dark"] body[data-page-id="about"] .about-main > *,
+[data-theme="dark"] body[data-page-id="tags-index"] .tag-area > *,
+[data-theme="dark"] body[data-page-id="tag-detail"] .tag-area > * {
+  position: relative;
+  z-index: 1;
+}
+/* Keep post text legible while the image is visible through a single translucent surface. */
+[data-theme="dark"] body[data-page-id="home"] .stats-container {
+  background: rgba(22, 32, 48, .80) !important;
+  border-color: rgba(154, 182, 216, .25) !important;
+}
+[data-theme="dark"] body[data-page-id="about"] .about-sheet {
+  background: rgba(20, 32, 48, .78) !important;
+  border-color: rgba(154, 182, 216, .20) !important;
+}
+[data-theme="dark"] body[data-page-id="tags-index"] .tag-panel,
+[data-theme="dark"] body[data-page-id="tag-detail"] .tag-panel,
+[data-theme="dark"] body[data-page-id="blog-list"] .blog-panel {
+  background: rgba(22, 32, 48, .81) !important;
+  border-color: rgba(154, 182, 216, .22) !important;
+}
+@media(max-width:720px) {
+  [data-theme="dark"] body[data-page-id="home"],
+  [data-theme="dark"] body[data-page-id="about"],
+  [data-theme="dark"] body[data-page-id="blog-list"],
+  [data-theme="dark"] body[data-page-id="tags-index"],
+  [data-theme="dark"] body[data-page-id="tag-detail"] {
+    background-position: center center !important;
+    background-size: cover !important;
+  }
+  [data-theme="dark"] body[data-page-id="home"] .stats-container,
+  [data-theme="dark"] body[data-page-id="about"] .about-sheet,
+  [data-theme="dark"] body[data-page-id="tags-index"] .tag-panel,
+  [data-theme="dark"] body[data-page-id="tag-detail"] .tag-panel {
+    background: rgba(20, 31, 47, .76) !important;
+  }
+}
+
+
+/* Preview v2: retire the old solid "cement box" instead of only changing wallpaper.
+   Shared editorial content floats over a continuous background. */
+[data-theme="dark"] body[data-page-id="home"] .stats-container,
+[data-theme="dark"] body[data-page-id="about"] .about-sheet,
+[data-theme="dark"] body[data-page-id="tags-index"] .tag-panel,
+[data-theme="dark"] body[data-page-id="tag-detail"] .tag-panel,
+[data-theme="dark"] body[data-page-id="blog-list"] .blog-panel {
+  background: linear-gradient(145deg, rgba(14, 29, 48, .53), rgba(13, 25, 42, .43)) !important;
+  border: 1px solid rgba(159, 197, 229, .14) !important;
+  box-shadow: 0 18px 60px rgba(0, 0, 0, .10) !important;
+  backdrop-filter: blur(8px) saturate(1.12);
+  -webkit-backdrop-filter: blur(8px) saturate(1.12);
+}
+/* No nested solid-colored islands; separations come from typography and hairlines. */
+[data-theme="dark"] body[data-page-id="about"] .about-sheet .portrait-frame,
+[data-theme="dark"] body[data-page-id="about"] .about-sheet .hobby-line span {
+  background: rgba(26, 52, 74, .32) !important;
+  border-color: rgba(149, 195, 220, .17) !important;
+}
+[data-theme="dark"] body[data-page-id="about"] .about-sheet .continuous-content,
+[data-theme="dark"] body[data-page-id="about"] .about-sheet .editorial-section,
+[data-theme="dark"] body[data-page-id="about"] .about-sheet .preview-label {
+  border-color: rgba(172, 207, 235, .13) !important;
+}
+[data-theme="dark"] body[data-page-id="home"] .stats-container {
+  border-radius: 24px !important;
+  padding: clamp(1.5rem, 3.2vw, 3rem) !important;
+}
+[data-theme="dark"] body[data-page-id="about"] .about-sheet {
+  border-radius: 22px !important;
+}
+[data-theme="dark"] body[data-page-id="tags-index"] .tag-panel,
+[data-theme="dark"] body[data-page-id="tag-detail"] .tag-panel,
+[data-theme="dark"] body[data-page-id="blog-list"] .blog-panel {
+  border-radius: 22px !important;
+}
+/* Inner panel hover motion stays understated; the wallpaper is the scene. */
+[data-theme="dark"] body[data-page-id="home"] .home-post-item:hover,
+[data-theme="dark"] body[data-page-id="tags-index"] .tag-post-item:hover,
+[data-theme="dark"] body[data-page-id="tag-detail"] .tag-post-item:hover {
+  background: rgba(39, 79, 111, .18) !important;
+}
+@media (max-width: 720px) {
+  [data-theme="dark"] body[data-page-id="home"] .stats-container,
+  [data-theme="dark"] body[data-page-id="about"] .about-sheet,
+  [data-theme="dark"] body[data-page-id="tags-index"] .tag-panel,
+  [data-theme="dark"] body[data-page-id="tag-detail"] .tag-panel,
+  [data-theme="dark"] body[data-page-id="blog-list"] .blog-panel {
+    background: linear-gradient(160deg, rgba(13, 27, 43, .57), rgba(14, 27, 44, .45)) !important;
+    border-left: 0 !important;
+    border-right: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    backdrop-filter: blur(5px) saturate(1.1);
+    -webkit-backdrop-filter: blur(5px) saturate(1.1);
+  }
+}
+
+
+/* Preview completeness pass: blog list uses .articles-area/.articles-inner,
+   not .blog-area/.blog-panel. Reuse the same night backdrop and glass panel. */
+[data-theme="dark"] body[data-page-id="blog-list"] .articles-area {
+  background: transparent !important;
+  position: relative;
+}
+[data-theme="dark"] body[data-page-id="blog-list"] .articles-area::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: clamp(150px, 25vh, 270px);
+  pointer-events: none;
+  background: linear-gradient(to bottom, #101b2b, rgba(16,27,43,0));
+}
+[data-theme="dark"] body[data-page-id="blog-list"] .articles-inner {
+  position: relative;
+  z-index: 1;
+  background: linear-gradient(145deg,rgba(14,29,48,.53),rgba(13,25,42,.43)) !important;
+  border: 1px solid rgba(159,197,229,.14) !important;
+  box-shadow: 0 18px 60px rgba(0,0,0,.10) !important;
+  border-radius: 22px !important;
+  backdrop-filter: blur(8px) saturate(1.12);
+  -webkit-backdrop-filter: blur(8px) saturate(1.12);
+}
+/* Shared outer page surfaces do not repaint over the wallpaper. */
+[data-theme="dark"] body[data-page-id="home"] .stats-wrapper,
+[data-theme="dark"] body[data-page-id="about"] .about-main,
+[data-theme="dark"] body[data-page-id="blog-list"] .articles-area,
+[data-theme="dark"] body[data-page-id="tags-index"] .tag-area,
+[data-theme="dark"] body[data-page-id="tag-detail"] .tag-area {
+  background-color: transparent !important;
+  background-image: none !important;
+}
+@media (max-width:720px) {
+  [data-theme="dark"] body[data-page-id="blog-list"] .articles-inner {
+    background: linear-gradient(160deg,rgba(13,27,43,.57),rgba(14,27,44,.45)) !important;
+    border-left: 0 !important;
+    border-right: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+  }
+}
+
+
+/* Persisted sky replaces body wallpaper, preventing a second image load during
+   Astro ClientRouter swaps. The background is one shared mounted layer. */
+[data-theme="dark"] body[data-page-id] {
+  background: #101b2b !important;
+}
+[data-theme="dark"] body[data-page-id] #main-content {
+  position: relative;
+  z-index: 1;
+  background: transparent !important;
+}
+/* Leave the persistent backdrop still during page animations. */
+::view-transition-group(night-sky),
+::view-transition-old(night-sky),
+::view-transition-new(night-sky) {
+  animation: none !important;
+}
