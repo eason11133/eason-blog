@@ -537,16 +537,17 @@ const { transparent = true } = Astro.props;
 
 	
 
-	/* Cinematic night-sky mobile navigation — no exposed bright Hero strip. */
+	/* Night mountains: a compact slide-in drawer, never a full-screen takeover.
+	   The opaque header cap deliberately covers any bright Hero photo. */
 	@media (max-width: 900px) {
 		header.mobile-menu-open,
 		header.transparent.mobile-menu-open,
 		header.transparent.scrolled.mobile-menu-open {
-			background: #0a1423 !important;
+			background: #101b2b !important;
+			border-bottom: 1px solid rgba(145, 183, 219, .2);
+			box-shadow: 0 4px 22px rgba(3, 8, 17, .35) !important;
 			backdrop-filter: none !important;
 			-webkit-backdrop-filter: none !important;
-			box-shadow: none !important;
-			border-bottom: 1px solid rgba(139,190,233,.14);
 		}
 		header.mobile-menu-open > nav {
 			position: relative;
@@ -555,46 +556,42 @@ const { transparent = true } = Astro.props;
 		header.mobile-menu-open > nav .site-home-link,
 		header.mobile-menu-open > nav .search-btn,
 		header.mobile-menu-open > nav .mobile-menu-btn {
-			color: #e6f3ff !important;
+			color: #f2f7ff !important;
 		}
 		header.mobile-menu-open .mobile-menu-btn {
-			background: rgba(146,202,255,.1);
-			border: 1px solid rgba(160,211,255,.22);
+			background: rgba(145, 191, 229, .10);
+			border: 1px solid rgba(145, 191, 229, .21);
 		}
 		.mobile-nav-overlay {
-			inset: 0;
-			background: #081221;
-			backdrop-filter: none;
+			inset: 64px 0 0;
+			background: rgba(4, 10, 20, .72);
+			backdrop-filter: blur(8px) brightness(.65);
+			-webkit-backdrop-filter: blur(8px) brightness(.65);
 		}
 		.mobile-nav-drawer,
 		:global([data-theme="dark"]) .mobile-nav-drawer {
 			position: fixed;
-			inset: 0;
-			top: 0;
+			inset: 64px 0 0 auto;
+			top: 64px;
 			right: 0;
-			width: 100%;
-			height: 100vh;
-			height: 100dvh;
+			width: min(87vw, 350px);
+			height: calc(100vh - 64px);
+			height: calc(100dvh - 64px);
 			padding: 0;
+			background: #0c192b url('/background/eason-night.svg') center / cover no-repeat;
 			border: 0;
-			box-shadow: none;
-			background:
-				linear-gradient(135deg, rgba(6,15,29,.93) 0%,rgba(8,19,36,.88) 48%,rgba(9,24,44,.90) 100%),
-				url('/background/eason-night.svg') center center / cover no-repeat,
-				#0a1525;
-			transform: translateY(-15px);
-			opacity: 0;
-			visibility: hidden;
-			overflow-x: hidden;
-			overflow-y: auto;
+			border-left: 1px solid rgba(147, 194, 234, .22);
+			box-shadow: -16px 0 52px rgba(0, 0, 0, .37);
+			transform: translateX(105%);
+			opacity: 1;
+			visibility: visible;
+			overflow: auto;
 			overscroll-behavior: contain;
-			transition: opacity .28s ease, transform .38s cubic-bezier(.18,.75,.22,1), visibility .28s;
+			transition: transform .46s cubic-bezier(.19,.83,.24,1), visibility .46s;
 			z-index: 2;
 		}
 		header.mobile-menu-open .mobile-nav-drawer {
-			transform: translateY(0);
-			opacity: 1;
-			visibility: visible;
+			transform: translateX(0);
 		}
 		.mobile-nav-scene {
 			position: absolute;
@@ -602,181 +599,161 @@ const { transparent = true } = Astro.props;
 			pointer-events: none;
 			overflow: hidden;
 			background:
-				radial-gradient(ellipse at 82% 27%, rgba(86,153,222,.18),transparent 38%),
-				radial-gradient(ellipse at 6% 74%, rgba(28,114,183,.13),transparent 40%);
+				linear-gradient(180deg,rgba(9,21,38,.20) 0%,rgba(9,21,38,.1) 37%,rgba(13,26,43,.12) 65%,rgba(9,19,33,.10) 100%),
+				radial-gradient(ellipse at 72% 43%,rgba(111,159,206,.08),transparent 44%);
 		}
 		.mobile-nav-scene::before {
 			content: '';
 			position: absolute;
-			inset: 0;
-			background-image:
-				radial-gradient(1.4px 1.4px at 15% 12%,#e4f4ff 70%,transparent 100%),
-				radial-gradient(2px 2px at 72% 20%,#d1eaff 65%,transparent 100%),
-				radial-gradient(1.3px 1.3px at 38% 65%,#f4faff 75%,transparent 100%),
-				radial-gradient(1.5px 1.5px at 89% 77%,#b7dfff 75%,transparent 100%),
-				radial-gradient(1.3px 1.3px at 55% 89%,#d6efff 75%,transparent 100%);
-			background-size: 310px 490px;
-			opacity: .65;
-			animation: mobile-nav-twinkle 7s ease-in-out infinite alternate;
+			inset: auto 0 0;
+			height: min(57%,520px);
+			background: url('/background/mobile-menu-mountains.svg') center bottom / 100% 100% no-repeat;
+			opacity: .92;
 		}
-		.mobile-nav-orbit {
-			position: absolute;
-			width: 420px;
-			height: 420px;
-			right: -235px;
-			top: 7%;
-			border: 1px solid rgba(131,199,246,.22);
-			border-radius: 50%;
-			box-shadow: 0 0 85px rgba(42,109,167,.08),inset 0 0 70px rgba(59,123,181,.06);
-			transform: rotate(-25deg) scaleY(.66);
-		}
-		.mobile-nav-orbit::after {
+		.mobile-nav-scene::after {
 			content: '';
 			position: absolute;
-			inset: 44px;
-			border: 1px solid rgba(133,204,255,.12);
-			border-radius: 50%;
+			inset: 0;
+			background:
+				radial-gradient(1.5px 1.5px at 13% 16%,#dfefff 70%,transparent),
+				radial-gradient(2px 2px at 68% 27%,#e9f3ff 70%,transparent),
+				radial-gradient(1.3px 1.3px at 85% 47%,#c5e0ff 70%,transparent),
+				radial-gradient(1.4px 1.4px at 39% 57%,#d9e9ff 70%,transparent);
+			background-size: 300px 460px;
+			opacity: .65;
+			animation: mobile-menu-stars 9s ease-in-out infinite alternate;
 		}
+		.mobile-nav-orbit { display: none; }
 		.mobile-nav-comet {
 			position: absolute;
-			left: 78%;
-			top: 24%;
-			width: 130px;
-			height: 2px;
+			top: 23%;
+			left: 84%;
+			width: 88px;
+			height: 1px;
 			border-radius: 10px;
-			background: linear-gradient(90deg, #eafbff,rgba(124,200,251,.25),transparent);
-			filter: drop-shadow(0 0 6px rgba(183,229,255,.8));
+			background: linear-gradient(90deg,#e5f6ff,rgba(157,207,252,.45),transparent);
 			opacity: 0;
-			animation: mobile-nav-comet-fly 8s linear 1.4s infinite;
+			filter: drop-shadow(0 0 4px rgba(174,222,255,.7));
+			animation: mobile-menu-shoot 11s linear 2s infinite;
 		}
 		.mobile-nav-inner {
 			position: relative;
 			z-index: 1;
-			max-width: 620px;
-			min-height: 100%;
-			margin: 0 auto;
-			padding: clamp(106px,15vh,150px) clamp(25px,7vw,52px) max(34px,env(safe-area-inset-bottom));
-			box-sizing: border-box;
 			display: flex;
 			flex-direction: column;
+			min-height: 100%;
+			box-sizing: border-box;
+			padding: clamp(28px, 5.6vh, 52px) clamp(20px, 5.5vw, 27px) max(25px,env(safe-area-inset-bottom));
 		}
 		.mobile-nav-kicker {
 			display: flex;
 			align-items: center;
-			gap: 10px;
+			gap: 8px;
 			font-size: 10px;
-			font-weight: 700;
-			letter-spacing: .25em;
-			color: #94b9db;
+			letter-spacing: .19em;
+			font-weight: 650;
+			color: #a7c2db;
 		}
 		.mobile-nav-kicker-dot {
-			width: 6px;
-			height: 6px;
+			width: 5px;
+			height: 5px;
 			border-radius: 50%;
-			background: #8bd8ff;
-			box-shadow: 0 0 10px rgba(136,214,255,.9);
+			background: #b5d9fb;
+			box-shadow: 0 0 8px rgba(188,224,255,.65);
 		}
 		.mobile-nav-heading {
-			margin: 9px 0 clamp(19px,4.5vh,41px);
-			font-size: clamp(43px,9vw,66px);
-			font-weight: 800;
-			line-height: 1.15;
-			letter-spacing: -.065em;
-			color: #f4f8ff;
-			text-shadow: 0 0 36px rgba(65,147,217,.13);
+			margin: 5px 0 clamp(20px,4vh,37px);
+			color: #ebf3fc;
+			font-size: clamp(33px,7vw,43px);
+			line-height: 1.2;
+			font-weight: 700;
+			letter-spacing: -.045em;
 		}
-		.mobile-nav-heading-period { color: #79caff; }
+		.mobile-nav-heading-period { color: #a0c5e7; }
 		.mobile-nav-links {
 			display: flex;
 			flex-direction: column;
 			align-items: stretch;
-			justify-content: flex-start;
+			gap: 6px;
 			height: auto;
 			width: 100%;
-			gap: 0;
 		}
 		.mobile-nav-drawer .mobile-nav-link,
 		header.transparent .mobile-nav-drawer .mobile-nav-link {
 			display: grid;
-			grid-template-columns: 32px minmax(0,1fr) 29px;
+			grid-template-columns: 22px minmax(0,1fr) 18px;
 			align-items: center;
-			gap: 14px;
-			padding: clamp(15px,2.55vh,25px) 2px;
-			min-height: 65px;
-			width: 100%;
+			gap: 12px;
 			box-sizing: border-box;
-			background: transparent;
-			border: 0;
-			border-bottom: 1px solid rgba(158,197,231,.19);
-			border-radius: 0;
+			min-height: 62px;
+			padding: 11px 12px 11px 9px;
+			border: 1px solid rgba(165,199,229,.11);
+			border-radius: 12px;
+			background: rgba(14,29,49,.41);
+			backdrop-filter: blur(4px);
+			-webkit-backdrop-filter: blur(4px);
+			color: #e2ecf8;
 			text-align: left;
-			color: #e7f1ff;
 			transform: none;
-			transition: padding-left .25s ease,background-color .25s ease,color .25s ease;
+			transition: background .25s ease, border-color .25s ease, transform .25s ease;
 		}
 		.mobile-nav-link .mobile-nav-index {
-			font-size: 11px;
+			font-size: 10px;
 			font-weight: 700;
-			letter-spacing: .09em;
-			color: #6a9cbd;
+			letter-spacing: .04em;
+			color: #92aec9;
 		}
 		.mobile-nav-link .mobile-nav-title {
-			font-size: clamp(23px,5.5vw,30px);
-			font-weight: 600;
-			letter-spacing: .045em;
+			font-size: clamp(18px,4.6vw,21px);
+			letter-spacing: .035em;
+			font-weight: 570;
 		}
 		.mobile-nav-link .mobile-nav-arrow {
-			font-size: 23px;
+			font-size: 20px;
 			font-weight: 300;
-			color: #7eb9e7;
 			justify-self: end;
-			opacity: .55;
-			transition: transform .25s ease,opacity .25s ease;
+			color: #abc8e6;
+			opacity: .65;
 		}
 		.mobile-nav-drawer .mobile-nav-link.active,
 		header.transparent .mobile-nav-drawer .mobile-nav-link.active {
-			color: #c3e8ff;
-			background: linear-gradient(90deg,rgba(75,144,205,.13),transparent 78%);
-			border-bottom-color: rgba(118,197,250,.53);
-		}
-		.mobile-nav-drawer .mobile-nav-link.active .mobile-nav-index {
-			color: #82d5ff;
+			border-color: rgba(161,201,239,.33);
+			background: rgba(72,115,153,.27);
+			color: #f0f7ff;
 		}
 		.mobile-nav-drawer .mobile-nav-link:hover,
 		.mobile-nav-drawer .mobile-nav-link:focus-visible {
-			padding-left: 10px;
-			background: linear-gradient(90deg,rgba(70,145,210,.18),transparent);
-		}
-		.mobile-nav-drawer .mobile-nav-link:hover .mobile-nav-arrow {
-			transform: translate(3px,-3px);
-			opacity: 1;
+			transform: translateX(-3px);
+			background: rgba(78,124,165,.3);
+			border-color: rgba(166,202,233,.4);
 		}
 		.mobile-nav-footer {
 			margin-top: auto;
-			padding-top: 30px;
 			display: flex;
 			align-items: center;
-			gap: 14px;
-			font-size: 10px;
-			font-weight: 700;
+			gap: 12px;
+			padding-top: 45px;
+			font-size: 9px;
 			letter-spacing: .18em;
-			color: #7599b7;
+			font-weight: 650;
+			color: #b0c2d2;
+			text-shadow: 0 1px 8px rgba(0,0,0,.45);
 		}
 		.mobile-nav-footer-line {
-			height: 1px;
 			flex: 1;
-			background: linear-gradient(90deg,rgba(129,187,234,.28),transparent);
+			height: 1px;
+			background: rgba(169,200,222,.22);
 		}
 	}
-	@keyframes mobile-nav-twinkle { from { opacity: .25; } to { opacity: .7; } }
-	@keyframes mobile-nav-comet-fly {
-		0%,7% { opacity: 0;transform: translate3d(0,0,0) rotate(-32deg); }
-		9% { opacity: .95; }
-		17%,100% { opacity: 0;transform: translate3d(-180px,110px,0) rotate(-32deg); }
+	@keyframes mobile-menu-stars { from {opacity: .32;} to {opacity:.72;} }
+	@keyframes mobile-menu-shoot {
+		0%, 13% {opacity:0;transform:translate3d(0,0,0) rotate(-31deg);}
+		15% {opacity:.85;}
+		23%,100% {opacity:0;transform:translate3d(-170px,100px,0) rotate(-31deg);}
 	}
 	@media (prefers-reduced-motion: reduce) {
-		.mobile-nav-scene::before,.mobile-nav-comet { animation: none !important; }
-		.mobile-nav-drawer { transition-duration: .01ms !important; }
+		.mobile-nav-scene::after,.mobile-nav-comet {animation:none !important;}
+		.mobile-nav-drawer {transition-duration:.01ms !important;}
 	}
 
 </style>
