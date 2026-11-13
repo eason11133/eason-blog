@@ -5,72 +5,8 @@
 <div class="night-sky" transition:persist="night-sky" aria-hidden="true">
   <div class="night-sky__glow"></div>
   <div class="night-sky__aurora">
-    <svg class="night-sky__aurora-art" viewBox="0 0 1440 900" preserveAspectRatio="none" aria-hidden="true">
-      <defs>
-        <linearGradient id="sky-aurora-green" x1="0%" y1="0%" x2="0%" y2="100%">
-          <stop offset="0%" stop-color="#a2ffdf" stop-opacity=".90"/>
-          <stop offset="16%" stop-color="#52ebbc" stop-opacity=".75"/>
-          <stop offset="46%" stop-color="#28b9ad" stop-opacity=".38"/>
-          <stop offset="100%" stop-color="#1886a2" stop-opacity="0"/>
-        </linearGradient>
-        <linearGradient id="sky-aurora-cyan" x1="0%" y1="0%" x2="0%" y2="100%">
-          <stop offset="0%" stop-color="#9ef6e8" stop-opacity=".84"/>
-          <stop offset="26%" stop-color="#52d4d2" stop-opacity=".59"/>
-          <stop offset="58%" stop-color="#368bca" stop-opacity=".20"/>
-          <stop offset="100%" stop-color="#368bca" stop-opacity="0"/>
-        </linearGradient>
-        <linearGradient id="sky-aurora-purple" x1="0%" y1="0%" x2="0%" y2="100%">
-          <stop offset="0%" stop-color="#c6a6fa" stop-opacity=".75"/>
-          <stop offset="52%" stop-color="#898bce" stop-opacity=".23"/>
-          <stop offset="100%" stop-color="#898bce" stop-opacity="0"/>
-        </linearGradient>
-        <linearGradient id="sky-aurora-fold" x1="0%" y1="0%" x2="0%" y2="100%">
-          <stop offset="0%" stop-color="#b6ffe8" stop-opacity=".40"/>
-          <stop offset="44%" stop-color="#70e5cc" stop-opacity=".18"/>
-          <stop offset="100%" stop-color="#339bb9" stop-opacity="0"/>
-        </linearGradient>
-      </defs>
-      <g class="night-sky__aurora-wave night-sky__aurora-wave--green">
-        <path fill="url(#sky-aurora-green)"
-          d="M -90 596 C 80 575 170 443 320 464
-             C 466 485 500 566 648 524 C 792 483 841 396 975 412
-             C 1113 428 1168 505 1312 430
-             L 1525 810 C 1274 771 1089 782 925 803
-             C 702 826 543 803 365 821 C 137 838 20 804 -90 832 Z"/>
-        <path fill="none" stroke="#84f6d1" stroke-opacity=".32" stroke-width="9"
-          d="M -90 596 C 80 575 170 443 320 464
-             C 466 485 500 566 648 524 C 792 483 841 396 975 412
-             C 1113 428 1168 505 1312 430"/>
-        <path fill="url(#sky-aurora-fold)" opacity=".70"
-          d="M 180 482 Q 213 453 244 455 C 248 557 275 689 238 790 Q 200 659 180 482 Z"/>
-        <path fill="url(#sky-aurora-fold)" opacity=".57"
-          d="M 490 544 Q 511 551 533 554 C 555 651 547 721 523 776 Q 499 675 490 544 Z"/>
-        <path fill="url(#sky-aurora-fold)" opacity=".75"
-          d="M 837 431 Q 866 411 891 409 C 909 520 928 659 877 772 Q 853 629 837 431 Z"/>
-        <path fill="url(#sky-aurora-fold)" opacity=".49"
-          d="M 1124 466 Q 1145 467 1168 470 C 1198 561 1198 685 1170 774 Q 1142 626 1124 466 Z"/>
-      </g>
-      <g class="night-sky__aurora-wave night-sky__aurora-wave--cyan">
-        <path fill="url(#sky-aurora-cyan)" opacity=".74"
-          d="M 334 579 C 500 601 607 552 743 459
-             C 892 358 1006 390 1135 405 C 1270 422 1374 331 1530 351
-             L 1530 738 C 1295 728 1088 730 889 753
-             C 676 788 510 747 334 780 Z"/>
-        <path fill="none" stroke="#84e8e4" stroke-opacity=".22" stroke-width="7"
-          d="M 334 579 C 500 601 607 552 743 459
-             C 892 358 1006 390 1135 405 C 1270 422 1374 331 1530 351"/>
-        <path fill="url(#sky-aurora-fold)" opacity=".42"
-          d="M 726 475 Q 750 450 776 436 C 798 530 808 653 772 740 Q 745 624 726 475 Z"/>
-        <path fill="url(#sky-aurora-fold)" opacity=".47"
-          d="M 1198 395 Q 1220 388 1243 385 C 1270 516 1279 623 1245 720 Q 1218 601 1198 395 Z"/>
-      </g>
-      <g class="night-sky__aurora-wave night-sky__aurora-wave--purple">
-        <path fill="url(#sky-aurora-purple)"
-          d="M 800 452 C 926 346 1074 401 1155 403
-             C 1292 409 1394 323 1525 337
-             L 1525 673 C 1318 653 1151 675 978 698 C 886 702 825 710 800 710 Z"/>
-      </g>
-    </svg>
+    <canvas class="night-sky__aurora-canvas" aria-hidden="true"></canvas>
+    <div class="night-sky__aurora-fallback"></div>
   </div>
   <div class="night-sky__stars"></div>
   <div class="night-sky__clouds"></div>
@@ -277,7 +213,7 @@
     71%, 100% { opacity: .27; }
   }
 
-  /* Curved light ribbons with vertical folds, instead of a green fog overlay. */
+  /* A noise-based aurora curtain. The GPU canvas remains idle between events. */
   .night-sky__aurora {
     position: absolute;
     inset: 0;
@@ -285,47 +221,34 @@
     overflow: hidden;
     pointer-events: none;
   }
-  .night-sky__aurora-art {
+  .night-sky__aurora-canvas {
     position: absolute;
     inset: 0;
     display: block;
     width: 100%;
     height: 100%;
+    mix-blend-mode: screen;
   }
-  .night-sky__aurora-wave {
-    transform-box: fill-box;
-    transform-origin: center;
+  .night-sky__aurora-fallback {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    background:
+      radial-gradient(ellipse 40% 19% at 39% 44%, rgba(43, 165, 140, .30), transparent 79%),
+      radial-gradient(ellipse 35% 20% at 70% 41%, rgba(39, 127, 185, .22), transparent 80%);
   }
-  .night-sky__aurora-wave--purple {
-    opacity: var(--aurora-purple-opacity, .045);
-  }
-  .night-sky__aurora.is-visible .night-sky__aurora-wave--green {
-    animation: night-aurora-wave-green 14s ease-in-out infinite alternate;
-  }
-  .night-sky__aurora.is-visible .night-sky__aurora-wave--cyan {
-    animation: night-aurora-wave-cyan 18s ease-in-out infinite alternate;
-  }
-  @keyframes night-aurora-wave-green {
-    from { transform: translate3d(-1.6%, .6%, 0) scaleX(.99); }
-    to { transform: translate3d(1.6%, -1%, 0) scaleX(1.02); }
-  }
-  @keyframes night-aurora-wave-cyan {
-    from { transform: translate3d(1%, .6%, 0) scaleX(1.015); }
-    to { transform: translate3d(-1.5%, -.8%, 0) scaleX(.985); }
-  }
+  .night-sky__aurora.use-fallback .night-sky__aurora-canvas { display: none; }
+  .night-sky__aurora.use-fallback .night-sky__aurora-fallback { opacity: 1; }
   .night-sky__aurora.is-visible {
-    /* Fallback opacity still reveals the aurora when animation is disabled. */
-    opacity: var(--aurora-opacity, .65);
-    /* Negative delay lets late visitors join the current event mid-animation. */
+    opacity: var(--aurora-opacity, .85);
     animation: night-aurora-appear var(--aurora-duration) ease-in-out var(--aurora-delay, 0ms) both;
-    will-change: opacity, transform;
+    will-change: opacity;
   }
   @keyframes night-aurora-appear {
-    0% { opacity: 0; transform: translate3d(-2%, 2%, 0) skewX(-8deg); }
-    24% { opacity: var(--aurora-opacity); transform: translate3d(0, 0, 0) skewX(-4deg); }
-    57% { opacity: calc(var(--aurora-opacity) * .82); transform: translate3d(2%, -1%, 0) skewX(-1deg); }
-    78% { opacity: var(--aurora-opacity); transform: translate3d(3%, 1%, 0) skewX(2deg); }
-    100% { opacity: 0; transform: translate3d(5%, 2%, 0) skewX(5deg); }
+    0% { opacity: 0; }
+    20% { opacity: var(--aurora-opacity, .85); }
+    78% { opacity: var(--aurora-opacity, .85); }
+    100% { opacity: 0; }
   }
 
   /* The existing fixed sky becomes visible *through* the drawer, not another image. */
@@ -350,7 +273,8 @@
       transform: none !important;
       will-change: auto;
     }
-    .night-sky__aurora-wave { animation: none !important; }
+    .night-sky__aurora.is-visible .night-sky__aurora-canvas { display: none !important; }
+    .night-sky__aurora.is-visible .night-sky__aurora-fallback { opacity: 1 !important; }
   }
 </style>
 
@@ -358,6 +282,7 @@
   import { getAuroraState } from '../lib/sky/aurora-schedule';
   import { getPlaneState, type PlaneEvent } from '../lib/sky/plane-schedule';
   import { getCloudState, type CloudEvent } from '../lib/sky/cloud-schedule';
+  import { createAuroraRenderer, type AuroraRenderer } from '../lib/sky/aurora-renderer';
 
   // This element persists across Astro navigation; start timers only once.
   const mountNightSky = () => {
@@ -368,7 +293,8 @@
     const clouds = layer.querySelector<HTMLElement>('.night-sky__clouds');
     const aircraft = layer.querySelector<HTMLElement>('.night-sky__aircraft');
     const aurora = layer.querySelector<HTMLElement>('.night-sky__aurora');
-    if (!stars || !meteors || !clouds || !aircraft || !aurora) return;
+    const auroraCanvas = layer.querySelector<HTMLCanvasElement>('.night-sky__aurora-canvas');
+    if (!stars || !meteors || !clouds || !aircraft || !aurora || !auroraCanvas) return;
     layer.dataset.ready = 'true';
 
     const randomBetween = (min: number, max: number) => min + Math.random() * (max - min);
@@ -401,6 +327,12 @@
     let planeSyncTimer: number | undefined;
     let auroraSyncTimer: number | undefined;
     let auroraEventId: number | null = null;
+    let auroraRenderer: AuroraRenderer | null = null;
+    let auroraFrame: number | null = null;
+    let auroraLastFrameTime = 0;
+    let auroraStartsAt = 0;
+    let auroraStrength = 0;
+    let auroraSeed = 0;
 
     // Each visitor sees the same real-time cloud positions. Clouds already
     // in flight are restored with a negative animation delay.
@@ -672,40 +604,81 @@
       planeSyncTimer = window.setTimeout(synchronizePlanes, delay);
     };
 
-    // Aurora is scheduled by absolute time, never by how long this tab stays open.
-    // Visitors joining mid-event use a negative CSS animation delay to catch up.
+    const stopAuroraFrames = () => {
+      if (auroraFrame !== null) window.cancelAnimationFrame(auroraFrame);
+      auroraFrame = null;
+    };
+
+    // Draw only while the wall-clock aurora is active and the tab is visible.
+    // Time is derived from event start, so reopening the page never restarts it.
+    const drawAurora = (frameTime: number) => {
+      auroraFrame = null;
+      if (!canAnimate() || auroraEventId === null) return;
+      if (frameTime - auroraLastFrameTime >= 1000 / 24) {
+        auroraLastFrameTime = frameTime;
+        if (!auroraRenderer) auroraRenderer = createAuroraRenderer(auroraCanvas);
+        if (!auroraRenderer) {
+          aurora.classList.add('use-fallback');
+          return;
+        }
+        const elapsed = Math.max(0, (Date.now() - auroraStartsAt) / 1000);
+        // Different events use different seeds; synchronized visitors see
+        // the same curtain at the same point in its motion.
+        if (!auroraRenderer.draw(elapsed + 28, auroraStrength, auroraSeed)) {
+          auroraRenderer = null;
+          aurora.classList.add('use-fallback');
+          return;
+        }
+      }
+      auroraFrame = window.requestAnimationFrame(drawAurora);
+    };
+
+    const startAuroraFrames = () => {
+      stopAuroraFrames();
+      if (!canAnimate() || auroraEventId === null) return;
+      auroraLastFrameTime = 0;
+      auroraFrame = window.requestAnimationFrame(drawAurora);
+    };
+
+    // Aurora timing and footer countdown remain on the same absolute schedule.
     const synchronizeAurora = () => {
       window.clearTimeout(auroraSyncTimer);
-      // Reduced-motion users still get a static aurora, as promised by Footer.
       if (!layer.isConnected || document.hidden) return;
       const now = Date.now();
       const { active, next } = getAuroraState(now);
 
       if (!active) {
         if (auroraEventId !== null) {
-          aurora.classList.remove('is-visible');
+          stopAuroraFrames();
+          aurora.classList.remove('is-visible', 'use-fallback');
           auroraEventId = null;
         }
       } else if (active.id !== auroraEventId) {
+        stopAuroraFrames();
         auroraEventId = active.id;
-        aurora.style.setProperty('--aurora-opacity', active.strength.toFixed(2));
-        // Violet tint appears occasionally, never throughout every event.
-        aurora.style.setProperty('--aurora-purple-opacity', active.id % 5 === 0 ? '.34' : '.045');
+        auroraStartsAt = active.startsAt;
+        auroraStrength = active.strength;
+        auroraSeed = ((active.id * .61803398875) % 17) + 3;
+        // Shader strength handles brightness. CSS only fades the whole curtain.
+        aurora.style.setProperty('--aurora-opacity', '.88');
         aurora.style.setProperty('--aurora-duration', `${active.durationMs}ms`);
         aurora.style.setProperty('--aurora-delay', `${active.startsAt - now}ms`);
-        aurora.classList.remove('is-visible');
-        // Restart only when a new event starts, not every update.
+        aurora.classList.remove('is-visible', 'use-fallback');
+        if (motion.matches) aurora.classList.add('use-fallback');
         void aurora.offsetWidth;
         aurora.classList.add('is-visible');
+        startAuroraFrames();
       }
 
       const boundary = active ? active.endsAt : next.startsAt;
-      // Wake at the next boundary; at most one check per minute for clock changes.
-      const delay = Math.min(60_000, Math.max(120, boundary - Date.now() + 40));
-      auroraSyncTimer = window.setTimeout(synchronizeAurora, delay);
+      auroraSyncTimer = window.setTimeout(
+        synchronizeAurora,
+        Math.min(60_000, Math.max(120, boundary - Date.now() + 40)),
+      );
     };
 
     const onVisibility = () => {
+      stopAuroraFrames();
       window.clearTimeout(meteorTimer);
       window.clearTimeout(meteorBurstTimer);
       window.clearTimeout(cloudTimer);
@@ -720,7 +693,7 @@
         for (const plane of activePlanes.values()) plane.remove();
         activePlanes.clear();
         if (!layer.isConnected || document.hidden) {
-          aurora.classList.remove('is-visible');
+          aurora.classList.remove('is-visible', 'use-fallback');
           auroraEventId = null;
           return;
         }
