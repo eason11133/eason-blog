@@ -1361,3 +1361,49 @@ hr {
     -webkit-backdrop-filter: blur(5px) saturate(1.1);
   }
 }
+
+
+/* Preview completeness pass: blog list uses .articles-area/.articles-inner,
+   not .blog-area/.blog-panel. Reuse the same night backdrop and glass panel. */
+[data-theme="dark"] body[data-page-id="blog-list"] .articles-area {
+  background: transparent !important;
+  position: relative;
+}
+[data-theme="dark"] body[data-page-id="blog-list"] .articles-area::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: clamp(150px, 25vh, 270px);
+  pointer-events: none;
+  background: linear-gradient(to bottom, #101b2b, rgba(16,27,43,0));
+}
+[data-theme="dark"] body[data-page-id="blog-list"] .articles-inner {
+  position: relative;
+  z-index: 1;
+  background: linear-gradient(145deg,rgba(14,29,48,.53),rgba(13,25,42,.43)) !important;
+  border: 1px solid rgba(159,197,229,.14) !important;
+  box-shadow: 0 18px 60px rgba(0,0,0,.10) !important;
+  border-radius: 22px !important;
+  backdrop-filter: blur(8px) saturate(1.12);
+  -webkit-backdrop-filter: blur(8px) saturate(1.12);
+}
+/* Shared outer page surfaces do not repaint over the wallpaper. */
+[data-theme="dark"] body[data-page-id="home"] .stats-wrapper,
+[data-theme="dark"] body[data-page-id="about"] .about-main,
+[data-theme="dark"] body[data-page-id="blog-list"] .articles-area,
+[data-theme="dark"] body[data-page-id="tags-index"] .tag-area,
+[data-theme="dark"] body[data-page-id="tag-detail"] .tag-area {
+  background-color: transparent !important;
+  background-image: none !important;
+}
+@media (max-width:720px) {
+  [data-theme="dark"] body[data-page-id="blog-list"] .articles-inner {
+    background: linear-gradient(160deg,rgba(13,27,43,.57),rgba(14,27,44,.45)) !important;
+    border-left: 0 !important;
+    border-right: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+  }
+}
