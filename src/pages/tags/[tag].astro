@@ -76,11 +76,17 @@ const tagsHero = heroConfig.tags;
     .tag-posts-list { display:flex; flex-direction:column; }
     .post-card-wrapper { border-bottom:1px solid rgba(159,179,212,.18); }
     .post-card-wrapper:last-child { border-bottom:0; }
-    .tag-post-item { padding:1.35rem .5rem; border-radius:8px; transition:background .2s,transform .2s; }
+    .tag-post-item { position:relative; padding:1.35rem .5rem; border-radius:8px; cursor:pointer; transition:background .2s,transform .2s; }
     .tag-post-item:hover { background:rgba(145,175,207,.08); transform:translateY(-2px); }
     .tag-post-title { font-size:1.28rem; font-weight:700; line-height:1.45; margin:0 0 .6rem; }
     .tag-post-title a { color:#f0f4fa; text-decoration:none; transition:color .2s; }
-    .tag-post-title a:hover { color:#a8caff; }
+    .tag-post-title a:hover, .tag-post-item:hover .tag-post-title a { color:#a8caff; }
+    /* Stretch only the article-title link across the card. The tag links sit above it. */
+    .tag-post-title a::after { content:''; position:absolute; inset:0; z-index:1; }
+    .tag-post-title a:focus-visible { outline:2px solid #a8caff; outline-offset:4px; }
+    .post-item-tags { position:relative; z-index:2; }
+    .post-item-tag-badge { display:inline-flex; text-decoration:none; }
+    .post-item-tag-badge:hover { color:#fff; background:rgba(145,175,207,.26); }
     .tag-post-excerpt { color:#bdc9da; font-size:.94rem; line-height:1.75; margin:0 0 .9rem; }
     .tag-post-meta { display:flex; flex-wrap:wrap; align-items:center; gap:.65rem 1rem; color:#9baec7; font-size:.83rem; }
     .tag-meta-item { display:inline-flex; align-items:center; gap:.35rem; }
@@ -161,7 +167,7 @@ const tagsHero = heroConfig.tags;
                     
                     <div class="post-item-tags">
                       {post.data.tags.map((t: string) => (
-                        <span class="post-item-tag-badge">#{t}</span>
+                        <a href={getTagPath(t)} class="post-item-tag-badge">#{t}</a>
                       ))}
                     </div>
                   </div>
