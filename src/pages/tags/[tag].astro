@@ -1,5 +1,6 @@
 ---
 import DraftBadge from '../../components/DraftBadge.astro';
+import PostMeta from '../../components/PostMeta.astro';
 import HeroHeader from '../../components/HeroHeader.astro';
 import PageShell from '../../layouts/PageShell.astro';
 import { heroConfig, siteTitle } from '../../config';
@@ -76,11 +77,21 @@ const tagsHero = heroConfig.tags;
     .tag-posts-list { display:flex; flex-direction:column; }
     .post-card-wrapper { border-bottom:1px solid rgba(159,179,212,.18); }
     .post-card-wrapper:last-child { border-bottom:0; }
-    .tag-post-item { position:relative; padding:1.35rem .5rem; border-radius:8px; cursor:pointer; transition:background .2s,transform .2s; }
-    .tag-post-item:hover { background:rgba(145,175,207,.08); transform:translateY(-2px); }
-    .tag-post-title { font-size:1.28rem; font-weight:700; line-height:1.45; margin:0 0 .6rem; }
-    .tag-post-title a { color:#f0f4fa; text-decoration:none; transition:color .2s; }
-    .tag-post-title a:hover, .tag-post-item:hover .tag-post-title a { color:#a8caff; }
+    .tag-post-item { position:relative; padding:1.2em .5rem; border-radius:8px; cursor:pointer; transition:background .2s,box-shadow .2s; }
+    .tag-post-item:hover { background:rgba(145,175,207,.08); box-shadow:inset 0 0 0 1px rgba(157,186,234,.16); }
+    .tag-post-title { font-size:1.2em; font-weight:600; line-height:1.45; margin:0 0 .5em; }
+    .tag-post-title a {
+      color:#f0f4fa;
+      text-decoration:none;
+      display:inline;
+      background-image:linear-gradient(#a8caff,#a8caff);
+      background-position:0% 100%;
+      background-repeat:no-repeat;
+      background-size:0% 2px;
+      transition:background-size .3s cubic-bezier(.25,.46,.45,.94),color .3s ease;
+      padding-bottom:2px;
+    }
+    .tag-post-title a:hover, .tag-post-item:hover .tag-post-title a { color:#a8caff; background-size:100% 2px; }
     /* Stretch only the article-title link across the card. The tag links sit above it. */
     .tag-post-title a::after { content:''; position:absolute; inset:0; z-index:1; }
     .tag-post-title a:focus-visible { outline:2px solid #a8caff; outline-offset:4px; }
@@ -88,11 +99,26 @@ const tagsHero = heroConfig.tags;
     .post-item-tag-badge { display:inline-flex; text-decoration:none; }
     .post-item-tag-badge:hover { color:#fff; background:rgba(145,175,207,.26); }
     .tag-post-excerpt { color:#bdc9da; font-size:.94rem; line-height:1.75; margin:0 0 .9rem; }
-    .tag-post-meta { display:flex; flex-wrap:wrap; align-items:center; gap:.65rem 1rem; color:#9baec7; font-size:.83rem; }
-    .tag-meta-item { display:inline-flex; align-items:center; gap:.35rem; }
-    .tag-meta-item svg { width:15px; height:15px; flex-shrink:0; }
-    .post-item-tags { display:flex; flex-wrap:wrap; gap:.4rem; }
-    .post-item-tag-badge { color:#b4cdee; background:rgba(145,175,207,.12); border-radius:5px; padding:2px 7px; font-size:.82em; }
+    .tag-post-meta { display:flex; flex-wrap:wrap; align-items:center; gap:1em; color:#9baec7; font-size:.85em; }
+    .tag-meta-item { display:flex; align-items:center; gap:.3em; }
+    .tag-meta-item svg { width:14px; height:14px; flex-shrink:0; }
+    .post-item-tags { display:flex; flex-wrap:wrap; gap:.4em; }
+    .post-item-tag-badge {
+      display:inline-flex;
+      align-items:center;
+      gap:.2em;
+      color:#b4cdee;
+      background:rgba(145,175,207,.12);
+      border-radius:4px;
+      padding:2px 8px;
+      font-size:.85em;
+      text-decoration:none;
+      transition:background-color .3s cubic-bezier(.2,0,0,1),color .3s cubic-bezier(.2,0,0,1),transform .3s cubic-bezier(.2,0,0,1),box-shadow .3s cubic-bezier(.2,0,0,1);
+      transform-origin:center;
+    }
+    .post-item-tag-badge:hover { transform:translateY(-2px) scale(1.05); }
+    .post-item-tag-badge:active { transform:translateY(0) scale(.97); }
+    .post-item-tag-badge svg { width:12px; height:12px; }
     .pagination { display:flex; align-items:center; justify-content:center; gap:.55rem; padding:1.7rem 0 .2rem; border-top:1px solid rgba(159,179,212,.18); margin-top:1.5rem; }
     .pagination[hidden] { display:none !important; }
     .page-numbers { display:flex; gap:.4rem; align-items:center; }
@@ -107,7 +133,7 @@ const tagsHero = heroConfig.tags;
       .tag-area { background:linear-gradient(to bottom,transparent 56px,#171c25 56px); padding:0 .8rem 3rem; }
       .tag-panel { padding:1.3rem 1rem; }
       .tag-heading { font-size:1.4rem; }
-      .tag-post-title { font-size:1.15rem; }
+      .tag-post-title { font-size:1.2em; }
       .tag-post-item { padding:1.15rem .25rem; }
     }
   </style>
@@ -145,32 +171,15 @@ const tagsHero = heroConfig.tags;
                   </h4>
                   {excerpt && <p class="tag-post-excerpt">{excerpt}</p>}
                   
-                  <div class="tag-post-meta">
-                    <span class="tag-meta-item">
-                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                        <line x1="16" y1="2" x2="16" y2="6"></line>
-                        <line x1="8" y1="2" x2="8" y2="6"></line>
-                        <line x1="3" y1="10" x2="21" y2="10"></line>
-                      </svg>
-                      {post.data.pubDate.toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric' })}
-                    </span>
-                    
-                    {post.data.categories && post.data.categories.length > 0 && (
-                      <span class="tag-meta-item">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                          <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
-                        </svg>
-                        {post.data.categories.join(', ')}
-                      </span>
-                    )}
-                    
-                    <div class="post-item-tags">
-                      {post.data.tags.map((t: string) => (
-                        <a href={getTagPath(t)} class="post-item-tag-badge">#{t}</a>
-                      ))}
-                    </div>
-                  </div>
+                  <PostMeta
+                    date={post.data.pubDate}
+                    categories={post.data.categories}
+                    tags={post.data.tags}
+                    containerClass="tag-post-meta"
+                    itemClass="tag-meta-item"
+                    tagsClass="post-item-tags"
+                    tagLinkClass="post-item-tag-badge"
+                  />
                 </article>
               </div>
             );
