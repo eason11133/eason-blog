@@ -1,0 +1,121 @@
+---
+/** Isolated WebGL aurora experiment. Never mounted on production sky. */
+---
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<meta name="robots" content="noindex, nofollow"/>
+<title>極光實驗室 · Eason</title>
+<style is:global>
+  * { box-sizing: border-box; }
+  html,body { margin:0; width:100%; min-height:100%; background:#07121f; color:#dceaf4; font-family:system-ui,-apple-system,"Noto Sans TC",sans-serif; }
+  #scene { position:fixed; inset:0; overflow:hidden; background:#061321 url('/background/eason-night.svg') center bottom / cover no-repeat; }
+  #aurora-canvas { position:absolute; inset:0; width:100%; height:100%; display:block; mix-blend-mode:screen; pointer-events:none; }
+  #fallback { position:absolute; inset:0; pointer-events:none; opacity:0; background:radial-gradient(ellipse 46% 20% at 40% 47%,rgba(51,181,139,.24),transparent),radial-gradient(ellipse 45% 18% at 72% 42%,rgba(42,153,198,.15),transparent); }
+  .panel { position:fixed; z-index:2; border:1px solid rgba(156,198,220,.23); background:rgba(5,17,31,.85); border-radius:15px; backdrop-filter:blur(8px); }
+  #intro { top:20px; left:20px; max-width:360px; padding:18px 20px; }
+  h1 { font-size:18px; margin:0 0 8px; }
+  #intro p { font-size:13px; line-height:1.7; color:#abc3d3; margin:0; }
+  #controls { right:20px; bottom:20px; padding:17px 20px; width:min(360px,calc(100% - 32px)); }
+  .line { display:flex; align-items:center; justify-content:space-between; gap:12px; margin:0 0 5px; font-size:13px; }
+  .value,#status { color:#9ec7cd; font-variant-numeric:tabular-nums; }
+  input[type=range] { width:100%; accent-color:#67ccbc; margin:0 0 14px; cursor:pointer; }
+  .buttons { display:flex; align-items:center; justify-content:space-between; gap:12px; }
+  button { border:1px solid rgba(130,206,200,.48); background:rgba(25,98,102,.39); color:#ddf3ee; font-size:13px; border-radius:9px; padding:9px 13px; cursor:pointer; }
+  .small { font-size:11px; color:#8cabbc; line-height:1.5; margin:13px 0 0; }
+  @media(max-width:640px) { #intro { left:12px; top:12px; right:12px; padding:12px 15px; max-width:none; } h1 { font-size:15px; } #intro p { font-size:12px; } #controls { right:12px; bottom:12px; padding:13px 15px; } }
+  @media(prefers-reduced-motion:reduce) { #aurora-canvas { display:none; } #fallback { opacity:1; } }
+</style>
+</head>
+<body>
+<div id="scene"><div id="fallback"></div><canvas id="aurora-canvas" aria-label="WebGL 極光實驗動畫"></canvas></div>
+<section class="panel" id="intro">
+  <h1>WebGL 極光實驗室</h1>
+  <p>用你網站原本的夜空底圖測試自然飄動的光幕。這裡會持續播放，方便調整；正式網站目前的極光計時、雲和飛機都不變。</p>
+</section>
+<section class="panel" id="controls">
+  <label class="line" for="strength">亮度 <span class="value" id="strength-label">65%</span></label>
+  <input id="strength" type="range" min="20" max="100" value="65" step="1"/>
+  <label class="line" for="speed">流動速度 <span class="value" id="speed-label">正常</span></label>
+  <input id="speed" type="range" min="20" max="150" value="78" step="1"/>
+  <div class="buttons"><button id="pause" type="button">暫停動畫</button><span id="status" aria-live="polite">初始化中…</span></div>
+  <p class="small">獨立測試分支 · 最多 24fps · 低解析度 GPU 繪製 · WebGL 不支援時使用靜態備用效果</p>
+</section>
+<script is:inline>
+(() => {
+  const canvas=document.getElementById('aurora-canvas');
+  const strength=document.getElementById('strength');
+  const speed=document.getElementById('speed');
+  const status=document.getElementById('status');
+  const pause=document.getElementById('pause');
+  const fallback=document.getElementById('fallback');
+  const strengthLabel=document.getElementById('strength-label');
+  const speedLabel=document.getElementById('speed-label');
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    status.textContent='動態效果已停用'; pause.disabled=true; return;
+  }
+  const gl=canvas.getContext('webgl',{alpha:true,antialias:false,premultipliedAlpha:false,depth:false,stencil:false});
+  if (!gl) { status.textContent='此裝置不支援 WebGL'; fallback.style.opacity='1'; pause.disabled=true; return; }
+  const vs="\nattribute vec2 aPosition;\nvarying vec2 vUv;\nvoid main() {\n  vUv = aPosition * .5 + .5;\n  gl_Position = vec4(aPosition, 0., 1.);\n}";
+  const fs="\nprecision mediump float;\nvarying vec2 vUv;\nuniform float uTime;\nuniform float uIntensity;\nuniform float uSeed;\n\nfloat hash(vec2 p) { return fract(sin(dot(p, vec2(127.1,311.7))) * 43758.5453); }\nfloat noise(vec2 p) {\n  vec2 i=floor(p), f=fract(p);\n  vec2 u=f*f*(3.0-2.0*f);\n  return mix(mix(hash(i),hash(i+vec2(1.,0.)),u.x),\n             mix(hash(i+vec2(0.,1.)),hash(i+vec2(1.,1.)),u.x),u.y);\n}\nfloat fbm(vec2 p) {\n  float v=0.0, a=.5;\n  for(int i=0;i<3;i++) { v+=a*noise(p); p=p*2.05+vec2(5.32,2.61); a*=.5; }\n  return v;\n}\nfloat curtain(vec2 p,float t,float seed,float level,float phase) {\n  float x=p.x;\n  float warp=(fbm(vec2(x*4.2+seed,t*.085))-.5)*.085;\n  float xx=x+warp;\n  float rim=level+.058*sin(xx*7.6+t*.19+phase)\n           +.031*sin(xx*14.4-t*.14+phase*1.7)\n           +.025*(noise(vec2(xx*6.5+seed,t*.055))-.5);\n  float below=rim-p.y;\n  float upper=smoothstep(-.014,.024,below);\n  float decay=exp(-max(below,0.)*8.0);\n  float fold=noise(vec2(xx*35.+seed*9.,t*.052));\n  float stripe=pow(.5+.5*sin(xx*118.+fold*5.+t*.16),2.);\n  float texture=.37+.63*(fold*.56+stripe*.44);\n  float highlight=.19*exp(-abs(below)*51.);\n  float sides=smoothstep(-.18,.09,x)*(1.-smoothstep(.82,1.16,x));\n  return (upper*decay*texture+highlight)*sides;\n}\nvoid main() {\n  vec2 p=vUv;\n  float t=uTime;\n  float a=curtain(p,t,uSeed,.65,.3);\n  float b=curtain(p+vec2(-.11,.034),t*.77,uSeed+3.7,.64,2.2);\n  float c=curtain(p+vec2(.19,-.027),t*.66,uSeed+9.1,.73,1.3);\n  float shimmer=fbm(vec2(p.x*7.4,t*.12+uSeed));\n  vec3 green=mix(vec3(.08,.79,.50),vec3(.15,.94,.73),shimmer);\n  vec3 cyan=vec3(.10,.57,.79), purple=vec3(.52,.34,.78);\n  float purpleShare=.06+.08*smoothstep(.5,.9,shimmer);\n  vec3 light=green*a*.92+cyan*b*.57+purple*c*purpleShare;\n  float alpha=clamp(max(a*.83,max(b*.50,c*purpleShare))*uIntensity,0.,.84);\n  gl_FragColor=vec4(clamp(light*1.55,0.,1.),alpha);\n}";
+  function compile(type,source) {
+    const sh=gl.createShader(type);
+    gl.shaderSource(sh,source); gl.compileShader(sh);
+    if(!gl.getShaderParameter(sh,gl.COMPILE_STATUS)) throw Error(gl.getShaderInfoLog(sh));
+    return sh;
+  }
+  let program;
+  try {
+    program=gl.createProgram();
+    gl.attachShader(program,compile(gl.VERTEX_SHADER,vs));
+    gl.attachShader(program,compile(gl.FRAGMENT_SHADER,fs));
+    gl.linkProgram(program);
+    if(!gl.getProgramParameter(program,gl.LINK_STATUS)) throw Error(gl.getProgramInfoLog(program));
+  } catch(err) {
+    console.error('WebGL shader compilation failed',err);
+    fallback.style.opacity='1';status.textContent='Shader 初始化失敗';pause.disabled=true;return;
+  }
+  gl.useProgram(program);
+  const buf=gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER,buf);
+  gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,1,-1,-1,1,-1,1,1,-1,1,1]),gl.STATIC_DRAW);
+  const loc=gl.getAttribLocation(program,'aPosition');
+  gl.enableVertexAttribArray(loc); gl.vertexAttribPointer(loc,2,gl.FLOAT,false,0,0);
+  const tLoc=gl.getUniformLocation(program,'uTime');
+  const strengthLoc=gl.getUniformLocation(program,'uIntensity');
+  gl.uniform1f(gl.getUniformLocation(program,'uSeed'),7.3);
+  function resize() {
+    const ratio=Math.min(devicePixelRatio||1,1.4)*.67;
+    const w=Math.min(1280,Math.max(1,Math.round(innerWidth*ratio)));
+    const h=Math.min(800,Math.max(1,Math.round(innerHeight*ratio)));
+    if(canvas.width!==w||canvas.height!==h) { canvas.width=w; canvas.height=h; gl.viewport(0,0,w,h); }
+  }
+  resize();addEventListener('resize',resize,{passive:true});
+  function updateLabels() {
+    strengthLabel.textContent=strength.value+'%';
+    speedLabel.textContent=Number(speed.value)===78?'正常':(Number(speed.value)/78).toFixed(1)+' 倍';
+  }
+  strength.addEventListener('input',updateLabels);
+  speed.addEventListener('input',updateLabels);
+  let active=true,t=28,previous=0,lastDraw=0,count=0,fpsStart=performance.now();
+  pause.addEventListener('click',()=>{active=!active;pause.textContent=active?'暫停動畫':'繼續動畫';status.textContent=active?'播放中':'已暫停';});
+  document.addEventListener('visibilitychange',()=>{previous=performance.now();});
+  function draw(now) {
+    requestAnimationFrame(draw);
+    if(document.hidden||!active) { previous=now; return; }
+    if(now-lastDraw<1000/24)return;
+    t+=Math.min((now-(previous||now))/1000,.12)*Number(speed.value)/78;
+    previous=now;lastDraw=now;
+    gl.clearColor(0,0,0,0);gl.clear(gl.COLOR_BUFFER_BIT);
+    gl.uniform1f(tLoc,t);gl.uniform1f(strengthLoc,Number(strength.value)/100);
+    gl.drawArrays(gl.TRIANGLES,0,6);
+    count++;
+    if(now-fpsStart>1800){status.textContent='WebGL · '+Math.round(count*1000/(now-fpsStart))+' fps';count=0;fpsStart=now;}
+  }
+  status.textContent='WebGL 已啟動';
+  requestAnimationFrame(draw);
+})();
+</script>
+</body>
+</html>
