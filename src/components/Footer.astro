@@ -52,8 +52,12 @@ const socials = profileConfig.socials.filter((social) =>
     border-top: 1px solid rgba(166, 187, 226, .12);
     color: #aebbd0;
     text-align: center;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    align-items: center;
   }
   .footer-line {
+    grid-column: 2;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -83,7 +87,10 @@ const socials = profileConfig.socials.filter((social) =>
   .social-item.unavailable { opacity: .57; cursor: default; }
   .social-icon { width: 21px; height: 21px; display: block; }
   .aurora-countdown {
-    margin: .85rem 0 0;
+    grid-column: 3;
+    justify-self: end;
+    margin: 0;
+    white-space: nowrap;
     color: #94b9cc;
     font-size: .78rem;
     font-variant-numeric: tabular-nums;
@@ -91,6 +98,17 @@ const socials = profileConfig.socials.filter((social) =>
   }
   .aurora-countdown[data-active="true"] {
     color: #a5d7c7;
+  }
+  @media (max-width: 840px) {
+    footer {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .footer-line, .aurora-countdown {
+      grid-column: 1;
+    }
+    .aurora-countdown {
+      margin-top: .7rem;
+    }
   }
 </style>
 
