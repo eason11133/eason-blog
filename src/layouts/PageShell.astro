@@ -73,7 +73,7 @@ const {
 	<body data-page-id={pageId}>
 		<NightSky />
 		<Header transparent={transparentHeader} />
-		<div id="main-content">
+		<div id="main-content" transition:animate={pageId === 'tags-index' || pageId === 'tag-detail' ? 'none' : undefined}>
 			{useMainWrapper ? (
 				<main class="page-shell-main">
 					<slot />
