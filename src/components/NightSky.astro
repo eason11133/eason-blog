@@ -132,10 +132,11 @@
   }
 
   @keyframes night-plane-flight {
-    0% { opacity: 0; transform: translate3d(0, 0, 0) rotate(var(--plane-tilt)); }
-    7%, 88% { opacity: var(--plane-opacity, .42); }
+    /* Opacity stays visible from the first edge to the opposite edge.
+       The plane starts and finishes outside the clipped viewport. */
+    0% { opacity: var(--plane-opacity, .42); transform: translate3d(0, 0, 0) rotate(var(--plane-tilt)); }
     100% {
-      opacity: 0;
+      opacity: var(--plane-opacity, .42);
       transform: translate3d(var(--plane-dx), var(--plane-dy), 0) rotate(var(--plane-tilt));
     }
   }
@@ -163,7 +164,8 @@
     pointer-events: none;
   }
   .night-sky__aurora.is-visible {
-    animation: night-aurora-appear var(--aurora-duration) ease-in-out forwards;
+    /* Negative delay lets late visitors join the current event mid-animation. */
+    animation: night-aurora-appear var(--aurora-duration) ease-in-out var(--aurora-delay, 0ms) both;
     will-change: opacity, transform;
   }
   @keyframes night-aurora-appear {
@@ -194,6 +196,8 @@
 </style>
 
 <script>
+  import { getAuroraState } from '../lib/sky/aurora-schedule';
+
   // This element persists across Astro navigation; start timers only once.
   const mountNightSky = () => {
     const layer = document.querySelector<HTMLElement>('.night-sky');
@@ -231,8 +235,8 @@
     let meteorTimer: number | undefined;
     let meteorBurstTimer: number | undefined;
     let planeTimer: number | undefined;
-    let auroraTimer: number | undefined;
-    let auroraShowing = false;
+    let auroraSyncTimer: number | undefined;
+    let auroraEventId: number | null = null;
 
     const shootMeteor = (allowBurst = true) => {
       if (!canAnimate()) return;
@@ -327,64 +331,72 @@
         const plane = document.createElement('span');
         plane.className = 'night-sky__plane';
         const size = randomBetween(width > 900 ? 8 : 5, width > 900 ? 15 : 10);
+        const margin = size + 8;
+        const fromX = fromLeft ? -margin : width + margin;
+        const toX = fromLeft ? width + margin : -margin;
+        const fromY = randomBetween(height * .14, height * .55);
+        const toY = Math.max(height * .08, Math.min(height * .65, fromY + randomBetween(-height * .07, height * .07)));
+        const deltaX = toX - fromX;
+        const deltaY = toY - fromY;
         const props: Record<string, string> = {
-          '--plane-x': `${(fromLeft ? -size - 4 : width + 4).toFixed(0)}px`,
-          '--plane-y': `${randomBetween(height * .12, height * .50).toFixed(0)}px`,
-          '--plane-dx': `${(fromLeft ? width + size * 2 + 8 : -(width + size * 2 + 8)).toFixed(0)}px`,
-          '--plane-dy': `${randomBetween(-height * .07, height * .07).toFixed(0)}px`,
+          // Both endpoints are fully outside the viewport: an actual full crossing.
+          '--plane-x': `${fromX.toFixed(0)}px`,
+          '--plane-y': `${fromY.toFixed(0)}px`,
+          '--plane-dx': `${deltaX.toFixed(0)}px`,
+          '--plane-dy': `${deltaY.toFixed(0)}px`,
           '--plane-size': `${size.toFixed(1)}px`,
-          '--plane-opacity': randomBetween(.20, .58).toFixed(2),
+          '--plane-opacity': randomBetween(.27, .60).toFixed(2),
           '--plane-duration': `${randomBetween(15, 30).toFixed(1)}s`,
-          '--plane-tilt': `${randomBetween(-8, 8).toFixed(1)}deg`,
+          '--plane-tilt': `${(Math.atan2(deltaY, deltaX) * 180 / Math.PI).toFixed(1)}deg`,
           '--plane-blink-time': `${randomBetween(.85, 2.2).toFixed(2)}s`,
         };
         for (const [name, value] of Object.entries(props)) plane.style.setProperty(name, value);
         activePlane = plane;
         aircraft.appendChild(plane);
-        plane.addEventListener('animationend', () => {
+        plane.addEventListener('animationend', (event) => {
+          if (event.animationName !== 'night-plane-flight') return;
           plane.remove();
           if (activePlane === plane) activePlane = null;
           schedulePlane();
-        }, { once: true });
+        });
       }, randomBetween(3 * 60_000, 8 * 60_000));
     };
 
-    const showAurora = () => {
-      if (!canAnimate() || auroraShowing) return;
-      auroraShowing = true;
-      // Excludes the strong 70–100% reference range.
-      const roll = Math.random();
-      const strength = roll < .38 ? randomBetween(.08, .21)
-        : roll < .87 ? randomBetween(.22, .43) : randomBetween(.44, .65);
-      aurora.style.setProperty('--aurora-opacity', strength.toFixed(2));
-      aurora.style.setProperty('--aurora-duration', `${randomBetween(20, 40).toFixed(1)}s`);
-      aurora.classList.remove('is-visible');
-      // Force reflow only when this rare effect begins, not on every animation frame.
-      void aurora.offsetWidth;
-      aurora.classList.add('is-visible');
-    };
-
-    const scheduleAurora = () => {
-      window.clearTimeout(auroraTimer);
+    // Aurora is scheduled by absolute time, never by how long this tab stays open.
+    // Visitors joining mid-event use a negative CSS animation delay to catch up.
+    const synchronizeAurora = () => {
+      window.clearTimeout(auroraSyncTimer);
       if (!canAnimate()) return;
-      auroraTimer = window.setTimeout(() => {
-        auroraTimer = undefined;
-        showAurora();
-      }, randomBetween(5 * 60_000, 12 * 60_000));
-    };
+      const now = Date.now();
+      const { active, next } = getAuroraState(now);
 
-    aurora.addEventListener('animationend', (event) => {
-      if (event.target !== aurora) return;
-      aurora.classList.remove('is-visible');
-      auroraShowing = false;
-      scheduleAurora();
-    });
+      if (!active) {
+        if (auroraEventId !== null) {
+          aurora.classList.remove('is-visible');
+          auroraEventId = null;
+        }
+      } else if (active.id !== auroraEventId) {
+        auroraEventId = active.id;
+        aurora.style.setProperty('--aurora-opacity', active.strength.toFixed(2));
+        aurora.style.setProperty('--aurora-duration', `${active.durationMs}ms`);
+        aurora.style.setProperty('--aurora-delay', `${active.startsAt - now}ms`);
+        aurora.classList.remove('is-visible');
+        // Restart only when a new event starts, not every update.
+        void aurora.offsetWidth;
+        aurora.classList.add('is-visible');
+      }
+
+      const boundary = active ? active.endsAt : next.startsAt;
+      // Wake at the next boundary; at most one check per minute for clock changes.
+      const delay = Math.min(60_000, Math.max(120, boundary - Date.now() + 40));
+      auroraSyncTimer = window.setTimeout(synchronizeAurora, delay);
+    };
 
     const onVisibility = () => {
       window.clearTimeout(meteorTimer);
       window.clearTimeout(meteorBurstTimer);
       window.clearTimeout(planeTimer);
-      window.clearTimeout(auroraTimer);
+      window.clearTimeout(auroraSyncTimer);
       meteorBurstTimer = undefined;
       if (!canAnimate()) {
         for (const meteor of activeMeteors) meteor.remove();
@@ -392,12 +404,12 @@
         activePlane?.remove();
         activePlane = null;
         aurora.classList.remove('is-visible');
-        auroraShowing = false;
+        auroraEventId = null;
         return;
       }
       scheduleMeteor();
       if (!activePlane) schedulePlane();
-      if (!auroraShowing) scheduleAurora();
+      synchronizeAurora();
     };
     document.addEventListener('visibilitychange', onVisibility);
     motion.addEventListener('change', onVisibility);

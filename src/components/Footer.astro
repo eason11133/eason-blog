@@ -42,6 +42,7 @@ const socials = profileConfig.socials.filter((social) =>
       })}
     </nav>
   </div>
+  <p id="aurora-countdown" class="aurora-countdown" role="timer" aria-label="下次極光倒數">✦ 極光時間計算中…</p>
 </footer>
 
 <style>
@@ -81,4 +82,56 @@ const socials = profileConfig.socials.filter((social) =>
   a.social-item:hover { color: #f3f7ff; }
   .social-item.unavailable { opacity: .57; cursor: default; }
   .social-icon { width: 21px; height: 21px; display: block; }
+  .aurora-countdown {
+    margin: .85rem 0 0;
+    color: #94b9cc;
+    font-size: .78rem;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: .015em;
+  }
+  .aurora-countdown[data-active="true"] {
+    color: #a5d7c7;
+  }
 </style>
+
+<script>
+  import { getAuroraState } from '../lib/sky/aurora-schedule';
+
+  let countdownTimer: number | undefined;
+
+  const formatCountdown = (milliseconds: number) => {
+    const totalSeconds = Math.max(0, Math.ceil(milliseconds / 1000));
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = totalSeconds % 60;
+    return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+  };
+
+  const updateCountdown = () => {
+    const element = document.getElementById('aurora-countdown');
+    if (!element) return;
+    const now = Date.now();
+    const { active, next } = getAuroraState(now);
+    if (active) {
+      element.textContent = `✦ 極光出現中・剩餘 ${formatCountdown(active.endsAt - now)}`;
+      element.dataset.active = 'true';
+      element.setAttribute('aria-label', '極光出現中');
+    } else {
+      element.textContent = `✦ 距離下次極光 ${formatCountdown(next.startsAt - now)}`;
+      element.dataset.active = 'false';
+      element.setAttribute('aria-label', '下次極光倒數');
+    }
+  };
+
+  const mountCountdown = () => {
+    // Footer is replaced on Astro navigation; never leave duplicate intervals.
+    window.clearInterval(countdownTimer);
+    updateCountdown();
+    countdownTimer = window.setInterval(updateCountdown, 1000);
+  };
+
+  mountCountdown();
+  document.addEventListener('astro:page-load', mountCountdown);
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) updateCountdown();
+  });
+</script>
