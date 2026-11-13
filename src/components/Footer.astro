@@ -55,10 +55,12 @@ const socials = profileConfig.socials.filter((social) =>
     text-align: center;
     display: grid;
     grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    grid-template-rows: auto;
     align-items: center;
   }
   .footer-line {
     grid-column: 2;
+    grid-row: 1;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -89,6 +91,8 @@ const socials = profileConfig.socials.filter((social) =>
   .social-icon { width: 21px; height: 21px; display: block; }
   .plane-countdown {
     grid-column: 1;
+    grid-row: 1;
+    align-self: center;
     justify-self: start;
     margin: 0;
     white-space: nowrap;
@@ -99,6 +103,8 @@ const socials = profileConfig.socials.filter((social) =>
   }
   .aurora-countdown {
     grid-column: 3;
+    grid-row: 1;
+    align-self: center;
     justify-self: end;
     margin: 0;
     white-space: nowrap;
@@ -116,6 +122,7 @@ const socials = profileConfig.socials.filter((social) =>
     }
     .footer-line, .aurora-countdown {
       grid-column: 1;
+      grid-row: 1;
     }
     /* Preserve the previously agreed mobile footer and its aurora-only swap. */
     .plane-countdown { display: none; }

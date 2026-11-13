@@ -99,14 +99,28 @@
     position: absolute;
     left: var(--plane-x);
     top: var(--plane-y);
-    width: var(--plane-size, 10px);
-    height: 2px;
-    border-radius: 50%;
-    background: rgba(213, 231, 242, .85);
-    box-shadow: 0 0 4px rgba(202, 232, 255, .42);
+    width: var(--plane-size, 24px);
+    height: 3px;
+    border-radius: 60% 40% 40% 60%;
+    background: rgba(222, 238, 249, .90);
+    box-shadow: 0 0 5px rgba(202, 232, 255, .50);
     opacity: 0;
     animation: night-plane-flight var(--plane-duration) linear var(--plane-delay, 0ms) forwards;
     will-change: transform, opacity;
+  }
+
+  /* Small wing silhouette makes the aircraft recognizable at normal zoom,
+     without turning it into a large foreground airplane. */
+  .night-sky__plane-wing {
+    position: absolute;
+    left: 40%;
+    top: 50%;
+    width: calc(var(--plane-size, 24px) * .34);
+    height: calc(var(--plane-size, 24px) * .26);
+    transform: translateY(-50%);
+    clip-path: polygon(16% 0, 100% 44%, 100% 56%, 16% 100%, 0 50%);
+    background: rgba(213, 235, 247, .78);
+    pointer-events: none;
   }
 
   /* A thin, fading contrail drawn behind the distant plane. Rotating the
@@ -350,7 +364,7 @@
     const spawnPlane = (event: PlaneEvent, now: number) => {
       const { width, height } = viewport();
       const desktop = width > 900;
-      const size = (desktop ? 10 : 7) + event.sizeFactor * (desktop ? 7 : 5);
+      const size = (desktop ? 20 : 13) + event.sizeFactor * (desktop ? 12 : 9);
       const margin = size + 8;
       const fromX = event.fromLeft ? -margin : width + margin;
       const toX = event.fromLeft ? width + margin : -margin;
@@ -367,7 +381,7 @@
         '--plane-dy': `${deltaY.toFixed(0)}px`,
         '--plane-size': `${size.toFixed(1)}px`,
         '--plane-opacity': event.opacity.toFixed(2),
-        '--plane-trail-length': `${((desktop ? 28 : 15) + event.trailFactor * (desktop ? 30 : 17)).toFixed(0)}px`,
+        '--plane-trail-length': `${((desktop ? 42 : 22) + event.trailFactor * (desktop ? 32 : 20)).toFixed(0)}px`,
         '--plane-trail-thickness': `${(1 + event.sizeFactor).toFixed(1)}px`,
         '--plane-trail-opacity': event.trailOpacity.toFixed(2),
         '--plane-duration': `${event.durationMs}ms`,
@@ -379,6 +393,9 @@
       const trail = document.createElement('span');
       trail.className = 'night-sky__plane-trail';
       plane.appendChild(trail);
+      const wing = document.createElement('span');
+      wing.className = 'night-sky__plane-wing';
+      plane.appendChild(wing);
       activePlanes.set(event.id, plane);
       aircraft.appendChild(plane);
       plane.addEventListener('animationend', (animationEvent) => {
