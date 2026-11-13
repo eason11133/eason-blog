@@ -73,6 +73,7 @@
     </svg>
   </div>
   <div class="night-sky__stars"></div>
+  <div class="night-sky__clouds"></div>
   <div class="night-sky__meteors"></div>
   <div class="night-sky__aircraft"></div>
 </div>
@@ -97,11 +98,43 @@
   }
 
   .night-sky__stars,
+  .night-sky__clouds,
   .night-sky__meteors,
   .night-sky__aircraft {
     position: absolute;
     inset: 0;
     pointer-events: none;
+  }
+
+  /* Sparse drifting night clouds. The clouds partially veil stars and aurora,
+     but remain below the plane / meteor layers so aircraft are never hidden. */
+  .night-sky__cloud {
+    position: absolute;
+    left: var(--cloud-x);
+    top: var(--cloud-y);
+    width: var(--cloud-width);
+    height: var(--cloud-height);
+    opacity: 0;
+    pointer-events: none;
+    animation: night-cloud-drift var(--cloud-duration) linear forwards;
+    will-change: transform, opacity;
+  }
+  .night-sky__cloud svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+  }
+  @keyframes night-cloud-drift {
+    0% {
+      opacity: 0;
+      transform: translate3d(0, 0, 0);
+    }
+    12%, 84% { opacity: var(--cloud-opacity, .38); }
+    100% {
+      opacity: 0;
+      transform: translate3d(var(--cloud-dx), var(--cloud-dy), 0);
+    }
   }
 
   .night-sky__star {
@@ -197,8 +230,8 @@
   }
 
   .night-sky__plane-silhouette {
-    fill: #4b6273;
-    stroke: rgba(174, 204, 221, .57);
+    fill: #30414D;
+    stroke: rgba(156, 186, 207, .47);
     stroke-width: 1.8;
     stroke-linejoin: round;
   }
@@ -304,6 +337,7 @@
 
   @media (prefers-reduced-motion: reduce) {
     .night-sky__star,
+    .night-sky__cloud,
     .night-sky__meteor,
     .night-sky__plane,
     .night-sky__aurora { animation: none !important; }
@@ -329,9 +363,10 @@
     if (!layer || layer.dataset.ready === 'true') return;
     const stars = layer.querySelector<HTMLElement>('.night-sky__stars');
     const meteors = layer.querySelector<HTMLElement>('.night-sky__meteors');
+    const clouds = layer.querySelector<HTMLElement>('.night-sky__clouds');
     const aircraft = layer.querySelector<HTMLElement>('.night-sky__aircraft');
     const aurora = layer.querySelector<HTMLElement>('.night-sky__aurora');
-    if (!stars || !meteors || !aircraft || !aurora) return;
+    if (!stars || !meteors || !clouds || !aircraft || !aurora) return;
     layer.dataset.ready = 'true';
 
     const randomBetween = (min: number, max: number) => min + Math.random() * (max - min);
@@ -356,12 +391,101 @@
     }
 
     const activeMeteors = new Set<HTMLElement>();
+    const activeClouds = new Set<HTMLElement>();
     const activePlanes = new Map<number, HTMLElement>();
+    let cloudTimer: number | undefined;
     let meteorTimer: number | undefined;
     let meteorBurstTimer: number | undefined;
     let planeSyncTimer: number | undefined;
     let auroraSyncTimer: number | undefined;
     let auroraEventId: number | null = null;
+
+    // Wispy cirrus and a lower scattered-cloud silhouette. Both are drawn
+    // from simple SVG paths; there are no images, blur filters or smoke particles.
+    const spawnCloud = () => {
+      if (!canAnimate()) return;
+      const { width, height } = viewport();
+      const desktop = width > 900;
+      if (activeClouds.size >= (desktop ? 2 : 1)) return;
+
+      const isCirrus = Math.random() < .63;
+      const cloudWidth = randomBetween(desktop ? 240 : 155, desktop ? 405 : 250);
+      const cloudHeight = cloudWidth * (isCirrus ? .29 : .34);
+      const fromLeft = Math.random() < .5;
+      const margin = cloudWidth + 15;
+      const fromX = fromLeft ? -margin : width + 15;
+      const toX = fromLeft ? width + 15 : -margin;
+      const y = isCirrus
+        ? randomBetween(height * .16, height * .54)
+        : randomBetween(height * .52, height * .73);
+      const dy = randomBetween(-height * .025, height * .025);
+
+      const cloud = document.createElement('span');
+      cloud.className = 'night-sky__cloud';
+      const gradientId = "sky-cloud-gradient-" + Math.round(Math.random() * 1_000_000_000);
+      const shape = isCirrus
+        ? `<path fill="url(#${gradientId})"
+             d="M 3 80 C 32 72 49 70 76 64 C 96 55 111 48 133 50
+                C 155 35 170 35 188 41 C 202 29 234 33 248 43
+                C 271 41 294 48 308 56 C 332 53 358 63 376 68
+                C 396 68 409 72 420 80 C 377 87 348 82 315 87
+                C 273 94 230 85 189 92 C 158 89 128 94 97 87
+                C 61 89 25 89 3 80 Z" />
+           <path fill="#8da3b5" opacity=".14"
+             d="M 50 69 C 87 66 122 52 143 56 C 175 45 192 46 219 51
+                C 257 52 277 60 304 68 C 277 69 262 65 238 67
+                C 189 64 151 73 118 72 C 91 75 63 72 50 69 Z" />`
+        : `<path fill="url(#${gradientId})"
+             d="M 4 87 C 30 84 46 80 65 76 C 72 58 100 57 117 65
+                C 123 46 151 39 173 51 C 194 33 219 34 238 48
+                C 257 44 274 50 287 62 C 312 57 340 66 356 75
+                C 382 73 402 81 420 85 C 396 99 371 96 340 98
+                C 308 103 279 96 250 103 C 205 106 177 102 143 104
+                C 99 106 57 102 4 87 Z" />
+           <path fill="#8ca3b4" opacity=".12"
+             d="M 91 72 Q 112 66 124 73 Q 152 53 184 65
+                Q 223 52 245 65 Q 273 65 293 77
+                Q 250 83 219 79 Q 176 86 148 80 Q 116 84 91 72 Z" />`;
+      cloud.innerHTML = `<svg viewBox="0 0 424 120" aria-hidden="true">
+        <defs>
+          <linearGradient id="${gradientId}" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" stop-color="#8297a9" stop-opacity=".34" />
+            <stop offset="36%" stop-color="#657d90" stop-opacity=".70" />
+            <stop offset="100%" stop-color="#26374b" stop-opacity=".64" />
+          </linearGradient>
+        </defs>
+        ${shape}
+      </svg>`;
+      const props: Record<string, string> = {
+        '--cloud-x': `${fromX.toFixed(0)}px`,
+        '--cloud-y': `${y.toFixed(0)}px`,
+        '--cloud-width': `${cloudWidth.toFixed(0)}px`,
+        '--cloud-height': `${cloudHeight.toFixed(0)}px`,
+        '--cloud-dx': `${(toX - fromX).toFixed(0)}px`,
+        '--cloud-dy': `${dy.toFixed(0)}px`,
+        '--cloud-duration': `${randomBetween(110, 190).toFixed(1)}s`,
+        '--cloud-opacity': randomBetween(.40, .68).toFixed(2),
+      };
+      for (const [key, value] of Object.entries(props)) cloud.style.setProperty(key, value);
+      activeClouds.add(cloud);
+      clouds.appendChild(cloud);
+      cloud.addEventListener('animationend', (event) => {
+        if (event.animationName !== 'night-cloud-drift') return;
+        cloud.remove();
+        activeClouds.delete(cloud);
+      }, { once: true });
+    };
+
+    const scheduleCloud = (initial = false) => {
+      window.clearTimeout(cloudTimer);
+      if (!canAnimate()) return;
+      // The first cloud arrives fairly soon; later there are genuinely clear gaps.
+      cloudTimer = window.setTimeout(() => {
+        cloudTimer = undefined;
+        if (canAnimate() && (initial || Math.random() < .70)) spawnCloud();
+        scheduleCloud();
+      }, initial ? randomBetween(12_000, 28_000) : randomBetween(45_000, 100_000));
+    };
 
     const shootMeteor = (allowBurst = true) => {
       if (!canAnimate()) return;
@@ -569,12 +693,15 @@
     const onVisibility = () => {
       window.clearTimeout(meteorTimer);
       window.clearTimeout(meteorBurstTimer);
+      window.clearTimeout(cloudTimer);
       window.clearTimeout(planeSyncTimer);
       window.clearTimeout(auroraSyncTimer);
       meteorBurstTimer = undefined;
       if (!canAnimate()) {
         for (const meteor of activeMeteors) meteor.remove();
         activeMeteors.clear();
+        for (const cloud of activeClouds) cloud.remove();
+        activeClouds.clear();
         for (const plane of activePlanes.values()) plane.remove();
         activePlanes.clear();
         if (!layer.isConnected || document.hidden) {
@@ -586,6 +713,7 @@
         return;
       }
       scheduleMeteor();
+      scheduleCloud(true);
       synchronizePlanes();
       synchronizeAurora();
     };
