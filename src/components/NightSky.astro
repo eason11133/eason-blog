@@ -94,19 +94,30 @@
     }
   }
 
-  /* Small, stylized top-down passenger jet in muted slate blue.
-     The SVG silhouette keeps wings and tail legible at a distant scale. */
+  /* A side/three-quarter passenger jet: long nose, upright tail fin and
+     asymmetric swept wings, rather than the old top-down arrow shape. */
   .night-sky__plane {
     position: absolute;
     left: var(--plane-x);
     top: var(--plane-y);
-    width: var(--plane-size, 30px);
-    height: calc(var(--plane-size, 30px) * .46);
+    width: var(--plane-size, 54px);
+    height: calc(var(--plane-size, 54px) * .4);
     opacity: 0;
-    transform-origin: center center;
+    transform-origin: center;
     animation: night-plane-flight var(--plane-duration) linear var(--plane-delay, 0ms) forwards;
     will-change: transform, opacity;
     pointer-events: none;
+  }
+
+  /* Mirror the artwork, not the outer flight animation: the tail stays upright
+     on right-to-left flights instead of rotating upside-down by 180 degrees. */
+  .night-sky__plane-art {
+    display: block;
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transform: scaleX(var(--plane-facing, 1));
+    transform-origin: center;
   }
 
   .night-sky__plane-shape {
@@ -114,23 +125,43 @@
     width: 100%;
     height: 100%;
     overflow: visible;
-    filter: drop-shadow(0 0 1px rgba(186, 221, 238, .30));
+    filter: drop-shadow(0 0 1.4px rgba(184, 213, 230, .28));
   }
 
-  .night-sky__plane-silhouette {
-    fill: #6d899b;
-    stroke: rgba(192, 216, 231, .74);
+  .night-sky__plane-tail {
+    fill: #668092;
+    stroke: rgba(171, 200, 216, .78);
     stroke-width: 1.8;
     stroke-linejoin: round;
   }
-
-  .night-sky__plane-fuselage {
+  .night-sky__plane-body {
+    fill: #728d9f;
+    stroke: rgba(186, 212, 227, .86);
+    stroke-width: 2.2;
+    stroke-linejoin: round;
+  }
+  .night-sky__plane-wing {
+    fill: #5d788c;
+    stroke: rgba(169, 196, 213, .84);
+    stroke-width: 1.8;
+    stroke-linejoin: round;
+  }
+  .night-sky__plane-distant-wing {
+    fill: #6f8c9e;
+    stroke: rgba(166, 193, 211, .67);
+    stroke-width: 1.6;
+  }
+  .night-sky__plane-detail {
     fill: none;
-    stroke: rgba(213, 233, 244, .47);
-    stroke-width: 1.4;
+    stroke: rgba(212, 232, 242, .40);
+    stroke-width: 1.1;
     stroke-linecap: round;
   }
-
+  .night-sky__plane-engine {
+    fill: #3e566c;
+    stroke: rgba(160, 186, 202, .72);
+    stroke-width: 1;
+  }
   .night-sky__plane-light {
     animation: night-plane-blink var(--plane-blink-time) steps(1, end) infinite;
   }
@@ -145,7 +176,7 @@
   .night-sky__plane-trail {
     position: absolute;
     left: calc(-1 * var(--plane-trail-length, 50px) + 4px);
-    top: 50%;
+    top: 58%;
     transform: translateY(-50%);
     width: var(--plane-trail-length, 50px);
     height: var(--plane-trail-thickness, 1.5px);
@@ -359,7 +390,7 @@
     const spawnPlane = (event: PlaneEvent, now: number) => {
       const { width, height } = viewport();
       const desktop = width > 900;
-      const size = (desktop ? 26 : 19) + event.sizeFactor * (desktop ? 12 : 10);
+      const size = (desktop ? 45 : 35) + event.sizeFactor * (desktop ? 15 : 12);
       const margin = size + 8;
       const fromX = event.fromLeft ? -margin : width + margin;
       const toX = event.fromLeft ? width + margin : -margin;
@@ -375,31 +406,43 @@
         '--plane-dx': `${deltaX.toFixed(0)}px`,
         '--plane-dy': `${deltaY.toFixed(0)}px`,
         '--plane-size': `${size.toFixed(1)}px`,
-        '--plane-opacity': event.opacity.toFixed(2),
+        '--plane-opacity': Math.max(.72, event.opacity).toFixed(2),
+        '--plane-facing': event.fromLeft ? '1' : '-1',
         '--plane-trail-length': `${((desktop ? 42 : 22) + event.trailFactor * (desktop ? 32 : 20)).toFixed(0)}px`,
         '--plane-trail-thickness': `${(1 + event.sizeFactor).toFixed(1)}px`,
         '--plane-trail-opacity': event.trailOpacity.toFixed(2),
         '--plane-duration': `${event.durationMs}ms`,
         '--plane-delay': `${event.startsAt - now}ms`,
-        '--plane-tilt': `${(Math.atan2(deltaY, deltaX) * 180 / Math.PI).toFixed(1)}deg`,
+        // Left-moving planes mirror the silhouette horizontally, not by a 180-degree rotation.
+        '--plane-tilt': `${((event.fromLeft ? 1 : -1) * Math.atan2(deltaY, Math.abs(deltaX)) * 180 / Math.PI).toFixed(1)}deg`,
         '--plane-blink-time': `${event.blinkSeconds.toFixed(2)}s`,
       };
       for (const [name, value] of Object.entries(props)) plane.style.setProperty(name, value);
-      // Right-facing jet. The parent rotates to match left/right flight angle.
-      // Muted silhouette + two small lights; no photographic assets or heavy effects.
+      // Right-facing side/three-quarter passenger jet. Flip the whole artwork
+      // (including its tail smoke) when travelling right-to-left.
       plane.innerHTML = `
-        <span class="night-sky__plane-trail"></span>
-        <svg class="night-sky__plane-shape" viewBox="0 0 100 46" aria-hidden="true">
-          <path class="night-sky__plane-silhouette"
-            d="M 6 22 L 20 20 L 13 13 L 17 12 L 31 19 L 46 19
-               L 25 4 L 35 4 L 65 18 L 86 19
-               Q 98 20 99 23 Q 98 26 86 27 L 65 28
-               L 35 42 L 25 42 L 46 27 L 31 27
-               L 17 34 L 13 33 L 20 26 L 6 24 Z" />
-          <path class="night-sky__plane-fuselage" d="M 17 23 L 88 23" />
-          <circle class="night-sky__plane-light night-sky__plane-light--red" cx="30" cy="4" r="3.1" />
-          <circle class="night-sky__plane-light night-sky__plane-light--white" cx="30" cy="42" r="3.1" />
-        </svg>`;
+        <span class="night-sky__plane-art">
+          <span class="night-sky__plane-trail"></span>
+          <svg class="night-sky__plane-shape" viewBox="0 0 180 72" aria-hidden="true">
+            <path class="night-sky__plane-distant-wing"
+              d="M 107 38 L 76 20 L 94 20 L 133 37 Z" />
+            <path class="night-sky__plane-tail"
+              d="M 30 38 L 44 14 Q 47 12 53 14 L 67 39 Z" />
+            <path class="night-sky__plane-body"
+              d="M 18 39 Q 18 37 27 36 L 67 37 L 128 34
+                 Q 154 34 170 39 Q 180 41 178 43
+                 Q 176 46 164 47 L 125 49 L 55 49 L 29 47
+                 Q 15 46 17 42 Z" />
+            <path class="night-sky__plane-wing"
+              d="M 44 48 L 25 59 L 45 57 L 68 49 Z" />
+            <path class="night-sky__plane-wing"
+              d="M 112 43 L 61 68 Q 60 70 67 69 L 83 69 L 137 44 Z" />
+            <path class="night-sky__plane-detail" d="M 50 42 Q 93 40 156 42" />
+            <ellipse class="night-sky__plane-engine" cx="102" cy="57" rx="8" ry="3" />
+            <circle class="night-sky__plane-light night-sky__plane-light--red" cx="67" cy="68" r="3" />
+            <circle class="night-sky__plane-light night-sky__plane-light--white" cx="95" cy="20" r="3" />
+          </svg>
+        </span>`;
       activePlanes.set(event.id, plane);
       aircraft.appendChild(plane);
       plane.addEventListener('animationend', (animationEvent) => {
