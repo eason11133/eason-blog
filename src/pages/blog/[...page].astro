@@ -585,7 +585,7 @@ if (last > 1) paginationList.push(last);
         <nav class="article-tags" aria-label="文章標籤">
           <a class="tag-filter all-tag" href="/blog/">全部文章 <span>{page.total}</span></a>
           {tags.map(([tag, count]) => (
-            <a class="tag-filter" href={getTagPath(tag)}>
+            <a class="tag-filter" href={getTagPath(tag)} data-astro-prefetch="viewport">
               <span class="tag-hash">#</span>{tag}<span class="tag-count">{count}</span>
             </a>
           ))}

@@ -146,9 +146,9 @@ const tagsHero = heroConfig.tags;
         <p class="tag-count-summary">共 {posts.length} 篇文章</p>
       </header>
       <nav class="tags-cloud" aria-label="文章標籤">
-        <a href="/tags/" class="tag-pill" data-tag="all">全部文章</a>
+        <a href="/tags/" data-astro-prefetch="viewport" class="tag-pill" data-tag="all">全部文章</a>
         {sortedTags.map(([t, count]) => (
-          <a href={getTagPath(t)} class:list={['tag-pill', {'active-tag': t === tag}]} data-tag={t} data-count={count}>
+          <a href={getTagPath(t)} data-astro-prefetch="viewport" class:list={['tag-pill', {'active-tag': t === tag}]} data-tag={t} data-count={count}>
             <span class="tag-hash">#</span><span class="tag-name">{t}</span>
             <span class="tag-badge">{count}</span>
           </a>
