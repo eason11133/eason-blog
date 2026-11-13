@@ -8,8 +8,8 @@ describe('shared wall-clock aurora schedule', () => {
       const b = auroraEventForSlot(slot + 1);
       expect(a.durationMs).toBeGreaterThanOrEqual(20_000);
       expect(a.durationMs).toBeLessThanOrEqual(40_000);
-      expect(a.strength).toBeGreaterThanOrEqual(.18);
-      expect(a.strength).toBeLessThanOrEqual(.60);
+      expect(a.strength).toBeGreaterThanOrEqual(.44);
+      expect(a.strength).toBeLessThanOrEqual(.80);
       expect(b.startsAt - a.startsAt).toBeGreaterThanOrEqual(5 * 60_000);
       expect(b.startsAt - a.startsAt).toBeLessThanOrEqual(12 * 60_000);
     }

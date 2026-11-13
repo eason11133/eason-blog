@@ -102,11 +102,28 @@
     width: var(--plane-size, 10px);
     height: 2px;
     border-radius: 50%;
-    background: rgba(196, 220, 237, .60);
-    box-shadow: 0 0 3px rgba(202, 232, 255, .30);
+    background: rgba(213, 231, 242, .85);
+    box-shadow: 0 0 4px rgba(202, 232, 255, .42);
     opacity: 0;
     animation: night-plane-flight var(--plane-duration) linear forwards;
     will-change: transform, opacity;
+  }
+
+  /* A thin, fading contrail drawn behind the distant plane. Rotating the
+     parent along its heading keeps the trail behind it in either direction.
+     One gradient element only; no smoke particles or expensive blur filters. */
+  .night-sky__plane-trail {
+    position: absolute;
+    left: calc(-1 * var(--plane-trail-length, 32px) + 1px);
+    top: 0;
+    width: var(--plane-trail-length, 32px);
+    height: var(--plane-trail-thickness, 1.5px);
+    border-radius: 99px;
+    background: linear-gradient(to right,
+      transparent,
+      rgba(169, 189, 204, .12) 35%,
+      rgba(192, 214, 228, var(--plane-trail-opacity, .35)) 100%);
+    pointer-events: none;
   }
 
   .night-sky__plane::before,
@@ -114,8 +131,8 @@
     content: '';
     position: absolute;
     top: -1px;
-    width: 3px;
-    height: 3px;
+    width: 3.5px;
+    height: 3.5px;
     border-radius: 50%;
     animation: night-plane-blink var(--plane-blink-time) steps(1, end) infinite;
   }
@@ -146,21 +163,19 @@
     71%, 100% { opacity: .27; }
   }
 
-  /* Just one translucent gradient layer: inexpensive, faint-to-visible aurora. */
+  /* Soft but visible throughout the open night sky, including the mountain
+     horizon visible near the footer. A single animated gradient layer. */
   .night-sky__aurora {
     position: absolute;
-    top: 6%;
-    left: -16%;
-    width: 132%;
-    height: 63%;
+    inset: 0 -12%;
     opacity: 0;
     background:
-      radial-gradient(ellipse 44% 27% at 28% 33%, rgba(45, 180, 155, .33), transparent 78%),
-      radial-gradient(ellipse 39% 29% at 59% 41%, rgba(41, 146, 187, .24), transparent 76%),
+      radial-gradient(ellipse 44% 34% at 29% 43%, rgba(65, 199, 168, .63), transparent 78%),
+      radial-gradient(ellipse 44% 31% at 72% 64%, rgba(56, 168, 206, .52), transparent 77%),
       linear-gradient(117deg,
-        transparent 23%, rgba(29, 157, 147, .10) 35%,
-        rgba(74, 178, 161, .24) 44%, transparent 58%,
-        rgba(57, 146, 182, .14) 67%, transparent 80%);
+        transparent 18%, rgba(45, 173, 156, .17) 33%,
+        rgba(81, 199, 177, .38) 47%, transparent 64%,
+        rgba(66, 166, 202, .26) 75%, transparent 89%);
     pointer-events: none;
   }
   .night-sky__aurora.is-visible {
@@ -330,7 +345,7 @@
         const fromLeft = Math.random() < .5;
         const plane = document.createElement('span');
         plane.className = 'night-sky__plane';
-        const size = randomBetween(width > 900 ? 8 : 5, width > 900 ? 15 : 10);
+        const size = randomBetween(width > 900 ? 10 : 7, width > 900 ? 17 : 12);
         const margin = size + 8;
         const fromX = fromLeft ? -margin : width + margin;
         const toX = fromLeft ? width + margin : -margin;
@@ -345,12 +360,18 @@
           '--plane-dx': `${deltaX.toFixed(0)}px`,
           '--plane-dy': `${deltaY.toFixed(0)}px`,
           '--plane-size': `${size.toFixed(1)}px`,
-          '--plane-opacity': randomBetween(.27, .60).toFixed(2),
+          '--plane-opacity': randomBetween(.56, .88).toFixed(2),
+          '--plane-trail-length': `${randomBetween(width > 900 ? 28 : 15, width > 900 ? 58 : 32).toFixed(0)}px`,
+          '--plane-trail-thickness': `${randomBetween(1, 2).toFixed(1)}px`,
+          '--plane-trail-opacity': randomBetween(.25, .45).toFixed(2),
           '--plane-duration': `${randomBetween(15, 30).toFixed(1)}s`,
           '--plane-tilt': `${(Math.atan2(deltaY, deltaX) * 180 / Math.PI).toFixed(1)}deg`,
           '--plane-blink-time': `${randomBetween(.85, 2.2).toFixed(2)}s`,
         };
         for (const [name, value] of Object.entries(props)) plane.style.setProperty(name, value);
+        const trail = document.createElement('span');
+        trail.className = 'night-sky__plane-trail';
+        plane.appendChild(trail);
         activePlane = plane;
         aircraft.appendChild(plane);
         plane.addEventListener('animationend', (event) => {

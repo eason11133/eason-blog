@@ -31,12 +31,12 @@ export function auroraEventForSlot(slot: number): AuroraEvent {
   const durationMs = 20_000 + Math.round(sample(slot, 0x6a47) * 20_000);
   const brightnessRoll = sample(slot, 0x13bf);
   const brightnessSeed = sample(slot, 0x7b91);
-  // Gentle through clearly visible, excluding the strongest reference range.
-  const strength = brightnessRoll < .15
-    ? .18 + brightnessSeed * .10
-    : brightnessRoll < .85
-      ? .29 + brightnessSeed * .18
-      : .47 + brightnessSeed * .13;
+  // Visible but still subdued: no extremely intense aurora events.
+  const strength = brightnessRoll < .18
+    ? .44 + brightnessSeed * .10
+    : brightnessRoll < .86
+      ? .55 + brightnessSeed * .15
+      : .70 + brightnessSeed * .10;
 
   return { id: slot, startsAt, endsAt: startsAt + durationMs, durationMs, strength };
 }
