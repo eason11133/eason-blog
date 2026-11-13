@@ -106,8 +106,21 @@ const socials = profileConfig.socials.filter((social) =>
     .footer-line, .aurora-countdown {
       grid-column: 1;
     }
+    /* On narrow screens the footer is normally the original single row.
+       For the final minute / active aurora, swap that row for the timer. */
     .aurora-countdown {
-      margin-top: .7rem;
+      display: none;
+      margin-top: 0;
+      justify-self: center;
+      line-height: 24px;
+    }
+    footer[data-aurora-notice="soon"] .footer-line,
+    footer[data-aurora-notice="active"] .footer-line {
+      display: none;
+    }
+    footer[data-aurora-notice="soon"] .aurora-countdown,
+    footer[data-aurora-notice="active"] .aurora-countdown {
+      display: block;
     }
   }
 </style>
@@ -129,6 +142,13 @@ const socials = profileConfig.socials.filter((social) =>
     if (!element) return;
     const now = Date.now();
     const { active, next } = getAuroraState(now);
+    const footer = element.closest('footer');
+    const untilNext = next.startsAt - now;
+    // Desktop keeps its usual continuous countdown. Mobile only switches
+    // the footer row for the last minute or while the aurora is occurring.
+    if (footer) {
+      footer.dataset.auroraNotice = active ? 'active' : untilNext <= 60_000 ? 'soon' : 'normal';
+    }
     if (active) {
       element.textContent = `✦ 極光出現中・剩餘 ${formatCountdown(active.endsAt - now)}`;
       element.dataset.active = 'true';
