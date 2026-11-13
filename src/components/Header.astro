@@ -556,15 +556,11 @@ const { transparent = true } = Astro.props;
       border-left-color: rgba(171, 207, 237, .17);
       box-shadow: -14px 0 40px rgba(0, 0, 0, .34);
     }
-    .mobile-nav-drawer .mobile-nav-link,
-    header.transparent .mobile-nav-drawer .mobile-nav-link {
+    /* Keep the existing active item colors and highlight unchanged. */
+    .mobile-nav-drawer .mobile-nav-link:not(.active),
+    header.transparent .mobile-nav-drawer .mobile-nav-link:not(.active) {
       color: #eaf3ff;
       text-shadow: 0 1px 10px rgba(2, 8, 19, .55);
-    }
-    .mobile-nav-drawer .mobile-nav-link.active,
-    header.transparent .mobile-nav-drawer .mobile-nav-link.active {
-      color: #cae3fb;
-      background: rgba(36, 72, 111, .52);
     }
   }
 </style>
