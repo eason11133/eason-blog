@@ -122,7 +122,7 @@
       window.clearTimeout(scheduled);
       if (!layer.isConnected || motion.matches || document.hidden) return;
       // Random gap between meteors, with one visible at a time.
-      scheduled = window.setTimeout(shoot, randomBetween(2000, 5000));
+      scheduled = window.setTimeout(shoot, randomBetween(1000, 5000));
     };
     const shoot = () => {
       if (!layer.isConnected || motion.matches || document.hidden || activeMeteor) {
