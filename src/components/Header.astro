@@ -313,7 +313,11 @@ const { transparent = true } = Astro.props;
 		font-size: 1rem;
 		font-weight: 600;
 		background: transparent;
-		transition: background 0.2s ease, color 0.2s ease;
+		transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
+	}
+
+	.mobile-nav-link:hover {
+		transform: translateY(-2px);
 	}
 
 	.mobile-nav-drawer .mobile-nav-link {
