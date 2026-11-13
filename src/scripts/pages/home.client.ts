@@ -2,7 +2,7 @@ import { setupParallax } from './parallax';
 
 function setupCountUp() {
 	const statValues = document.querySelectorAll('.stat-value');
-	if (statValues.length === 0) return;
+	if (statValues.length === 0 || document.documentElement.dataset.clientNavigated === 'true') return;
 
 	const countUpObserver = new IntersectionObserver(
 		(entries) => {

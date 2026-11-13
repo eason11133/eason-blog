@@ -66,7 +66,9 @@ const elementId = id || `typewriter-${Math.random().toString(36).substring(7)}`;
 
     document.addEventListener('astro:page-load', () => {
         // Only the first document load types text. Navigation retains SSR text.
-        const shouldAnimate = firstPageLoad && !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        const shouldAnimate = firstPageLoad
+            && document.documentElement.dataset.clientNavigated !== 'true'
+            && !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
         firstPageLoad = false;
         cleanups.forEach((cleanup) => cleanup());
         cleanups = [];
