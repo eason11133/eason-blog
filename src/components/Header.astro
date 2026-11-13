@@ -51,22 +51,13 @@ const { transparent = true } = Astro.props;
 		</div>
 	</nav>
 	<div id="mobile-nav-overlay" class="mobile-nav-overlay" aria-hidden="true"></div>
-	<aside id="mobile-nav-drawer" class="mobile-nav-drawer" aria-hidden="true" aria-label="網站導覽">
-		<div class="mobile-nav-scene" aria-hidden="true">
-			<div class="mobile-nav-orbit"></div>
-			<div class="mobile-nav-comet"></div>
-		</div>
-		<div class="mobile-nav-inner">
-			<div class="mobile-nav-kicker"><span class="mobile-nav-kicker-dot"></span> EASON / NAVIGATION</div>
-			<div class="mobile-nav-heading">Explore<span class="mobile-nav-heading-period">.</span></div>
-			<nav class="mobile-nav-links" aria-label="手機版導覽">
-				<a href="/" class="mobile-nav-link"><span class="mobile-nav-index">01</span><span class="mobile-nav-title">首頁</span><span class="mobile-nav-arrow" aria-hidden="true">↗</span></a>
-				<a href="/blog" class="mobile-nav-link"><span class="mobile-nav-index">02</span><span class="mobile-nav-title">文章</span><span class="mobile-nav-arrow" aria-hidden="true">↗</span></a>
-				<a href="/experience" class="mobile-nav-link"><span class="mobile-nav-index">03</span><span class="mobile-nav-title">作品與經歷</span><span class="mobile-nav-arrow" aria-hidden="true">↗</span></a>
-				<a href="/about" class="mobile-nav-link"><span class="mobile-nav-index">04</span><span class="mobile-nav-title">關於我</span><span class="mobile-nav-arrow" aria-hidden="true">↗</span></a>
-			</nav>
-			<div class="mobile-nav-footer"><span>STAY CURIOUS</span><span class="mobile-nav-footer-line"></span><span>© EASON</span></div>
-		</div>
+	<aside id="mobile-nav-drawer" class="mobile-nav-drawer" aria-hidden="true">
+		<nav class="mobile-nav-links" aria-label="移动端导航">
+			<a href="/" class="mobile-nav-link">首頁</a>
+			<a href="/blog" class="mobile-nav-link">文章</a>
+			<a href="/experience" class="mobile-nav-link">作品與經歷</a>
+			<a href="/about" class="mobile-nav-link">關於我</a>
+		</nav>
 	</aside>
 </header>
 <style>
@@ -537,191 +528,45 @@ const { transparent = true } = Astro.props;
 
 	
 
-	/* Night mountains: a compact slide-in drawer, never a full-screen takeover.
-	   The opaque header cap deliberately covers any bright Hero photo. */
-	@media (max-width: 900px) {
-		header.mobile-menu-open,
-		header.transparent.mobile-menu-open,
-		header.transparent.scrolled.mobile-menu-open {
-			background: #101b2b !important;
-			border-bottom: 1px solid rgba(145, 183, 219, .2);
-			box-shadow: 0 4px 22px rgba(3, 8, 17, .35) !important;
-			backdrop-filter: none !important;
-			-webkit-backdrop-filter: none !important;
-		}
-		header.mobile-menu-open > nav {
-			position: relative;
-			z-index: 5;
-		}
-		header.mobile-menu-open > nav .site-home-link,
-		header.mobile-menu-open > nav .search-btn,
-		header.mobile-menu-open > nav .mobile-menu-btn {
-			color: #f2f7ff !important;
-		}
-		header.mobile-menu-open .mobile-menu-btn {
-			background: rgba(145, 191, 229, .10);
-			border: 1px solid rgba(145, 191, 229, .21);
-		}
-		.mobile-nav-overlay {
-			inset: 64px 0 0;
-			background: rgba(4, 10, 20, .72);
-			backdrop-filter: blur(8px) brightness(.65);
-			-webkit-backdrop-filter: blur(8px) brightness(.65);
-		}
-		.mobile-nav-drawer,
-		:global([data-theme="dark"]) .mobile-nav-drawer {
-			position: fixed;
-			inset: 64px 0 0 auto;
-			top: 64px;
-			right: 0;
-			width: min(87vw, 350px);
-			height: calc(100vh - 64px);
-			height: calc(100dvh - 64px);
-			padding: 0;
-			background: #091828 url('/background/mobile-menu-photo.svg') center center / cover no-repeat;
-			border: 0;
-			border-left: 1px solid rgba(147, 194, 234, .22);
-			box-shadow: -16px 0 52px rgba(0, 0, 0, .37);
-			transform: translateX(105%);
-			opacity: 1;
-			visibility: visible;
-			overflow: auto;
-			overscroll-behavior: contain;
-			transition: transform .46s cubic-bezier(.19,.83,.24,1), visibility .46s;
-			z-index: 2;
-		}
-		header.mobile-menu-open .mobile-nav-drawer {
-			transform: translateX(0);
-		}
-		/* The selected artwork is now the actual drawer background; no SVG mountain
-		   approximation or secondary drawing layered over it. */
-		.mobile-nav-scene {
-			position: absolute;
-			inset: 0;
-			pointer-events: none;
-			background: linear-gradient(180deg,rgba(7,19,34,.23) 0%,rgba(7,19,34,.03) 40%,rgba(7,19,34,.12) 100%);
-		}
-		.mobile-nav-orbit,.mobile-nav-comet { display: none; }
-		.mobile-nav-inner {
-			position: relative;
-			z-index: 1;
-			display: flex;
-			flex-direction: column;
-			min-height: 100%;
-			box-sizing: border-box;
-			padding: clamp(28px, 5.6vh, 52px) clamp(20px, 5.5vw, 27px) max(25px,env(safe-area-inset-bottom));
-		}
-		.mobile-nav-kicker {
-			display: flex;
-			align-items: center;
-			gap: 8px;
-			font-size: 10px;
-			letter-spacing: .19em;
-			font-weight: 650;
-			color: #a7c2db;
-		}
-		.mobile-nav-kicker-dot {
-			width: 5px;
-			height: 5px;
-			border-radius: 50%;
-			background: #b5d9fb;
-			box-shadow: 0 0 8px rgba(188,224,255,.65);
-		}
-		.mobile-nav-heading {
-			margin: 5px 0 clamp(20px,4vh,37px);
-			color: #ebf3fc;
-			font-size: clamp(33px,7vw,43px);
-			line-height: 1.2;
-			font-weight: 700;
-			letter-spacing: -.045em;
-		}
-		.mobile-nav-heading-period { color: #a0c5e7; }
-		.mobile-nav-links {
-			display: flex;
-			flex-direction: column;
-			align-items: stretch;
-			gap: 6px;
-			height: auto;
-			width: 100%;
-		}
-		.mobile-nav-drawer .mobile-nav-link,
-		header.transparent .mobile-nav-drawer .mobile-nav-link {
-			display: grid;
-			grid-template-columns: 22px minmax(0,1fr) 18px;
-			align-items: center;
-			gap: 12px;
-			box-sizing: border-box;
-			min-height: 62px;
-			padding: 11px 12px 11px 9px;
-			border: 1px solid rgba(165,199,229,.11);
-			border-radius: 12px;
-			background: rgba(14,29,49,.41);
-			backdrop-filter: blur(4px);
-			-webkit-backdrop-filter: blur(4px);
-			color: #e2ecf8;
-			text-align: left;
-			transform: none;
-			transition: background .25s ease, border-color .25s ease, transform .25s ease;
-		}
-		.mobile-nav-link .mobile-nav-index {
-			font-size: 10px;
-			font-weight: 700;
-			letter-spacing: .04em;
-			color: #92aec9;
-		}
-		.mobile-nav-link .mobile-nav-title {
-			font-size: clamp(18px,4.6vw,21px);
-			letter-spacing: .035em;
-			font-weight: 570;
-		}
-		.mobile-nav-link .mobile-nav-arrow {
-			font-size: 20px;
-			font-weight: 300;
-			justify-self: end;
-			color: #abc8e6;
-			opacity: .65;
-		}
-		.mobile-nav-drawer .mobile-nav-link.active,
-		header.transparent .mobile-nav-drawer .mobile-nav-link.active {
-			border-color: rgba(161,201,239,.33);
-			background: rgba(72,115,153,.27);
-			color: #f0f7ff;
-		}
-		.mobile-nav-drawer .mobile-nav-link:hover,
-		.mobile-nav-drawer .mobile-nav-link:focus-visible {
-			transform: translateX(-3px);
-			background: rgba(78,124,165,.3);
-			border-color: rgba(166,202,233,.4);
-		}
-		.mobile-nav-footer {
-			margin-top: auto;
-			display: flex;
-			align-items: center;
-			gap: 12px;
-			padding-top: 45px;
-			font-size: 9px;
-			letter-spacing: .18em;
-			font-weight: 650;
-			color: #b0c2d2;
-			text-shadow: 0 1px 8px rgba(0,0,0,.45);
-		}
-		.mobile-nav-footer-line {
-			flex: 1;
-			height: 1px;
-			background: rgba(169,200,222,.22);
-		}
-	}
-	@keyframes mobile-menu-stars { from {opacity: .32;} to {opacity:.72;} }
-	@keyframes mobile-menu-shoot {
-		0%, 13% {opacity:0;transform:translate3d(0,0,0) rotate(-31deg);}
-		15% {opacity:.85;}
-		23%,100% {opacity:0;transform:translate3d(-170px,100px,0) rotate(-31deg);}
-	}
-	@media (prefers-reduced-motion: reduce) {
-		.mobile-nav-scene::after,.mobile-nav-comet {animation:none !important;}
-		.mobile-nav-drawer {transition-duration:.01ms !important;}
-	}
-
+  /* Mobile drawer: preserve the site's original labels, type and link spacing.
+     Only change the atmosphere and cover the bright Hero behind the open header. */
+  @media (max-width: 900px) {
+    header.mobile-menu-open,
+    header.transparent.mobile-menu-open,
+    header.transparent.scrolled.mobile-menu-open {
+      background: #101b2b !important;
+      border-bottom: 1px solid rgba(155, 177, 214, .16);
+      box-shadow: 0 3px 20px rgba(3, 9, 21, .3) !important;
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
+    }
+    header.mobile-menu-open > nav .site-home-link,
+    header.mobile-menu-open > nav .search-btn,
+    header.mobile-menu-open > nav .mobile-menu-btn {
+      color: #e9f2ff !important;
+    }
+    .mobile-nav-overlay {
+      background: rgba(5, 11, 24, .64);
+      backdrop-filter: blur(6px) brightness(.7);
+      -webkit-backdrop-filter: blur(6px) brightness(.7);
+    }
+    .mobile-nav-drawer,
+    :global([data-theme="dark"]) .mobile-nav-drawer {
+      background: #0e1c30 url('/background/mobile-menu-photo.svg') center center / cover no-repeat;
+      border-left-color: rgba(171, 207, 237, .17);
+      box-shadow: -14px 0 40px rgba(0, 0, 0, .34);
+    }
+    .mobile-nav-drawer .mobile-nav-link,
+    header.transparent .mobile-nav-drawer .mobile-nav-link {
+      color: #eaf3ff;
+      text-shadow: 0 1px 10px rgba(2, 8, 19, .55);
+    }
+    .mobile-nav-drawer .mobile-nav-link.active,
+    header.transparent .mobile-nav-drawer .mobile-nav-link.active {
+      color: #cae3fb;
+      background: rgba(36, 72, 111, .52);
+    }
+  }
 </style>
 
 <script>
