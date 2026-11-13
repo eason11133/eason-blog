@@ -1218,11 +1218,6 @@ hr {
 [data-theme="dark"] body[data-page-id="tags-index"],
 [data-theme="dark"] body[data-page-id="tag-detail"] {
   background-color: #101b2b !important;
-  background-image: url('/background/eason-night.svg') !important;
-  background-position: center 45% !important;
-  background-repeat: no-repeat !important;
-  background-size: cover !important;
-  background-attachment: fixed !important;
 }
 [data-theme="dark"] body[data-page-id] #main-content {
   background: transparent;

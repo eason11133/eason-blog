@@ -1,11 +1,13 @@
 ---
-/** One background layer retained by Astro ClientRouter across page navigation. */
+/** One continuous, persistent night-sky background for every page and mobile menu. */
 ---
 
 <div class="night-sky" transition:persist="night-sky" aria-hidden="true">
   <div class="night-sky__glow"></div>
+  <div class="night-sky__aurora"></div>
   <div class="night-sky__stars"></div>
   <div class="night-sky__meteors"></div>
+  <div class="night-sky__aircraft"></div>
 </div>
 
 <style is:global>
@@ -15,22 +17,26 @@
     z-index: 0;
     overflow: hidden;
     pointer-events: none;
-    background: #101b2b url('/background/eason-night.svg') center center / cover no-repeat;
+    background: #07121f url('/background/eason-night.svg') center bottom / cover no-repeat;
     contain: paint;
   }
+
   .night-sky__glow {
     position: absolute;
     inset: 0;
     background:
-      radial-gradient(ellipse 45% 36% at 66% 34%, rgba(56, 114, 169, .10), transparent),
-      radial-gradient(ellipse 38% 30% at 25% 77%, rgba(79, 131, 176, .07), transparent);
-    pointer-events: none;
+      radial-gradient(ellipse 44% 32% at 66% 34%, rgba(56, 114, 169, .07), transparent),
+      radial-gradient(ellipse 36% 29% at 25% 77%, rgba(79, 131, 176, .04), transparent);
   }
-  .night-sky__stars, .night-sky__meteors {
+
+  .night-sky__stars,
+  .night-sky__meteors,
+  .night-sky__aircraft {
     position: absolute;
     inset: 0;
     pointer-events: none;
   }
+
   .night-sky__star {
     position: absolute;
     display: block;
@@ -39,33 +45,34 @@
     border-radius: 50%;
     background: #e4f2ff;
     opacity: var(--star-opacity);
-    box-shadow: 0 0 var(--star-glow) rgba(181, 222, 255, .60);
+    box-shadow: 0 0 var(--star-glow) rgba(181, 222, 255, .52);
     animation: night-star-twinkle var(--twinkle-time) ease-in-out var(--twinkle-delay) infinite alternate;
   }
+
   @keyframes night-star-twinkle {
     from { opacity: calc(var(--star-opacity) * .48); }
-    to { opacity: var(--star-opacity); }
+    to   { opacity: var(--star-opacity); }
   }
+
   .night-sky__meteor {
     position: absolute;
-    display: block;
-    height: var(--meteor-thickness, 2px);
-    width: var(--meteor-length);
     left: var(--meteor-x);
     top: var(--meteor-y);
-    opacity: 0;
+    width: var(--meteor-length);
+    height: var(--meteor-thickness, 2px);
     border-radius: 99px;
-    /* Keep most of each random-length trail visible, rather than fading out at 58%. */
+    opacity: 0;
+    transform-origin: left center;
     background: linear-gradient(to right,
       rgba(245, 252, 255, var(--meteor-head-alpha, .95)) 0%,
       rgba(197, 233, 255, var(--meteor-mid-alpha, .75)) var(--meteor-bright-stop, 27%),
       rgba(142, 204, 255, var(--meteor-tail-alpha, .26)) var(--meteor-fade-stop, 82%),
       transparent 100%);
     box-shadow: 0 0 var(--meteor-glow, 4px) rgba(193, 226, 255, var(--meteor-glow-alpha, .48));
-    transform-origin: left center;
     animation: night-meteor-flight var(--meteor-duration) linear forwards;
     will-change: transform, opacity;
   }
+
   .night-sky__meteor::before {
     content: '';
     position: absolute;
@@ -77,121 +84,213 @@
     background: #f5fbff;
     box-shadow: 0 0 var(--meteor-head-glow, 9px) rgba(180, 224, 255, var(--meteor-head-alpha, .95));
   }
+
   @keyframes night-meteor-flight {
     0% { opacity: 0; transform: translate3d(0, 0, 0) rotate(var(--meteor-angle)); }
-    8% { opacity: var(--meteor-peak-opacity, .95); }
-    82% { opacity: var(--meteor-peak-opacity, .95); }
+    8%, 82% { opacity: var(--meteor-peak-opacity, .95); }
     100% {
       opacity: 0;
       transform: translate3d(var(--meteor-travel-x), var(--meteor-travel-y), 0) rotate(var(--meteor-angle));
     }
   }
+
+  /* A distant aircraft: tiny silhouette and gently blinking lights, never a large close-up. */
+  .night-sky__plane {
+    position: absolute;
+    left: var(--plane-x);
+    top: var(--plane-y);
+    width: var(--plane-size, 10px);
+    height: 2px;
+    border-radius: 50%;
+    background: rgba(196, 220, 237, .60);
+    box-shadow: 0 0 3px rgba(202, 232, 255, .30);
+    opacity: 0;
+    animation: night-plane-flight var(--plane-duration) linear forwards;
+    will-change: transform, opacity;
+  }
+
+  .night-sky__plane::before,
+  .night-sky__plane::after {
+    content: '';
+    position: absolute;
+    top: -1px;
+    width: 3px;
+    height: 3px;
+    border-radius: 50%;
+    animation: night-plane-blink var(--plane-blink-time) steps(1, end) infinite;
+  }
+  .night-sky__plane::before {
+    left: 0;
+    background: #ed8589;
+    box-shadow: 0 0 3px rgba(238, 95, 100, .66);
+  }
+  .night-sky__plane::after {
+    right: 0;
+    background: #e0f4ff;
+    box-shadow: 0 0 3px rgba(195, 222, 250, .66);
+    animation-delay: calc(var(--plane-blink-time) * -.5);
+  }
+
+  @keyframes night-plane-flight {
+    0% { opacity: 0; transform: translate3d(0, 0, 0) rotate(var(--plane-tilt)); }
+    7%, 88% { opacity: var(--plane-opacity, .42); }
+    100% {
+      opacity: 0;
+      transform: translate3d(var(--plane-dx), var(--plane-dy), 0) rotate(var(--plane-tilt));
+    }
+  }
+  @keyframes night-plane-blink {
+    0%, 49% { opacity: .2; }
+    50%, 70% { opacity: 1; }
+    71%, 100% { opacity: .27; }
+  }
+
+  /* Just one translucent gradient layer: inexpensive, faint-to-visible aurora. */
+  .night-sky__aurora {
+    position: absolute;
+    top: 6%;
+    left: -16%;
+    width: 132%;
+    height: 63%;
+    opacity: 0;
+    background:
+      radial-gradient(ellipse 44% 27% at 28% 33%, rgba(45, 180, 155, .33), transparent 78%),
+      radial-gradient(ellipse 39% 29% at 59% 41%, rgba(41, 146, 187, .24), transparent 76%),
+      linear-gradient(117deg,
+        transparent 23%, rgba(29, 157, 147, .10) 35%,
+        rgba(74, 178, 161, .24) 44%, transparent 58%,
+        rgba(57, 146, 182, .14) 67%, transparent 80%);
+    pointer-events: none;
+  }
+  .night-sky__aurora.is-visible {
+    animation: night-aurora-appear var(--aurora-duration) ease-in-out forwards;
+    will-change: opacity, transform;
+  }
+  @keyframes night-aurora-appear {
+    0% { opacity: 0; transform: translate3d(-2%, 2%, 0) skewX(-8deg); }
+    24% { opacity: var(--aurora-opacity); transform: translate3d(0, 0, 0) skewX(-4deg); }
+    57% { opacity: calc(var(--aurora-opacity) * .82); transform: translate3d(2%, -1%, 0) skewX(-1deg); }
+    78% { opacity: var(--aurora-opacity); transform: translate3d(3%, 1%, 0) skewX(2deg); }
+    100% { opacity: 0; transform: translate3d(5%, 2%, 0) skewX(5deg); }
+  }
+
+  /* The existing fixed sky becomes visible *through* the drawer, not another image. */
+  @media (max-width: 900px) {
+    body:has(header.mobile-menu-open) .night-sky {
+      z-index: 99;
+      clip-path: inset(64px 0 0 calc(100% - min(86vw, 320px)));
+    }
+  }
+
   @media (prefers-reduced-motion: reduce) {
-    .night-sky__star { animation: none; }
-    .night-sky__meteor { display: none; }
+    .night-sky__star,
+    .night-sky__meteor,
+    .night-sky__plane,
+    .night-sky__aurora { animation: none !important; }
+    .night-sky__meteor,
+    .night-sky__plane,
+    .night-sky__aurora { display: none !important; }
   }
 </style>
 
 <script>
-  // This component is persistent: initialize once, including after navigation.
+  // This element persists across Astro navigation; start timers only once.
   const mountNightSky = () => {
     const layer = document.querySelector<HTMLElement>('.night-sky');
     if (!layer || layer.dataset.ready === 'true') return;
-    layer.dataset.ready = 'true';
     const stars = layer.querySelector<HTMLElement>('.night-sky__stars');
     const meteors = layer.querySelector<HTMLElement>('.night-sky__meteors');
-    if (!stars || !meteors) return;
+    const aircraft = layer.querySelector<HTMLElement>('.night-sky__aircraft');
+    const aurora = layer.querySelector<HTMLElement>('.night-sky__aurora');
+    if (!stars || !meteors || !aircraft || !aurora) return;
+    layer.dataset.ready = 'true';
 
     const randomBetween = (min: number, max: number) => min + Math.random() * (max - min);
     const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const viewport = () => ({ width: layer.clientWidth || window.innerWidth, height: layer.clientHeight || window.innerHeight });
+    const canAnimate = () => layer.isConnected && !motion.matches && !document.hidden;
 
-    // Keep points fixed across page navigation; only opacity softly changes.
-    for (let i = 0; i < 75; i++) {
+    // Static positions, soft twinkle; fewer animated points on small devices.
+    const starCount = motion.matches ? 0 : (window.innerWidth > 900 ? 48 : 30);
+    for (let i = 0; i < starCount; i++) {
       const star = document.createElement('i');
-      const bright = i < 22;
+      const bright = i < Math.ceil(starCount * .29);
       star.className = 'night-sky__star';
       star.style.left = `${randomBetween(1, 99).toFixed(2)}%`;
       star.style.top = `${randomBetween(2, 98).toFixed(2)}%`;
-      star.style.setProperty('--star-size', `${randomBetween(bright ? 1.7 : .7, bright ? 3 : 1.5).toFixed(2)}px`);
-      star.style.setProperty('--star-opacity', randomBetween(bright ? .7 : .3, bright ? .96 : .65).toFixed(2));
-      star.style.setProperty('--star-glow', `${randomBetween(bright ? 6 : 2, bright ? 11 : 5).toFixed(1)}px`);
-      star.style.setProperty('--twinkle-time', `${randomBetween(3.5, 9).toFixed(1)}s`);
-      star.style.setProperty('--twinkle-delay', `${randomBetween(-9, 0).toFixed(1)}s`);
+      star.style.setProperty('--star-size', `${randomBetween(bright ? 1.6 : .7, bright ? 2.8 : 1.4).toFixed(2)}px`);
+      star.style.setProperty('--star-opacity', randomBetween(bright ? .64 : .26, bright ? .90 : .58).toFixed(2));
+      star.style.setProperty('--star-glow', `${randomBetween(bright ? 5 : 1.5, bright ? 9 : 4).toFixed(1)}px`);
+      star.style.setProperty('--twinkle-time', `${randomBetween(4, 10).toFixed(1)}s`);
+      star.style.setProperty('--twinkle-delay', `${randomBetween(-10, 0).toFixed(1)}s`);
       stars.appendChild(star);
     }
 
-    // The background persists across Astro navigation; timers are created once.
     const activeMeteors = new Set<HTMLElement>();
-    let scheduled: number | undefined;
-    let burstTimer: number | undefined;
-    const canAnimate = () => layer.isConnected && !motion.matches && !document.hidden;
+    let activePlane: HTMLElement | null = null;
+    let meteorTimer: number | undefined;
+    let meteorBurstTimer: number | undefined;
+    let planeTimer: number | undefined;
+    let auroraTimer: number | undefined;
+    let auroraShowing = false;
 
-    const shoot = (allowBurst = true) => {
+    const shootMeteor = (allowBurst = true) => {
       if (!canAnimate()) return;
-      const viewportWidth = layer.clientWidth || window.innerWidth;
-      const viewportHeight = layer.clientHeight || window.innerHeight;
-      const desktop = viewportWidth > 900;
-      // Limit the number of simultaneous glow layers to avoid adding scroll lag.
+      const { width, height } = viewport();
+      const desktop = width > 900;
       if (activeMeteors.size >= (desktop ? 2 : 1)) return;
 
+      const angle = randomBetween(9, 78);
+      const rad = angle * Math.PI / 180;
+      const goesLeft = Math.random() < .77;
+      const roll = Math.random();
+      const sizeScale = Math.min(Math.max(Math.sqrt(width / 1440), .8), 1.25);
+      const requestedLength = desktop
+        ? (roll < .18 ? randomBetween(180, 300)
+          : roll < .88 ? randomBetween(340, 610) : randomBetween(660, 890)) * sizeScale
+        : (roll < .24 ? randomBetween(72, 115)
+          : roll < .91 ? randomBetween(115, 190) : randomBetween(195, 255));
+      // Keep the entire trail and starting point inside the same viewport.
+      const maxTailLength = Math.min(width * .60 / Math.max(.14, Math.cos(rad)), height * .57 / Math.max(.14, Math.sin(rad)));
+      const length = Math.max(45, Math.min(requestedLength, maxTailLength));
+      const tailX = length * Math.cos(rad);
+      const tailY = length * Math.sin(rad);
+      const minX = goesLeft ? Math.min(width * .51, width - tailX - 14) : tailX + 14;
+      const maxX = goesLeft ? width - tailX - 14 : Math.max(minX, width * .53);
+      const x = randomBetween(Math.max(14, minX), Math.max(Math.max(14, minX), Math.min(width - 12, maxX)));
+      const y = randomBetween(tailY + 15, Math.max(tailY + 15, height * .76));
+
+      const availableX = goesLeft ? x - 14 : width - x - 14;
+      const availableY = height - y - 20;
+      const maxTravel = Math.max(0, Math.min(availableX / Math.max(.14, Math.cos(rad)), availableY / Math.max(.14, Math.sin(rad))));
+      const travel = Math.min(randomBetween(width * .26, width * .65), maxTravel);
+      const brightnessRoll = Math.random();
+      const brightness = brightnessRoll < .45 ? randomBetween(.18, .42)
+        : brightnessRoll < .85 ? randomBetween(.43, .72) : randomBetween(.73, .98);
+      const duration = randomBetween(2, 6);
       const meteor = document.createElement('span');
       meteor.className = 'night-sky__meteor';
-
-      // Every meteor gets a new path, trail, glow and duration.
-      const angle = randomBetween(20, 49);
-      const radians = angle * Math.PI / 180;
-      const sizeFactor = Math.min(Math.max(Math.sqrt(viewportWidth / 1440), .8), 1.2);
-      const lengthRoll = Math.random();
-      const length = desktop
-        ? Math.min(viewportWidth * .58,
-            (lengthRoll < .18 ? randomBetween(260, 355)
-              : lengthRoll < .91 ? randomBetween(380, 640)
-              : randomBetween(700, 880)) * sizeFactor)
-        : Math.min(viewportWidth * .61,
-            lengthRoll < .88 ? randomBetween(95, 185) : randomBetween(190, 240));
-
-      // Leave room for the rotated trail at the right/top of the viewport.
-      const maxStartX = Math.max(20, viewportWidth - Math.cos(radians) * length - 24);
-      const minStartX = Math.min(viewportWidth * .37, maxStartX);
-      const startX = randomBetween(minStartX, Math.max(minStartX, Math.min(viewportWidth * .82, maxStartX)));
-      const minStartY = Math.sin(radians) * length + 14;
-      const startY = randomBetween(
-        Math.min(minStartY, viewportHeight * .42),
-        Math.max(Math.min(minStartY, viewportHeight * .42), viewportHeight * .53)
-      );
-
-      // A meteor always moves down-left; its direction and distance vary.
-      // Clamp the path so even a six-second meteor remains visible throughout.
-      const roomLeft = (startX - 12) / Math.cos(radians);
-      const roomDown = (viewportHeight - startY - 22) / Math.sin(radians);
-      const room = Math.max(0, Math.min(roomLeft, roomDown));
-      const desiredTravel = desktop
-        ? randomBetween(viewportWidth * .28, viewportWidth * .63)
-        : randomBetween(viewportWidth * .44, viewportWidth * .92);
-      const travel = Math.min(desiredTravel, room);
-      const durationSeconds = randomBetween(2, 6);
-      const brightness = randomBetween(.68, .99);
-      const thickness = randomBetween(1.5, 2.7);
-
-      meteor.style.setProperty('--meteor-x', `${startX.toFixed(0)}px`);
-      meteor.style.setProperty('--meteor-y', `${startY.toFixed(0)}px`);
-      meteor.style.setProperty('--meteor-length', `${length.toFixed(0)}px`);
-      meteor.style.setProperty('--meteor-angle', `${(-angle).toFixed(1)}deg`);
-      meteor.style.setProperty('--meteor-travel-x', `${(-travel * Math.cos(radians)).toFixed(0)}px`);
-      meteor.style.setProperty('--meteor-travel-y', `${(travel * Math.sin(radians)).toFixed(0)}px`);
-      meteor.style.setProperty('--meteor-duration', `${durationSeconds.toFixed(2)}s`);
-      meteor.style.setProperty('--meteor-thickness', `${thickness.toFixed(1)}px`);
-      meteor.style.setProperty('--meteor-head-size', `${randomBetween(4.5, 7.5).toFixed(1)}px`);
-      meteor.style.setProperty('--meteor-glow', `${randomBetween(2.5, 5.5).toFixed(1)}px`);
-      meteor.style.setProperty('--meteor-head-glow', `${randomBetween(6, 11).toFixed(1)}px`);
-      meteor.style.setProperty('--meteor-peak-opacity', brightness.toFixed(2));
-      meteor.style.setProperty('--meteor-head-alpha', brightness.toFixed(2));
-      meteor.style.setProperty('--meteor-mid-alpha', (brightness * randomBetween(.69, .90)).toFixed(2));
-      meteor.style.setProperty('--meteor-tail-alpha', (brightness * randomBetween(.30, .52)).toFixed(2));
-      meteor.style.setProperty('--meteor-glow-alpha', (brightness * randomBetween(.30, .60)).toFixed(2));
-      meteor.style.setProperty('--meteor-bright-stop', `${randomBetween(18, 35).toFixed(0)}%`);
-      meteor.style.setProperty('--meteor-fade-stop', `${randomBetween(77, 92).toFixed(0)}%`);
-
+      const props: Record<string, string> = {
+        '--meteor-x': `${x.toFixed(0)}px`,
+        '--meteor-y': `${y.toFixed(0)}px`,
+        '--meteor-length': `${length.toFixed(0)}px`,
+        '--meteor-angle': `${(goesLeft ? -angle : 180 + angle).toFixed(1)}deg`,
+        '--meteor-travel-x': `${((goesLeft ? -1 : 1) * travel * Math.cos(rad)).toFixed(0)}px`,
+        '--meteor-travel-y': `${(travel * Math.sin(rad)).toFixed(0)}px`,
+        '--meteor-duration': `${duration.toFixed(2)}s`,
+        '--meteor-thickness': `${randomBetween(1.2, 2.7).toFixed(1)}px`,
+        '--meteor-head-size': `${randomBetween(3.5, 7.2).toFixed(1)}px`,
+        '--meteor-glow': `${randomBetween(2, 5).toFixed(1)}px`,
+        '--meteor-head-glow': `${randomBetween(4, 10).toFixed(1)}px`,
+        '--meteor-peak-opacity': brightness.toFixed(2),
+        '--meteor-head-alpha': brightness.toFixed(2),
+        '--meteor-mid-alpha': (brightness * randomBetween(.66, .90)).toFixed(2),
+        '--meteor-tail-alpha': (brightness * randomBetween(.29, .49)).toFixed(2),
+        '--meteor-glow-alpha': (brightness * randomBetween(.25, .55)).toFixed(2),
+        '--meteor-bright-stop': `${randomBetween(18, 37).toFixed(0)}%`,
+        '--meteor-fade-stop': `${randomBetween(77, 93).toFixed(0)}%`,
+      };
+      for (const [name, value] of Object.entries(props)) meteor.style.setProperty(name, value);
       activeMeteors.add(meteor);
       meteors.appendChild(meteor);
       meteor.addEventListener('animationend', () => {
@@ -199,39 +298,110 @@
         activeMeteors.delete(meteor);
       }, { once: true });
 
-      // Rare paired streaks on desktop; no more than two at once.
-      if (desktop && allowBurst && activeMeteors.size === 1 && burstTimer === undefined && Math.random() < .16) {
-        burstTimer = window.setTimeout(() => {
-          burstTimer = undefined;
-          shoot(false);
-        }, randomBetween(450, 1150));
+      // Occasional pair, never more than two simultaneous meteors on desktop.
+      if (desktop && allowBurst && activeMeteors.size === 1 && meteorBurstTimer === undefined && Math.random() < .13) {
+        meteorBurstTimer = window.setTimeout(() => {
+          meteorBurstTimer = undefined;
+          shootMeteor(false);
+        }, randomBetween(400, 1000));
       }
     };
 
-    const schedule = () => {
-      window.clearTimeout(scheduled);
+    const scheduleMeteor = () => {
+      window.clearTimeout(meteorTimer);
       if (!canAnimate()) return;
-      const desktop = (layer.clientWidth || window.innerWidth) > 900;
-      scheduled = window.setTimeout(() => {
-        shoot();
-        schedule();
-      }, desktop ? randomBetween(1600, 5600) : randomBetween(2400, 6600));
+      meteorTimer = window.setTimeout(() => {
+        shootMeteor();
+        scheduleMeteor();
+      }, randomBetween(6000, 18000));
     };
+
+    const schedulePlane = () => {
+      window.clearTimeout(planeTimer);
+      if (!canAnimate()) return;
+      planeTimer = window.setTimeout(() => {
+        planeTimer = undefined;
+        if (!canAnimate() || activePlane) return;
+        const { width, height } = viewport();
+        const fromLeft = Math.random() < .5;
+        const plane = document.createElement('span');
+        plane.className = 'night-sky__plane';
+        const size = randomBetween(width > 900 ? 8 : 5, width > 900 ? 15 : 10);
+        const props: Record<string, string> = {
+          '--plane-x': `${(fromLeft ? -size - 4 : width + 4).toFixed(0)}px`,
+          '--plane-y': `${randomBetween(height * .12, height * .50).toFixed(0)}px`,
+          '--plane-dx': `${(fromLeft ? width + size * 2 + 8 : -(width + size * 2 + 8)).toFixed(0)}px`,
+          '--plane-dy': `${randomBetween(-height * .07, height * .07).toFixed(0)}px`,
+          '--plane-size': `${size.toFixed(1)}px`,
+          '--plane-opacity': randomBetween(.20, .58).toFixed(2),
+          '--plane-duration': `${randomBetween(15, 30).toFixed(1)}s`,
+          '--plane-tilt': `${randomBetween(-8, 8).toFixed(1)}deg`,
+          '--plane-blink-time': `${randomBetween(.85, 2.2).toFixed(2)}s`,
+        };
+        for (const [name, value] of Object.entries(props)) plane.style.setProperty(name, value);
+        activePlane = plane;
+        aircraft.appendChild(plane);
+        plane.addEventListener('animationend', () => {
+          plane.remove();
+          if (activePlane === plane) activePlane = null;
+          schedulePlane();
+        }, { once: true });
+      }, randomBetween(3 * 60_000, 8 * 60_000));
+    };
+
+    const showAurora = () => {
+      if (!canAnimate() || auroraShowing) return;
+      auroraShowing = true;
+      // Excludes the strong 70–100% reference range.
+      const roll = Math.random();
+      const strength = roll < .38 ? randomBetween(.08, .21)
+        : roll < .87 ? randomBetween(.22, .43) : randomBetween(.44, .65);
+      aurora.style.setProperty('--aurora-opacity', strength.toFixed(2));
+      aurora.style.setProperty('--aurora-duration', `${randomBetween(20, 40).toFixed(1)}s`);
+      aurora.classList.remove('is-visible');
+      // Force reflow only when this rare effect begins, not on every animation frame.
+      void aurora.offsetWidth;
+      aurora.classList.add('is-visible');
+    };
+
+    const scheduleAurora = () => {
+      window.clearTimeout(auroraTimer);
+      if (!canAnimate()) return;
+      auroraTimer = window.setTimeout(() => {
+        auroraTimer = undefined;
+        showAurora();
+      }, randomBetween(5 * 60_000, 12 * 60_000));
+    };
+
+    aurora.addEventListener('animationend', (event) => {
+      if (event.target !== aurora) return;
+      aurora.classList.remove('is-visible');
+      auroraShowing = false;
+      scheduleAurora();
+    });
 
     const onVisibility = () => {
+      window.clearTimeout(meteorTimer);
+      window.clearTimeout(meteorBurstTimer);
+      window.clearTimeout(planeTimer);
+      window.clearTimeout(auroraTimer);
+      meteorBurstTimer = undefined;
       if (!canAnimate()) {
-        window.clearTimeout(scheduled);
-        window.clearTimeout(burstTimer);
-        burstTimer = undefined;
-        activeMeteors.forEach((meteor) => meteor.remove());
+        for (const meteor of activeMeteors) meteor.remove();
         activeMeteors.clear();
-      } else {
-        schedule();
+        activePlane?.remove();
+        activePlane = null;
+        aurora.classList.remove('is-visible');
+        auroraShowing = false;
+        return;
       }
+      scheduleMeteor();
+      if (!activePlane) schedulePlane();
+      if (!auroraShowing) scheduleAurora();
     };
     document.addEventListener('visibilitychange', onVisibility);
     motion.addEventListener('change', onVisibility);
-    schedule();
+    onVisibility();
   };
   mountNightSky();
   document.addEventListener('astro:page-load', mountNightSky);

@@ -546,15 +546,16 @@ const { transparent = true } = Astro.props;
       color: #e9f2ff !important;
     }
     .mobile-nav-overlay {
-      background: rgba(5, 11, 24, .64);
-      backdrop-filter: blur(6px) brightness(.7);
-      -webkit-backdrop-filter: blur(6px) brightness(.7);
+      /* Dim the underlying content without costly backdrop blur. */
+      background: rgba(5, 11, 24, .50);
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
     }
     .mobile-nav-drawer,
     :global([data-theme="dark"]) .mobile-nav-drawer {
-      background:
-        linear-gradient(rgba(7, 15, 29, .60), rgba(7, 15, 29, .60)),
-        #0e1c30 url('/background/mobile-menu-photo.svg') center center / cover no-repeat;
+      /* The same persistent NightSky is visible through this drawer.
+         No second wallpaper or re-positioned copy. */
+      background: rgba(5, 13, 27, .20);
       border-left-color: rgba(171, 207, 237, .17);
       box-shadow: -14px 0 40px rgba(0, 0, 0, .34);
     }
