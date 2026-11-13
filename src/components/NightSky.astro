@@ -4,7 +4,74 @@
 
 <div class="night-sky" transition:persist="night-sky" aria-hidden="true">
   <div class="night-sky__glow"></div>
-  <div class="night-sky__aurora"></div>
+  <div class="night-sky__aurora">
+    <svg class="night-sky__aurora-art" viewBox="0 0 1440 900" preserveAspectRatio="none" aria-hidden="true">
+      <defs>
+        <linearGradient id="sky-aurora-green" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stop-color="#a2ffdf" stop-opacity=".90"/>
+          <stop offset="16%" stop-color="#52ebbc" stop-opacity=".75"/>
+          <stop offset="46%" stop-color="#28b9ad" stop-opacity=".38"/>
+          <stop offset="100%" stop-color="#1886a2" stop-opacity="0"/>
+        </linearGradient>
+        <linearGradient id="sky-aurora-cyan" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stop-color="#9ef6e8" stop-opacity=".84"/>
+          <stop offset="26%" stop-color="#52d4d2" stop-opacity=".59"/>
+          <stop offset="58%" stop-color="#368bca" stop-opacity=".20"/>
+          <stop offset="100%" stop-color="#368bca" stop-opacity="0"/>
+        </linearGradient>
+        <linearGradient id="sky-aurora-purple" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stop-color="#c6a6fa" stop-opacity=".75"/>
+          <stop offset="52%" stop-color="#898bce" stop-opacity=".23"/>
+          <stop offset="100%" stop-color="#898bce" stop-opacity="0"/>
+        </linearGradient>
+        <linearGradient id="sky-aurora-fold" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" stop-color="#b6ffe8" stop-opacity=".40"/>
+          <stop offset="44%" stop-color="#70e5cc" stop-opacity=".18"/>
+          <stop offset="100%" stop-color="#339bb9" stop-opacity="0"/>
+        </linearGradient>
+      </defs>
+      <g class="night-sky__aurora-wave night-sky__aurora-wave--green">
+        <path fill="url(#sky-aurora-green)"
+          d="M -90 596 C 80 575 170 443 320 464
+             C 466 485 500 566 648 524 C 792 483 841 396 975 412
+             C 1113 428 1168 505 1312 430
+             L 1525 810 C 1274 771 1089 782 925 803
+             C 702 826 543 803 365 821 C 137 838 20 804 -90 832 Z"/>
+        <path fill="none" stroke="#84f6d1" stroke-opacity=".32" stroke-width="9"
+          d="M -90 596 C 80 575 170 443 320 464
+             C 466 485 500 566 648 524 C 792 483 841 396 975 412
+             C 1113 428 1168 505 1312 430"/>
+        <path fill="url(#sky-aurora-fold)" opacity=".70"
+          d="M 180 482 Q 213 453 244 455 C 248 557 275 689 238 790 Q 200 659 180 482 Z"/>
+        <path fill="url(#sky-aurora-fold)" opacity=".57"
+          d="M 490 544 Q 511 551 533 554 C 555 651 547 721 523 776 Q 499 675 490 544 Z"/>
+        <path fill="url(#sky-aurora-fold)" opacity=".75"
+          d="M 837 431 Q 866 411 891 409 C 909 520 928 659 877 772 Q 853 629 837 431 Z"/>
+        <path fill="url(#sky-aurora-fold)" opacity=".49"
+          d="M 1124 466 Q 1145 467 1168 470 C 1198 561 1198 685 1170 774 Q 1142 626 1124 466 Z"/>
+      </g>
+      <g class="night-sky__aurora-wave night-sky__aurora-wave--cyan">
+        <path fill="url(#sky-aurora-cyan)" opacity=".74"
+          d="M 334 579 C 500 601 607 552 743 459
+             C 892 358 1006 390 1135 405 C 1270 422 1374 331 1530 351
+             L 1530 738 C 1295 728 1088 730 889 753
+             C 676 788 510 747 334 780 Z"/>
+        <path fill="none" stroke="#84e8e4" stroke-opacity=".22" stroke-width="7"
+          d="M 334 579 C 500 601 607 552 743 459
+             C 892 358 1006 390 1135 405 C 1270 422 1374 331 1530 351"/>
+        <path fill="url(#sky-aurora-fold)" opacity=".42"
+          d="M 726 475 Q 750 450 776 436 C 798 530 808 653 772 740 Q 745 624 726 475 Z"/>
+        <path fill="url(#sky-aurora-fold)" opacity=".47"
+          d="M 1198 395 Q 1220 388 1243 385 C 1270 516 1279 623 1245 720 Q 1218 601 1198 395 Z"/>
+      </g>
+      <g class="night-sky__aurora-wave night-sky__aurora-wave--purple">
+        <path fill="url(#sky-aurora-purple)"
+          d="M 800 452 C 926 346 1074 401 1155 403
+             C 1292 409 1394 323 1525 337
+             L 1525 673 C 1318 653 1151 675 978 698 C 886 702 825 710 800 710 Z"/>
+      </g>
+    </svg>
+  </div>
   <div class="night-sky__stars"></div>
   <div class="night-sky__meteors"></div>
   <div class="night-sky__aircraft"></div>
@@ -176,22 +243,41 @@
     71%, 100% { opacity: .27; }
   }
 
-  /* Visible green/teal aurora curtains across the lower open sky.
-     The central soft ribbons stand out against the blue background without
-     turning the entire sky into a uniformly bright or saturated overlay. */
+  /* Curved light ribbons with vertical folds, instead of a green fog overlay. */
   .night-sky__aurora {
     position: absolute;
-    inset: 0 -12%;
+    inset: 0;
     opacity: 0;
-    background:
-      radial-gradient(ellipse 33% 19% at 27% 71%, rgba(71, 234, 170, .86), transparent 88%),
-      radial-gradient(ellipse 37% 24% at 59% 64%, rgba(65, 213, 169, .77), transparent 86%),
-      radial-gradient(ellipse 29% 21% at 80% 59%, rgba(76, 191, 218, .72), transparent 84%),
-      linear-gradient(115deg,
-        transparent 14%, rgba(62, 212, 174, .20) 30%,
-        rgba(78, 225, 183, .43) 43%, transparent 55%,
-        rgba(76, 189, 211, .31) 72%, transparent 85%);
+    overflow: hidden;
     pointer-events: none;
+  }
+  .night-sky__aurora-art {
+    position: absolute;
+    inset: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+  .night-sky__aurora-wave {
+    transform-box: fill-box;
+    transform-origin: center;
+  }
+  .night-sky__aurora-wave--purple {
+    opacity: var(--aurora-purple-opacity, .045);
+  }
+  .night-sky__aurora.is-visible .night-sky__aurora-wave--green {
+    animation: night-aurora-wave-green 14s ease-in-out infinite alternate;
+  }
+  .night-sky__aurora.is-visible .night-sky__aurora-wave--cyan {
+    animation: night-aurora-wave-cyan 18s ease-in-out infinite alternate;
+  }
+  @keyframes night-aurora-wave-green {
+    from { transform: translate3d(-1.6%, .6%, 0) scaleX(.99); }
+    to { transform: translate3d(1.6%, -1%, 0) scaleX(1.02); }
+  }
+  @keyframes night-aurora-wave-cyan {
+    from { transform: translate3d(1%, .6%, 0) scaleX(1.015); }
+    to { transform: translate3d(-1.5%, -.8%, 0) scaleX(.985); }
   }
   .night-sky__aurora.is-visible {
     /* Fallback opacity still reveals the aurora when animation is disabled. */
@@ -229,6 +315,7 @@
       transform: none !important;
       will-change: auto;
     }
+    .night-sky__aurora-wave { animation: none !important; }
   }
 </style>
 
@@ -396,22 +483,22 @@
       plane.innerHTML = `
         <span class="night-sky__plane-art">
           <span class="night-sky__plane-trail"></span>
-          <svg class="night-sky__plane-shape" viewBox="0 0 180 65" aria-hidden="true">
+          <svg class="night-sky__plane-shape" viewBox="22 8 148 55" aria-hidden="true">
             <path class="night-sky__plane-silhouette"
-              d="M 71 31 L 58 19 L 70 19 L 102 31 Z" />
+              d="M 80 31 L 69 21 L 81 21 L 102 31 Z" />
             <path class="night-sky__plane-silhouette"
-              d="M 24 33 L 17 11 Q 17 9 20 9 L 28 9 L 50 33 Z" />
+              d="M 42 33 L 36 13 Q 36 11 39 11 L 47 11 L 63 33 Z" />
             <path class="night-sky__plane-silhouette"
-              d="M 13 33 Q 19 30 31 30 L 129 30
-                 Q 153 30 171 35 Q 179 37 179 40
-                 Q 178 44 170 45 L 41 45
-                 Q 20 44 13 40 Q 10 37 13 33 Z" />
+              d="M 27 33 Q 33 30 44 30 L 119 30
+                 Q 141 30 153 35 Q 163 37 164 40
+                 Q 163 44 151 45 L 53 45
+                 Q 34 44 28 41 Q 25 38 27 33 Z" />
             <path class="night-sky__plane-silhouette"
-              d="M 106 39 L 69 60 Q 68 62 73 62 L 87 60 L 134 40 Z" />
+              d="M 111 39 L 80 57 Q 78 59 83 59 L 96 57 L 133 40 Z" />
             <path class="night-sky__plane-silhouette"
-              d="M 42 39 L 23 51 L 37 50 L 60 40 Z" />
-            <circle class="night-sky__plane-light night-sky__plane-light--red" cx="72" cy="60" r="2.4" />
-            <circle class="night-sky__plane-light night-sky__plane-light--white" cx="68" cy="19" r="2.2" />
+              d="M 52 40 L 40 50 L 53 49 L 66 40 Z" />
+            <circle class="night-sky__plane-light night-sky__plane-light--red" cx="82" cy="58" r="2.4" />
+            <circle class="night-sky__plane-light night-sky__plane-light--white" cx="79" cy="21" r="2.2" />
           </svg>
         </span>`;
       activePlanes.set(event.id, plane);
@@ -463,6 +550,8 @@
       } else if (active.id !== auroraEventId) {
         auroraEventId = active.id;
         aurora.style.setProperty('--aurora-opacity', active.strength.toFixed(2));
+        // Violet tint appears occasionally, never throughout every event.
+        aurora.style.setProperty('--aurora-purple-opacity', active.id % 5 === 0 ? '.34' : '.045');
         aurora.style.setProperty('--aurora-duration', `${active.durationMs}ms`);
         aurora.style.setProperty('--aurora-delay', `${active.startsAt - now}ms`);
         aurora.classList.remove('is-visible');
