@@ -1529,3 +1529,14 @@ html[data-theme="dark"] body[data-page-id] {
     -webkit-backdrop-filter: none !important;
   }
 }
+
+/* Homepage status/pinned/recent frame: outline only.
+   Let the exact same persistent sky and moving stars show through inside and out. */
+html[data-theme="dark"] body[data-page-id="home"] #stats-card,
+html[data-theme="dark"] body[data-page-id="home"] #stats-card .stats-container {
+  background: transparent !important;
+  background-image: none !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
