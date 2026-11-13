@@ -49,14 +49,19 @@
   .night-sky__meteor {
     position: absolute;
     display: block;
-    height: 2px;
+    height: var(--meteor-thickness, 2px);
     width: var(--meteor-length);
     left: var(--meteor-x);
     top: var(--meteor-y);
     opacity: 0;
     border-radius: 99px;
-    background: linear-gradient(to right, #f5fcff 0%, rgba(183, 224, 255, .75) 12%, rgba(142, 204, 255, .25) 58%, transparent 100%);
-    filter: drop-shadow(0 0 4px rgba(193, 226, 255, .75));
+    /* Keep most of each random-length trail visible, rather than fading out at 58%. */
+    background: linear-gradient(to right,
+      rgba(245, 252, 255, var(--meteor-head-alpha, .95)) 0%,
+      rgba(197, 233, 255, var(--meteor-mid-alpha, .75)) var(--meteor-bright-stop, 27%),
+      rgba(142, 204, 255, var(--meteor-tail-alpha, .26)) var(--meteor-fade-stop, 82%),
+      transparent 100%);
+    box-shadow: 0 0 var(--meteor-glow, 4px) rgba(193, 226, 255, var(--meteor-glow-alpha, .48));
     transform-origin: left center;
     animation: night-meteor-flight var(--meteor-duration) linear forwards;
     will-change: transform, opacity;
@@ -65,17 +70,17 @@
     content: '';
     position: absolute;
     left: -1px;
-    top: -2px;
-    width: 6px;
-    height: 6px;
+    top: calc((var(--meteor-head-size, 6px) - var(--meteor-thickness, 2px)) / -2);
+    width: var(--meteor-head-size, 6px);
+    height: var(--meteor-head-size, 6px);
     border-radius: 50%;
     background: #f5fbff;
-    box-shadow: 0 0 10px rgba(180, 224, 255, .95);
+    box-shadow: 0 0 var(--meteor-head-glow, 9px) rgba(180, 224, 255, var(--meteor-head-alpha, .95));
   }
   @keyframes night-meteor-flight {
     0% { opacity: 0; transform: translate3d(0, 0, 0) rotate(var(--meteor-angle)); }
-    9% { opacity: .95; }
-    75% { opacity: .85; }
+    8% { opacity: var(--meteor-peak-opacity, .95); }
+    82% { opacity: var(--meteor-peak-opacity, .95); }
     100% {
       opacity: 0;
       transform: translate3d(var(--meteor-travel-x), var(--meteor-travel-y), 0) rotate(var(--meteor-angle));
@@ -115,53 +120,111 @@
       stars.appendChild(star);
     }
 
+    // The background persists across Astro navigation; timers are created once.
+    const activeMeteors = new Set<HTMLElement>();
     let scheduled: number | undefined;
-    let activeMeteor: HTMLElement | null = null;
-    const schedule = () => {
-      window.clearTimeout(scheduled);
-      if (!layer.isConnected || motion.matches || document.hidden) return;
-      // Random gap between meteors, with one visible at a time.
-      scheduled = window.setTimeout(shoot, randomBetween(1000, 5000));
-    };
-    const shoot = () => {
-      if (!layer.isConnected || motion.matches || document.hidden || activeMeteor) {
-        schedule();
-        return;
-      }
+    let burstTimer: number | undefined;
+    const canAnimate = () => layer.isConnected && !motion.matches && !document.hidden;
+
+    const shoot = (allowBurst = true) => {
+      if (!canAnimate()) return;
+      const viewportWidth = layer.clientWidth || window.innerWidth;
+      const viewportHeight = layer.clientHeight || window.innerHeight;
+      const desktop = viewportWidth > 900;
+      // Limit the number of simultaneous glow layers to avoid adding scroll lag.
+      if (activeMeteors.size >= (desktop ? 2 : 1)) return;
+
       const meteor = document.createElement('span');
       meteor.className = 'night-sky__meteor';
 
-      // The old 75-160px trail looked fine on phones, but tiny on a desktop.
-      // It also frequently spawned at 95% of the viewport, clipping the tail.
-      const viewportWidth = layer.clientWidth || window.innerWidth;
-      const desktop = viewportWidth > 900;
-      const scale = desktop ? Math.min(Math.max(viewportWidth / 1280, 1), 1.45) : 1;
+      // Every meteor gets a new path, trail, glow and duration.
+      const angle = randomBetween(20, 49);
+      const radians = angle * Math.PI / 180;
+      const sizeFactor = Math.min(Math.max(Math.sqrt(viewportWidth / 1440), .8), 1.2);
+      const lengthRoll = Math.random();
       const length = desktop
-        ? randomBetween(220, 340) * scale
-        : randomBetween(75, 160);
-      const maxX = desktop ? Math.min(76, 94 - length / viewportWidth * 100) : 95;
-      const startX = desktop ? randomBetween(46, Math.max(47, maxX)) : randomBetween(46, 95);
+        ? Math.min(viewportWidth * .58,
+            (lengthRoll < .18 ? randomBetween(260, 355)
+              : lengthRoll < .91 ? randomBetween(380, 640)
+              : randomBetween(700, 880)) * sizeFactor)
+        : Math.min(viewportWidth * .61,
+            lengthRoll < .88 ? randomBetween(95, 185) : randomBetween(190, 240));
 
-      meteor.style.setProperty('--meteor-x', `${startX.toFixed(1)}%`);
-      meteor.style.setProperty('--meteor-y', `${randomBetween(8, 60).toFixed(1)}%`);
+      // Leave room for the rotated trail at the right/top of the viewport.
+      const maxStartX = Math.max(20, viewportWidth - Math.cos(radians) * length - 24);
+      const minStartX = Math.min(viewportWidth * .37, maxStartX);
+      const startX = randomBetween(minStartX, Math.max(minStartX, Math.min(viewportWidth * .82, maxStartX)));
+      const minStartY = Math.sin(radians) * length + 14;
+      const startY = randomBetween(
+        Math.min(minStartY, viewportHeight * .42),
+        Math.max(Math.min(minStartY, viewportHeight * .42), viewportHeight * .53)
+      );
+
+      // A meteor always moves down-left; its direction and distance vary.
+      // Clamp the path so even a six-second meteor remains visible throughout.
+      const roomLeft = (startX - 12) / Math.cos(radians);
+      const roomDown = (viewportHeight - startY - 22) / Math.sin(radians);
+      const room = Math.max(0, Math.min(roomLeft, roomDown));
+      const desiredTravel = desktop
+        ? randomBetween(viewportWidth * .28, viewportWidth * .63)
+        : randomBetween(viewportWidth * .44, viewportWidth * .92);
+      const travel = Math.min(desiredTravel, room);
+      const durationSeconds = randomBetween(2, 6);
+      const brightness = randomBetween(.68, .99);
+      const thickness = randomBetween(1.5, 2.7);
+
+      meteor.style.setProperty('--meteor-x', `${startX.toFixed(0)}px`);
+      meteor.style.setProperty('--meteor-y', `${startY.toFixed(0)}px`);
       meteor.style.setProperty('--meteor-length', `${length.toFixed(0)}px`);
-      meteor.style.setProperty('--meteor-angle', `${-randomBetween(22, 38).toFixed(1)}deg`);
-      meteor.style.setProperty('--meteor-travel-x', `${-(desktop ? randomBetween(380, 590) * scale : randomBetween(130, 310)).toFixed(0)}px`);
-      meteor.style.setProperty('--meteor-travel-y', `${(desktop ? randomBetween(190, 320) * scale : randomBetween(75, 170)).toFixed(0)}px`);
-      meteor.style.setProperty('--meteor-duration', `${(desktop ? randomBetween(1.2, 1.7) : randomBetween(.75, 1.35)).toFixed(2)}s`);
-      activeMeteor = meteor;
+      meteor.style.setProperty('--meteor-angle', `${(-angle).toFixed(1)}deg`);
+      meteor.style.setProperty('--meteor-travel-x', `${(-travel * Math.cos(radians)).toFixed(0)}px`);
+      meteor.style.setProperty('--meteor-travel-y', `${(travel * Math.sin(radians)).toFixed(0)}px`);
+      meteor.style.setProperty('--meteor-duration', `${durationSeconds.toFixed(2)}s`);
+      meteor.style.setProperty('--meteor-thickness', `${thickness.toFixed(1)}px`);
+      meteor.style.setProperty('--meteor-head-size', `${randomBetween(4.5, 7.5).toFixed(1)}px`);
+      meteor.style.setProperty('--meteor-glow', `${randomBetween(2.5, 5.5).toFixed(1)}px`);
+      meteor.style.setProperty('--meteor-head-glow', `${randomBetween(6, 11).toFixed(1)}px`);
+      meteor.style.setProperty('--meteor-peak-opacity', brightness.toFixed(2));
+      meteor.style.setProperty('--meteor-head-alpha', brightness.toFixed(2));
+      meteor.style.setProperty('--meteor-mid-alpha', (brightness * randomBetween(.69, .90)).toFixed(2));
+      meteor.style.setProperty('--meteor-tail-alpha', (brightness * randomBetween(.30, .52)).toFixed(2));
+      meteor.style.setProperty('--meteor-glow-alpha', (brightness * randomBetween(.30, .60)).toFixed(2));
+      meteor.style.setProperty('--meteor-bright-stop', `${randomBetween(18, 35).toFixed(0)}%`);
+      meteor.style.setProperty('--meteor-fade-stop', `${randomBetween(77, 92).toFixed(0)}%`);
+
+      activeMeteors.add(meteor);
       meteors.appendChild(meteor);
       meteor.addEventListener('animationend', () => {
         meteor.remove();
-        activeMeteor = null;
-        schedule();
+        activeMeteors.delete(meteor);
       }, { once: true });
+
+      // Rare paired streaks on desktop; no more than two at once.
+      if (desktop && allowBurst && activeMeteors.size === 1 && burstTimer === undefined && Math.random() < .16) {
+        burstTimer = window.setTimeout(() => {
+          burstTimer = undefined;
+          shoot(false);
+        }, randomBetween(450, 1150));
+      }
     };
+
+    const schedule = () => {
+      window.clearTimeout(scheduled);
+      if (!canAnimate()) return;
+      const desktop = (layer.clientWidth || window.innerWidth) > 900;
+      scheduled = window.setTimeout(() => {
+        shoot();
+        schedule();
+      }, desktop ? randomBetween(1600, 5600) : randomBetween(2400, 6600));
+    };
+
     const onVisibility = () => {
-      if (document.hidden || motion.matches) {
+      if (!canAnimate()) {
         window.clearTimeout(scheduled);
-        activeMeteor?.remove();
-        activeMeteor = null;
+        window.clearTimeout(burstTimer);
+        burstTimer = undefined;
+        activeMeteors.forEach((meteor) => meteor.remove());
+        activeMeteors.clear();
       } else {
         schedule();
       }
