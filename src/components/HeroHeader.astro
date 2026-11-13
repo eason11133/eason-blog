@@ -10,6 +10,7 @@ interface Props {
     compact?: boolean;
     interactive?: boolean; // 是否启用悬停交互效果（仅主页）
     cutoutImage?: string;
+    stableOnNavigation?: boolean;
 }
 
 const { 
@@ -18,7 +19,8 @@ const {
     backgroundImage = heroConfig.postDefaultBackground,
     compact = false,
     interactive = false,
-    cutoutImage
+    cutoutImage,
+    stableOnNavigation = false
 } = Astro.props;
 const backgroundImageSrc =
     typeof backgroundImage === 'string' ? backgroundImage : backgroundImage.src;
@@ -28,7 +30,7 @@ if (interactive) heroClass += ' hero-interactive';
 if (cutoutImage) heroClass += ' hero-cutout-mode';
 ---
 
-<div class={heroClass} transition:name="hero">
+<div class={heroClass} transition:name="hero" transition:animate={stableOnNavigation ? "none" : undefined}>
     {cutoutImage ? (
         <img class="hero-cutout" src={cutoutImage} alt="Stephen Curry 背影" />
     ) : (
