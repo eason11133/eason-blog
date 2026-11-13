@@ -131,19 +131,19 @@ const tagsHero = heroConfig.tags;
       .tag-post-item { padding:1.15rem .25rem; }
     }
   </style>
-  <HeroHeader text={"標籤"} backgroundImage={tagsHero.backgroundImage} compact={true} />
-  <section class="tag-area" aria-label="標籤總覽">
+  <HeroHeader text={"標籤"} backgroundImage={tagsHero.backgroundImage} compact={true} stableOnNavigation={true} />
+  <section class="tag-area" aria-label="標籤總覽" transition:animate="none">
     <div class="tag-panel">
       <header class="tag-top">
         <h2 class="tag-heading">文章標籤</h2>
         <p class="tag-count-summary">共 {posts.length} 篇文章</p>
       </header>
       <nav class="tags-cloud" aria-label="文章標籤">
-  <a href="/tags/" data-astro-reload class:list={['tag-pill',{ 'active-tag': true }]} data-tag="all">
+  <a href="/tags/" class:list={['tag-pill',{ 'active-tag': true }]} data-tag="all">
     全部文章 <span class="tag-badge">{posts.length}</span>
   </a>
   {sortedTags.map(([t, count]) => (
-    <a href={getTagPath(t)} data-astro-reload class:list={['tag-pill', {'active-tag': false}]} data-tag={t} data-count={count}>
+    <a href={getTagPath(t)} class:list={['tag-pill', {'active-tag': false}]} data-tag={t} data-count={count}>
       <span class="tag-hash">#</span><span class="tag-name">{t}</span>
       <span class="tag-badge">{count}</span>
     </a>
