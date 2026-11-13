@@ -1407,3 +1407,21 @@ hr {
     -webkit-backdrop-filter: blur(5px);
   }
 }
+
+
+/* Persisted sky replaces body wallpaper, preventing a second image load during
+   Astro ClientRouter swaps. The background is one shared mounted layer. */
+[data-theme="dark"] body[data-page-id] {
+  background: #101b2b !important;
+}
+[data-theme="dark"] body[data-page-id] #main-content {
+  position: relative;
+  z-index: 1;
+  background: transparent !important;
+}
+/* Leave the persistent backdrop still during page animations. */
+::view-transition-group(night-sky),
+::view-transition-old(night-sky),
+::view-transition-new(night-sky) {
+  animation: none !important;
+}
