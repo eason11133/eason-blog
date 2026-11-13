@@ -1206,3 +1206,99 @@ hr {
     width: 0;
     height: 0;
 }
+
+
+/* Eason night-sky Preview — shared, photo-independent content backdrop.
+   One background asset stays fixed across the page; it is never tiled or split.
+   Remove this block when the preview is discarded. */
+[data-theme="dark"] body[data-page-id="home"],
+[data-theme="dark"] body[data-page-id="about"],
+[data-theme="dark"] body[data-page-id="blog-list"],
+[data-theme="dark"] body[data-page-id="tags-index"],
+[data-theme="dark"] body[data-page-id="tag-detail"] {
+  background-color: #101b2b !important;
+  background-image: url('/background/eason-night.svg') !important;
+  background-position: center 45% !important;
+  background-repeat: no-repeat !important;
+  background-size: cover !important;
+  background-attachment: fixed !important;
+}
+[data-theme="dark"] body[data-page-id] #main-content {
+  background: transparent;
+}
+/* All content sections reveal the same background behind them. */
+[data-theme="dark"] body[data-page-id="home"] .stats-wrapper,
+[data-theme="dark"] body[data-page-id="about"] .about-main,
+[data-theme="dark"] body[data-page-id="blog-list"] .blog-area,
+[data-theme="dark"] body[data-page-id="blog-list"] .posts-area,
+[data-theme="dark"] body[data-page-id="tags-index"] .tag-area,
+[data-theme="dark"] body[data-page-id="tag-detail"] .tag-area {
+  background: transparent !important;
+}
+/* An intentional fade bridges ANY Hero photo to the independent night background. */
+[data-theme="dark"] body[data-page-id] .hero-header {
+  isolation: isolate;
+}
+[data-theme="dark"] body[data-page-id] .hero-header::after {
+  content: "";
+  position: absolute;
+  z-index: 3;
+  inset: auto 0 0;
+  height: clamp(140px, 24vh, 270px);
+  pointer-events: none;
+  background: linear-gradient(to bottom,
+    rgba(16, 27, 43, 0) 0%,
+    rgba(16, 27, 43, .15) 27%,
+    rgba(16, 27, 43, .65) 69%,
+    #101b2b 100%);
+}
+[data-theme="dark"] body[data-page-id="home"] .stats-wrapper::before,
+[data-theme="dark"] body[data-page-id="about"] .about-main::before,
+[data-theme="dark"] body[data-page-id="tags-index"] .tag-area::before,
+[data-theme="dark"] body[data-page-id="tag-detail"] .tag-area::before {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  pointer-events: none;
+  inset: 0 0 auto;
+  height: clamp(150px, 25vh, 270px);
+  background: linear-gradient(to bottom, #101b2b 0%, rgba(16, 27, 43, 0) 100%);
+}
+[data-theme="dark"] body[data-page-id="home"] .stats-wrapper > *,
+[data-theme="dark"] body[data-page-id="about"] .about-main > *,
+[data-theme="dark"] body[data-page-id="tags-index"] .tag-area > *,
+[data-theme="dark"] body[data-page-id="tag-detail"] .tag-area > * {
+  position: relative;
+  z-index: 1;
+}
+/* Keep post text legible while the image is visible through a single translucent surface. */
+[data-theme="dark"] body[data-page-id="home"] .stats-container {
+  background: rgba(22, 32, 48, .80) !important;
+  border-color: rgba(154, 182, 216, .25) !important;
+}
+[data-theme="dark"] body[data-page-id="about"] .about-sheet {
+  background: rgba(20, 32, 48, .78) !important;
+  border-color: rgba(154, 182, 216, .20) !important;
+}
+[data-theme="dark"] body[data-page-id="tags-index"] .tag-panel,
+[data-theme="dark"] body[data-page-id="tag-detail"] .tag-panel,
+[data-theme="dark"] body[data-page-id="blog-list"] .blog-panel {
+  background: rgba(22, 32, 48, .81) !important;
+  border-color: rgba(154, 182, 216, .22) !important;
+}
+@media(max-width:720px) {
+  [data-theme="dark"] body[data-page-id="home"],
+  [data-theme="dark"] body[data-page-id="about"],
+  [data-theme="dark"] body[data-page-id="blog-list"],
+  [data-theme="dark"] body[data-page-id="tags-index"],
+  [data-theme="dark"] body[data-page-id="tag-detail"] {
+    background-position: center center !important;
+    background-size: cover !important;
+  }
+  [data-theme="dark"] body[data-page-id="home"] .stats-container,
+  [data-theme="dark"] body[data-page-id="about"] .about-sheet,
+  [data-theme="dark"] body[data-page-id="tags-index"] .tag-panel,
+  [data-theme="dark"] body[data-page-id="tag-detail"] .tag-panel {
+    background: rgba(20, 31, 47, .76) !important;
+  }
+}
