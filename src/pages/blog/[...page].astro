@@ -418,9 +418,13 @@ if (last > 1) paginationList.push(last);
 
       /* Blog index: preserve the template Hero, use homepage dark palette below. */
       .articles-area {
-        background: #171c25;
+        position: relative;
+        z-index: 2;
+        /* The Hero already overlaps the next section by 88px. Keep that
+           region transparent so the rounded article card sits over the photo. */
+        background: linear-gradient(to bottom, transparent 88px, #171c25 88px);
         min-height: 44vh;
-        padding: 4rem 1.5rem 5rem;
+        padding: 0 1.5rem 5rem;
         color: #ecf1f8;
       }
       .articles-inner {
@@ -506,7 +510,10 @@ if (last > 1) paginationList.push(last);
         color: #b9d2f3;
       }
       @media (max-width: 720px) {
-        .articles-area { padding: 2.1rem .8rem 3rem; }
+        .articles-area {
+          background: linear-gradient(to bottom, transparent 56px, #171c25 56px);
+          padding: 0 .8rem 3rem;
+        }
         .articles-inner { padding: 1.25rem 1rem; }
         .articles-list :global(.blog-post-title) { font-size: 1.16rem; }
       }
