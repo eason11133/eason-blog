@@ -51,8 +51,17 @@ const elementId = id || `typewriter-${Math.random().toString(36).substring(7)}`;
 <script>
     // Re-initialize after Astro page transitions and clean up old observers/timers.
     let cleanups: Array<() => void> = [];
+    let navigatingFromTags = false;
+
+    document.addEventListener('astro:before-preparation', () => {
+        navigatingFromTags = /^\/tags(?:\/|$)/.test(window.location.pathname);
+    });
 
     document.addEventListener('astro:page-load', () => {
+        // Animate on the first visit, but show the next title immediately
+        // when switching between Tag pages so the content does not flash.
+        const isTagToTagNavigation = navigatingFromTags && /^\/tags(?:\/|$)/.test(window.location.pathname);
+        navigatingFromTags = false;
         cleanups.forEach((cleanup) => cleanup());
         cleanups = [];
 
@@ -99,7 +108,11 @@ const elementId = id || `typewriter-${Math.random().toString(36).substring(7)}`;
                 schedule(typeNext, 300);
             }
 
-            replay();
+            if (isTagToTagNavigation) {
+                typedText.textContent = fullText;
+            } else {
+                replay();
+            }
 
             // Only re-arm after the visitor genuinely leaves the cover.
             // The main-content div is ulBo's actual scrolling container.
