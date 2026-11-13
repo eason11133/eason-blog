@@ -527,6 +527,42 @@ const { transparent = true } = Astro.props;
 	}
 
 	
+
+  /* Mobile drawer: preserve the site's original labels, type and link spacing.
+     Only change the atmosphere and cover the bright Hero behind the open header. */
+  @media (max-width: 900px) {
+    header.mobile-menu-open,
+    header.transparent.mobile-menu-open,
+    header.transparent.scrolled.mobile-menu-open {
+      background: #101b2b !important;
+      border-bottom: 1px solid rgba(155, 177, 214, .16);
+      box-shadow: 0 3px 20px rgba(3, 9, 21, .3) !important;
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
+    }
+    header.mobile-menu-open > nav .site-home-link,
+    header.mobile-menu-open > nav .search-btn,
+    header.mobile-menu-open > nav .mobile-menu-btn {
+      color: #e9f2ff !important;
+    }
+    .mobile-nav-overlay {
+      background: rgba(5, 11, 24, .64);
+      backdrop-filter: blur(6px) brightness(.7);
+      -webkit-backdrop-filter: blur(6px) brightness(.7);
+    }
+    .mobile-nav-drawer,
+    :global([data-theme="dark"]) .mobile-nav-drawer {
+      background: #0e1c30 url('/background/mobile-menu-photo.svg') center center / cover no-repeat;
+      border-left-color: rgba(171, 207, 237, .17);
+      box-shadow: -14px 0 40px rgba(0, 0, 0, .34);
+    }
+    /* Keep the existing active item colors and highlight unchanged. */
+    .mobile-nav-drawer .mobile-nav-link:not(.active),
+    header.transparent .mobile-nav-drawer .mobile-nav-link:not(.active) {
+      color: #eaf3ff;
+      text-shadow: 0 1px 10px rgba(2, 8, 19, .55);
+    }
+  }
 </style>
 
 <script>
