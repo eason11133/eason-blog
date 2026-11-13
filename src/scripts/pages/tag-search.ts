@@ -160,7 +160,7 @@ export class TagSearchController {
 			const button = (event.target as HTMLElement).closest<HTMLButtonElement>('[data-page]');
 			if (button) this.goToPage(Number(button.dataset.page));
 		}, { signal });
-		if (this.mode === 'index') {
+		if (this.mode === 'index' && !this.input.classList.contains('tag-hidden-input')) {
 			this.tagPills.forEach((pill) => pill.addEventListener('click', (event) => this.handleTagClick(event, pill), { signal }));
 			window.addEventListener('hashchange', () => this.syncActiveTagFromHash(), { signal });
 		}
@@ -262,7 +262,7 @@ export class TagSearchController {
 
 	private renderPagination(lastPage: number) {
 		if (!this.pagination || !this.pageNumbers || !this.prevPageButton || !this.nextPageButton) return;
-		this.pagination.hidden = lastPage <= 1;
+		this.pagination.hidden = false;
 		this.prevPageButton.disabled = this.currentPage === 1;
 		this.nextPageButton.disabled = this.currentPage === lastPage;
 		this.prevPageButton.classList.toggle('disabled', this.prevPageButton.disabled);
@@ -369,7 +369,7 @@ export class TagSearchController {
 	}
 
 	private syncActiveTagFromHash() {
-		if (this.mode !== 'index') return;
+		if (this.mode !== 'index' || this.input.classList.contains('tag-hidden-input')) return;
 		const candidate = this.getHashTag();
 		this.activeTag = this.tagPills.some((pill) => pill.dataset.tag === candidate && candidate !== 'all') ? candidate : null;
 		this.syncActiveTagUI();
