@@ -130,13 +130,25 @@
       }
       const meteor = document.createElement('span');
       meteor.className = 'night-sky__meteor';
-      meteor.style.setProperty('--meteor-x', `${randomBetween(46, 95).toFixed(1)}%`);
+
+      // The old 75-160px trail looked fine on phones, but tiny on a desktop.
+      // It also frequently spawned at 95% of the viewport, clipping the tail.
+      const viewportWidth = layer.clientWidth || window.innerWidth;
+      const desktop = viewportWidth > 900;
+      const scale = desktop ? Math.min(Math.max(viewportWidth / 1280, 1), 1.45) : 1;
+      const length = desktop
+        ? randomBetween(220, 340) * scale
+        : randomBetween(75, 160);
+      const maxX = desktop ? Math.min(76, 94 - length / viewportWidth * 100) : 95;
+      const startX = desktop ? randomBetween(46, Math.max(47, maxX)) : randomBetween(46, 95);
+
+      meteor.style.setProperty('--meteor-x', `${startX.toFixed(1)}%`);
       meteor.style.setProperty('--meteor-y', `${randomBetween(8, 60).toFixed(1)}%`);
-      meteor.style.setProperty('--meteor-length', `${randomBetween(75, 160).toFixed(0)}px`);
+      meteor.style.setProperty('--meteor-length', `${length.toFixed(0)}px`);
       meteor.style.setProperty('--meteor-angle', `${-randomBetween(22, 38).toFixed(1)}deg`);
-      meteor.style.setProperty('--meteor-travel-x', `${-randomBetween(130, 310).toFixed(0)}px`);
-      meteor.style.setProperty('--meteor-travel-y', `${randomBetween(75, 170).toFixed(0)}px`);
-      meteor.style.setProperty('--meteor-duration', `${randomBetween(.75, 1.35).toFixed(2)}s`);
+      meteor.style.setProperty('--meteor-travel-x', `${-(desktop ? randomBetween(380, 590) * scale : randomBetween(130, 310)).toFixed(0)}px`);
+      meteor.style.setProperty('--meteor-travel-y', `${(desktop ? randomBetween(190, 320) * scale : randomBetween(75, 170)).toFixed(0)}px`);
+      meteor.style.setProperty('--meteor-duration', `${(desktop ? randomBetween(1.2, 1.7) : randomBetween(.75, 1.35)).toFixed(2)}s`);
       activeMeteor = meteor;
       meteors.appendChild(meteor);
       meteor.addEventListener('animationend', () => {
