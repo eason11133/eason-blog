@@ -6,6 +6,13 @@ function setupScrollReveal() {
 
 	const pending = targets.filter((el) => !el.classList.contains('visible'));
 	if (pending.length === 0) return;
+	if (document.documentElement.dataset.clientNavigated === 'true') {
+		pending.forEach((el) => {
+			el.classList.remove('reveal-pending');
+			el.classList.add('visible');
+		});
+		return;
+	}
 
 	if (!('IntersectionObserver' in window)) {
 		pending.forEach((el) => {

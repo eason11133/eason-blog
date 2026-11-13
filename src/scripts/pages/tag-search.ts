@@ -124,7 +124,7 @@ export class TagSearchController {
 				title,
 				link,
 				excerpt,
-				originalTitle: title.textContent ?? '',
+				originalTitle: link.textContent ?? '',
 				originalHref: link.getAttribute('href') ?? '',
 				originalExcerpt: excerpt?.textContent ?? '',
 				hadExcerpt: Boolean(excerpt),

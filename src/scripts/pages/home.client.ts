@@ -51,6 +51,11 @@ function setupPostsStagger() {
 	if (!postsList) return;
 
 	if (postsList.classList.contains('visible')) return;
+	if (document.documentElement.dataset.clientNavigated === 'true') {
+		postsList.classList.remove('home-stagger-ready');
+		postsList.classList.add('visible');
+		return;
+	}
 
 	postsList.classList.add('home-stagger-ready');
 	const reveal = () => postsList.classList.add('visible');

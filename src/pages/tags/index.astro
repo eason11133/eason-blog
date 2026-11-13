@@ -69,6 +69,7 @@ const tagsHero = heroConfig.tags;
     .tag-hash { color:#9bbdec; }
     .tag-badge { font-size:.78rem; color:#9eb0c9; }
     .tag-posts-list { display:flex; flex-direction:column; }
+    .tag-posts-list > .post-card-wrapper:nth-child(n+16) { display:none; }
     .post-card-wrapper { border-bottom:1px solid rgba(159,179,212,.18); }
     .post-card-wrapper:last-child { border-bottom:0; }
     .tag-post-item { position:relative; padding:1.2em .5rem; border-radius:8px; cursor:pointer; transition:background .2s,box-shadow .2s; }
@@ -131,7 +132,7 @@ const tagsHero = heroConfig.tags;
       .tag-post-item { padding:1.15rem .25rem; }
     }
   </style>
-  <HeroHeader text={"標籤"} backgroundImage={tagsHero.backgroundImage} compact={true} stableOnNavigation={true} />
+  <HeroHeader text={"標籤"} backgroundImage={tagsHero.backgroundImage} compact={true} />
   <section class="tag-area" aria-label="標籤總覽" transition:animate="none">
     <div class="tag-panel">
       <header class="tag-top">

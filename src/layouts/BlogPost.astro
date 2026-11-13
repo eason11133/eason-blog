@@ -203,18 +203,9 @@ const articleSchema = {
 				padding: 3em;
 				min-height: 300px;
 				width: 100%;
-				animation: slideUp 0.5s ease-out forwards;
-				opacity: 0; /* 初始隐藏 */
-				transform: translateY(30px); /* 初始下移 */
-				min-width: 0; /* 修复：防止 Grid Item 被内部宽元素（如代码块）撑大 */
-				will-change: transform, opacity;
-			}
-
-			@keyframes slideUp {
-				to {
-					opacity: 1;
-					transform: translateY(0);
-				}
+				opacity: 1;
+				transform: none;
+				min-width: 0; /* Prevent wide code blocks from expanding the grid. */
 			}
 
 			/* 响应式调整 */
@@ -687,7 +678,7 @@ const articleSchema = {
 		
 	<div class="stats-wrapper">
 		<div class="layout-container">
-			<main class="content-card" transition:name="page-content">
+			<main class="content-card" transition:animate="none">
 				<article>
 					<div class="prose">
 						<header class="pdf-print-heading">

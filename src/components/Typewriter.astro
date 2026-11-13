@@ -13,12 +13,23 @@ const elementId = id || `typewriter-${Math.random().toString(36).substring(7)}`;
 ---
 
 <Tag class:list={['typewriter', className]} id={elementId} data-text={text} data-disappear-after-typing={disappearAfterTyping ? "true" : undefined}>
-    <span class="typed-text">{text}</span><span class="cursor" aria-hidden="true">_</span>
+    <span class="typewriter-reserve" aria-hidden="true">{text}</span>
+    <span class="typewriter-animation"><span class="typed-text">{text}</span><span class="cursor" aria-hidden="true">_</span></span>
 </Tag>
 
 <style>
     .typewriter {
-        display: inline-block;
+        display: inline-grid;
+        max-width: 100%;
+        vertical-align: baseline;
+    }
+    .typewriter-reserve, .typewriter-animation {
+        grid-area: 1 / 1;
+        white-space: pre-wrap;
+    }
+    .typewriter-reserve {
+        visibility: hidden;
+        pointer-events: none;
     }
 
     .typewriter[data-disappear-after-typing="true"] {
@@ -51,17 +62,12 @@ const elementId = id || `typewriter-${Math.random().toString(36).substring(7)}`;
 <script>
     // Re-initialize after Astro page transitions and clean up old observers/timers.
     let cleanups: Array<() => void> = [];
-    let navigatingFromTags = false;
-
-    document.addEventListener('astro:before-preparation', () => {
-        navigatingFromTags = /^\/tags(?:\/|$)/.test(window.location.pathname);
-    });
+    let firstPageLoad = true;
 
     document.addEventListener('astro:page-load', () => {
-        // Animate on the first visit, but show the next title immediately
-        // when switching between Tag pages so the content does not flash.
-        const isTagToTagNavigation = navigatingFromTags && /^\/tags(?:\/|$)/.test(window.location.pathname);
-        navigatingFromTags = false;
+        // Only the first document load types text. Navigation retains SSR text.
+        const shouldAnimate = firstPageLoad && !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        firstPageLoad = false;
         cleanups.forEach((cleanup) => cleanup());
         cleanups = [];
 
@@ -108,11 +114,8 @@ const elementId = id || `typewriter-${Math.random().toString(36).substring(7)}`;
                 schedule(typeNext, 300);
             }
 
-            if (isTagToTagNavigation) {
-                typedText.textContent = fullText;
-            } else {
-                replay();
-            }
+            if (shouldAnimate) replay();
+            else typedText.textContent = fullText;
 
             // Only re-arm after the visitor genuinely leaves the cover.
             // The main-content div is ulBo's actual scrolling container.

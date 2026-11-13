@@ -135,111 +135,22 @@ const fullTitle =
 ))}
 
 <!-- View Transitions -->
-<ClientRouter />
+<ClientRouter fallback="swap" />
 
 <style is:global>
-  /* ============================================
-   * Material Design 3 — Core Easing Curves
-   * 
-   * 1. Emphasized Decelerate: cubic-bezier(0.05, 0.7, 0.1, 1.0)
-   *    → For entering/appearing elements (快速启动，缓慢着陆)
-   *
-   * 2. Emphasized Accelerate: cubic-bezier(0.3, 0.0, 0.8, 0.15)
-   *    → For exiting/disappearing elements (慢速启动，快速离场)
-   *
-   * 3. Emphasized (Standard): cubic-bezier(0.2, 0.0, 0.0, 1.0)
-   *    → For shared-axis / morphing transitions (柔和的全程过渡)
-   * ============================================ */
-
-  /* 页面退出动画 — Emphasized Accelerate: 缓慢拾起，迅速消失 */
-  @keyframes md3SlideOut {
-    from {
-      opacity: 1;
-      transform: translateY(0) scale(1);
-    }
-    30% {
-      opacity: 1;
-      transform: translateY(-2px) scale(1.005);
-    }
-    to {
-      opacity: 0;
-      transform: translateY(-30px) scale(0.97);
-    }
-  }
-  
-  /* 页面进入动画 — Emphasized Decelerate: 迅速到达，优雅着陆 */
-  @keyframes md3SlideIn {
-    from {
-      opacity: 0;
-      transform: translateY(40px) scale(0.97);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0) scale(1);
-    }
-  }
-
-  /* 交叉淡入 — 用于 Hero 等共享元素 */
-  @keyframes md3FadeIn {
-    from { opacity: 0; }
-    to   { opacity: 1; }
-  }
-  @keyframes md3FadeOut {
-    from { opacity: 1; }
-    to   { opacity: 0; }
-  }
-  
-  /* ---- 主要内容区域过渡 ---- */
-  ::view-transition-old(page-content) {
-    animation: md3SlideOut 0.25s cubic-bezier(0.3, 0.0, 0.8, 0.15) forwards;
-  }
-  
-  ::view-transition-new(page-content) {
-    animation: md3SlideIn 0.4s cubic-bezier(0.05, 0.7, 0.1, 1.0) forwards;
-  }
-
-  /* Header 保持不动，不参与过渡动画 */
-  ::view-transition-group(header) {
-    animation: none;
-    z-index: 100;
-  }
+  /* Do not animate screenshots of two pages over each other during navigation. */
+  ::view-transition-group(header),
   ::view-transition-old(header),
-  ::view-transition-new(header) {
-    animation: none;
-  }
-
-  /* SearchModal 保持不动 */
-  ::view-transition-group(search-modal) {
-    animation: none;
-  }
+  ::view-transition-new(header),
+  ::view-transition-group(hero),
+  ::view-transition-old(hero),
+  ::view-transition-new(hero),
+  ::view-transition-group(page-content),
+  ::view-transition-old(page-content),
+  ::view-transition-new(page-content),
+  ::view-transition-group(search-modal),
   ::view-transition-old(search-modal),
   ::view-transition-new(search-modal) {
-    animation: none;
+    animation: none !important;
   }
-
-  /* ---- Hero 区域过渡 — Emphasized Standard ---- */
-  ::view-transition-group(hero) {
-    animation-duration: 0.5s;
-    animation-timing-function: cubic-bezier(0.2, 0.0, 0.0, 1.0);
-    z-index: 1;
-    overflow: hidden;
-  }
-
-  ::view-transition-old(hero),
-  ::view-transition-new(hero) {
-    animation: none;
-    mix-blend-mode: normal;
-    object-fit: none;
-    object-position: center; 
-    height: 100%;
-    width: 100%;
-  }
-
-  /* ---- 内容区域组过渡 — Emphasized Standard ---- */
-  ::view-transition-group(page-content) {
-    animation-duration: 0.5s;
-    animation-timing-function: cubic-bezier(0.2, 0.0, 0.0, 1.0);
-    z-index: 10;
-  }
-  
 </style>

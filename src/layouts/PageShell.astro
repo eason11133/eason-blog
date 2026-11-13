@@ -51,7 +51,7 @@ const {
 ---
 
 <!doctype html>
-<html lang={lang}>
+<html lang={lang} transition:name="root" transition:animate="none">
 	<head>
 		<BaseHead
 			title={title}
@@ -73,7 +73,7 @@ const {
 	<body data-page-id={pageId}>
 		<NightSky />
 		<Header transparent={transparentHeader} />
-		<div id="main-content" transition:animate={pageId === 'tags-index' || pageId === 'tag-detail' ? 'none' : undefined}>
+		<div id="main-content" transition:animate="none">
 			{useMainWrapper ? (
 				<main class="page-shell-main">
 					<slot />
@@ -92,16 +92,31 @@ const {
 
 			const runtimeWindow = window as Window & {
 				__globalPageEnhancementsHandler?: () => void;
+				__globalPageAfterSwapHandler?: () => void;
 			};
 
-			const handlePageLoad = () => runCurrentPageEnhancements();
-
+			// Prepare lists before the new view paints, once per body.
+			const initializedBodies = new WeakSet<HTMLElement>();
+			const initializePageOnce = () => {
+				if (initializedBodies.has(document.body)) return;
+				initializedBodies.add(document.body);
+				runCurrentPageEnhancements();
+			};
+			const handleAfterSwap = () => {
+				document.documentElement.dataset.clientNavigated = 'true';
+				initializePageOnce();
+			};
 			if (runtimeWindow.__globalPageEnhancementsHandler) {
 				document.removeEventListener('astro:page-load', runtimeWindow.__globalPageEnhancementsHandler);
 			}
-			runtimeWindow.__globalPageEnhancementsHandler = handlePageLoad;
-			document.addEventListener('astro:page-load', handlePageLoad);
-			handlePageLoad();
+			if (runtimeWindow.__globalPageAfterSwapHandler) {
+				document.removeEventListener('astro:after-swap', runtimeWindow.__globalPageAfterSwapHandler);
+			}
+			runtimeWindow.__globalPageEnhancementsHandler = initializePageOnce;
+			runtimeWindow.__globalPageAfterSwapHandler = handleAfterSwap;
+			document.addEventListener('astro:after-swap', handleAfterSwap);
+			document.addEventListener('astro:page-load', initializePageOnce);
+			initializePageOnce();
 		</script>
 		<slot name="scripts" />
 	</body>

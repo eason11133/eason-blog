@@ -273,19 +273,13 @@ body {
 	width: 100%;
 	overflow-y: auto;
 	overflow-x: hidden;
-	scroll-behavior: smooth;
+	scroll-behavior: auto;
 	-webkit-overflow-scrolling: touch;
 	overscroll-behavior-y: contain;
 	/* Ensure content goes under header */
 	position: relative;
 	z-index: 1;
 	scroll-padding-top: calc(var(--header-height) + var(--anchor-gap));
-}
-
-/* Tag switching restores scroll positions programmatically. Do not animate those jumps. */
-body[data-page-id="tags-index"] #main-content,
-body[data-page-id="tag-detail"] #main-content {
-  scroll-behavior: auto;
 }
 
 
@@ -1524,4 +1518,19 @@ hr {
     backdrop-filter: none !important;
   }
   .night-sky { display: none !important; }
+}
+
+/* The NightSky is persistent: never re-paint the same large asset on body. */
+html[data-theme="dark"] body[data-page-id] {
+  background-color: #101b2b !important;
+  background-image: none !important;
+}
+/* Reduce expensive blur layers on small devices without changing card colors. */
+@media (max-width: 720px) {
+  [data-theme="dark"] body .archive-card,
+  [data-theme="dark"] body .articles-inner,
+  [data-theme="dark"] body .layout-container > .content-card {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
 }
