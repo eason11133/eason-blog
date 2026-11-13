@@ -480,6 +480,8 @@ if (last > 1) paginationList.push(last);
       }
       .blog-posts-list { display: flex; flex-direction: column; }
       .articles-list :global(.blog-post-item) {
+        position: relative;
+        cursor: pointer;
         padding: 1.4rem .6rem;
         margin: 0;
         border-bottom: 1px solid rgba(159, 179, 212, .17);
@@ -497,6 +499,17 @@ if (last > 1) paginationList.push(last);
         line-height: 1.4;
         margin: 0 0 .65rem;
         color: #f0f4fa;
+      }
+      /* Full-card article link, with independent clickable category tags. */
+      .articles-list :global(.blog-post-title a)::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        z-index: 1;
+      }
+      .articles-list :global(.blog-post-tags) {
+        position: relative;
+        z-index: 2;
       }
       .articles-list :global(.blog-post-excerpt) {
         color: #bfcbdc;
