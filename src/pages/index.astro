@@ -214,6 +214,8 @@ const webSiteSchema = {
       }
 
       .home-posts-list :global(.home-post-item) {
+        position: relative;
+        cursor: pointer;
         padding: 1.2em 0;
         border-bottom: 1px solid var(--color-border-subtle);
         transition: opacity 0.5s ease-out, transform 0.5s ease-out, background 0.2s;
@@ -236,6 +238,24 @@ const webSiteSchema = {
         font-size: 1.2em;
         font-weight: 600;
         margin: 0 0 0.5em 0;
+      }
+
+      /* Keep each post a single large click target without covering tag links. */
+      .home-posts-list :global(.home-post-title a)::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        z-index: 1;
+      }
+
+      .home-posts-list :global(.home-post-tags) {
+        position: relative;
+        z-index: 2;
+      }
+
+      .recent-posts-section > .home-posts-list,
+      .recent-posts-section > :global(.home-posts-list) {
+        margin-top: 20px;
       }
 
       .home-posts-list :global(.home-post-title a) {
