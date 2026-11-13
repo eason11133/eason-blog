@@ -116,7 +116,8 @@
     height: var(--cloud-height);
     opacity: 0;
     pointer-events: none;
-    animation: night-cloud-drift var(--cloud-duration) linear forwards;
+    /* A negative delay restores the correct in-flight position for late arrivals. */
+    animation: night-cloud-drift var(--cloud-duration) linear var(--cloud-delay, 0ms) forwards;
     will-change: transform, opacity;
   }
   .night-sky__cloud svg {
@@ -356,6 +357,7 @@
 <script>
   import { getAuroraState } from '../lib/sky/aurora-schedule';
   import { getPlaneState, type PlaneEvent } from '../lib/sky/plane-schedule';
+  import { getCloudState, type CloudEvent } from '../lib/sky/cloud-schedule';
 
   // This element persists across Astro navigation; start timers only once.
   const mountNightSky = () => {
@@ -391,7 +393,7 @@
     }
 
     const activeMeteors = new Set<HTMLElement>();
-    const activeClouds = new Set<HTMLElement>();
+    const activeClouds = new Map<number, HTMLElement>();
     const activePlanes = new Map<number, HTMLElement>();
     let cloudTimer: number | undefined;
     let meteorTimer: number | undefined;
@@ -400,29 +402,23 @@
     let auroraSyncTimer: number | undefined;
     let auroraEventId: number | null = null;
 
-    // Wispy cirrus and a lower scattered-cloud silhouette. Both are drawn
-    // from simple SVG paths; there are no images, blur filters or smoke particles.
-    const spawnCloud = () => {
-      if (!canAnimate()) return;
+    // Each visitor sees the same real-time cloud positions. Clouds already
+    // in flight are restored with a negative animation delay.
+    const spawnCloud = (event: CloudEvent, now: number) => {
       const { width, height } = viewport();
       const desktop = width > 900;
-      if (activeClouds.size >= (desktop ? 2 : 1)) return;
-
-      const isCirrus = Math.random() < .63;
-      const cloudWidth = randomBetween(desktop ? 240 : 155, desktop ? 405 : 250);
+      const isCirrus = event.isCirrus;
+      const cloudWidth = (desktop ? 240 : 155) + event.widthFactor * (desktop ? 165 : 95);
       const cloudHeight = cloudWidth * (isCirrus ? .29 : .34);
-      const fromLeft = Math.random() < .5;
       const margin = cloudWidth + 15;
-      const fromX = fromLeft ? -margin : width + 15;
-      const toX = fromLeft ? width + 15 : -margin;
-      const y = isCirrus
-        ? randomBetween(height * .16, height * .54)
-        : randomBetween(height * .52, height * .73);
-      const dy = randomBetween(-height * .025, height * .025);
+      const fromX = event.fromLeft ? -margin : width + 15;
+      const toX = event.fromLeft ? width + 15 : -margin;
+      const y = event.yFraction * height;
+      const dy = event.dyFraction * height;
 
       const cloud = document.createElement('span');
       cloud.className = 'night-sky__cloud';
-      const gradientId = "sky-cloud-gradient-" + Math.round(Math.random() * 1_000_000_000);
+      const gradientId = 'sky-cloud-gradient-' + event.id;
       const shape = isCirrus
         ? `<path fill="url(#${gradientId})"
              d="M 3 80 C 32 72 49 70 76 64 C 96 55 111 48 133 50
@@ -463,28 +459,47 @@
         '--cloud-height': `${cloudHeight.toFixed(0)}px`,
         '--cloud-dx': `${(toX - fromX).toFixed(0)}px`,
         '--cloud-dy': `${dy.toFixed(0)}px`,
-        '--cloud-duration': `${randomBetween(110, 190).toFixed(1)}s`,
-        '--cloud-opacity': randomBetween(.40, .68).toFixed(2),
+        '--cloud-duration': `${event.durationMs}ms`,
+        '--cloud-delay': `${event.startsAt - now}ms`,
+        '--cloud-opacity': event.opacity.toFixed(2),
       };
       for (const [key, value] of Object.entries(props)) cloud.style.setProperty(key, value);
-      activeClouds.add(cloud);
+      activeClouds.set(event.id, cloud);
       clouds.appendChild(cloud);
-      cloud.addEventListener('animationend', (event) => {
-        if (event.animationName !== 'night-cloud-drift') return;
+      cloud.addEventListener('animationend', (animationEvent) => {
+        if (animationEvent.animationName !== 'night-cloud-drift') return;
         cloud.remove();
-        activeClouds.delete(cloud);
-      }, { once: true });
+        activeClouds.delete(event.id);
+      });
     };
 
-    const scheduleCloud = (initial = false) => {
+    const synchronizeClouds = () => {
       window.clearTimeout(cloudTimer);
       if (!canAnimate()) return;
-      // The first cloud arrives fairly soon; later there are genuinely clear gaps.
-      cloudTimer = window.setTimeout(() => {
-        cloudTimer = undefined;
-        if (canAnimate() && (initial || Math.random() < .70)) spawnCloud();
-        scheduleCloud();
-      }, initial ? randomBetween(12_000, 28_000) : randomBetween(45_000, 100_000));
+
+      const now = Date.now();
+      const { active, next } = getCloudState(now);
+      const activeIds = new Set(active.map((event) => event.id));
+
+      for (const [id, cloud] of activeClouds) {
+        if (!activeIds.has(id)) {
+          cloud.remove();
+          activeClouds.delete(id);
+        }
+      }
+      for (const event of active) {
+        if (!activeClouds.has(event.id)) spawnCloud(event, now);
+      }
+
+      const earliestEnd = active.length > 0
+        ? Math.min(...active.map((event) => event.endsAt))
+        : next.startsAt;
+      const boundary = Math.min(earliestEnd, next.startsAt);
+      // Periodically resync against actual time, including clock changes.
+      cloudTimer = window.setTimeout(
+        synchronizeClouds,
+        Math.min(20_000, Math.max(100, boundary - Date.now() + 40)),
+      );
     };
 
     const shootMeteor = (allowBurst = true) => {
@@ -700,7 +715,7 @@
       if (!canAnimate()) {
         for (const meteor of activeMeteors) meteor.remove();
         activeMeteors.clear();
-        for (const cloud of activeClouds) cloud.remove();
+        for (const cloud of activeClouds.values()) cloud.remove();
         activeClouds.clear();
         for (const plane of activePlanes.values()) plane.remove();
         activePlanes.clear();
@@ -713,7 +728,7 @@
         return;
       }
       scheduleMeteor();
-      scheduleCloud(true);
+      synchronizeClouds();
       synchronizePlanes();
       synchronizeAurora();
     };
