@@ -90,49 +90,54 @@
     to   { opacity: var(--star-opacity); }
   }
 
+  /* The meteor's soft textured trail is generated once, then moved as one
+     element. The head has its own compact glow, never a flat glowing rod. */
   .night-sky__meteor {
     position: absolute;
     left: var(--meteor-x);
     top: var(--meteor-y);
     width: var(--meteor-length);
-    height: var(--meteor-thickness, 2px);
-    border-radius: 99px;
+    height: var(--meteor-height, 17px);
     opacity: 0;
     transform-origin: left center;
-    background: linear-gradient(to right,
-      rgba(245, 252, 255, var(--meteor-head-alpha, .95)) 0%,
-      rgba(197, 233, 255, var(--meteor-mid-alpha, .75)) var(--meteor-bright-stop, 27%),
-      rgba(142, 204, 255, var(--meteor-tail-alpha, .26)) var(--meteor-fade-stop, 82%),
-      transparent 100%);
-    box-shadow: 0 0 var(--meteor-glow, 4px) rgba(193, 226, 255, var(--meteor-glow-alpha, .48));
+    pointer-events: none;
     animation: night-meteor-flight var(--meteor-duration) linear forwards;
     will-change: transform, opacity;
   }
-
-  .night-sky__meteor::before {
-    content: '';
+  .night-sky__meteor-ribbon {
     position: absolute;
-    left: -1px;
-    top: calc((var(--meteor-head-size, 6px) - var(--meteor-thickness, 2px)) / -2);
-    width: var(--meteor-head-size, 6px);
-    height: var(--meteor-head-size, 6px);
-    border-radius: 50%;
-    background: #f5fbff;
-    box-shadow: 0 0 var(--meteor-head-glow, 9px) rgba(180, 224, 255, var(--meteor-head-alpha, .95));
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+    filter: drop-shadow(0 0 var(--meteor-glow, 3px) rgba(145, 210, 249, .35));
   }
-
+  .night-sky__meteor-head {
+    position: absolute;
+    left: 0;
+    top: 50%;
+    width: var(--meteor-head-size, 5px);
+    height: var(--meteor-head-size, 5px);
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    background: radial-gradient(circle, #fbfdff 0%, #dcefff 37%, rgba(156, 211, 255, .15) 83%, transparent 100%);
+    box-shadow:
+      0 0 var(--meteor-head-glow, 8px) rgba(179, 226, 255, .69),
+      0 0 calc(var(--meteor-head-glow, 8px) * 1.7) rgba(84, 179, 242, .18);
+  }
   @keyframes night-meteor-flight {
     0% { opacity: 0; transform: translate3d(0, 0, 0) rotate(var(--meteor-angle)); }
-    8%, 82% { opacity: var(--meteor-peak-opacity, .95); }
+    7% { opacity: var(--meteor-peak-opacity, .8); }
+    64% { opacity: var(--meteor-peak-opacity, .8); }
+    86% { opacity: calc(var(--meteor-peak-opacity, .8) * .54); }
     100% {
       opacity: 0;
       transform: translate3d(var(--meteor-travel-x), var(--meteor-travel-y), 0) rotate(var(--meteor-angle));
     }
   }
 
-  /* Small side-view airliner silhouette: smooth fuselage, upright tail,
-     swept wing, no windows or decorative strokes. Inspired by the supplied
-     visual direction, drawn as an original simplified SVG path. */
+  /* Airliner v2: keep the compact dark profile, but refine the outline,
+     offset navigation lamps, and add a softly textured thin wake. */
   .night-sky__plane {
     position: absolute;
     left: var(--plane-x);
@@ -145,9 +150,6 @@
     will-change: transform, opacity;
     pointer-events: none;
   }
-
-  /* Flip the icon, rather than rotating it 180 degrees: the fin stays above
-     the fuselage, and the contrail always comes from the rear. */
   .night-sky__plane-art {
     display: block;
     position: relative;
@@ -156,60 +158,82 @@
     transform: scaleX(var(--plane-facing, 1));
     transform-origin: center;
   }
-
   .night-sky__plane-shape {
     display: block;
     width: 100%;
     height: 100%;
     overflow: visible;
-    filter: drop-shadow(0 0 1px rgba(176, 202, 216, .34));
+    filter: blur(var(--plane-softness, .12px)) drop-shadow(0 0 1px rgba(156, 186, 207, .28));
   }
-
   .night-sky__plane-silhouette {
-    fill: #30414D;
-    stroke: rgba(156, 186, 207, .47);
-    stroke-width: 1.8;
+    fill: #30414d;
+    stroke: rgba(141, 171, 191, .36);
+    stroke-width: 1.3;
     stroke-linejoin: round;
   }
-  .night-sky__plane-light {
-    animation: night-plane-blink var(--plane-blink-time) steps(1, end) infinite;
+  .night-sky__plane-wing {
+    fill: #374c5a;
+    stroke: rgba(151, 180, 196, .23);
+    stroke-width: .9;
+    stroke-linejoin: round;
   }
-  .night-sky__plane-light--red { fill: #e9979a; }
-  .night-sky__plane-light--white {
-    fill: #e4eff8;
-    animation-delay: calc(var(--plane-blink-time) * -.5);
+  .night-sky__plane-engine { fill: #243645; }
+  .night-sky__plane-nav-red {
+    fill: #d77c84;
+    opacity: .68;
+    filter: drop-shadow(0 0 2px rgba(242, 111, 125, .6));
+  }
+  .night-sky__plane-nav-green {
+    fill: #90c2b5;
+    opacity: .50;
+    filter: drop-shadow(0 0 2px rgba(128, 223, 194, .34));
+  }
+  .night-sky__plane-strobe {
+    fill: #f4f9ff;
+    animation: night-plane-strobe var(--plane-blink-time, 1.5s) steps(1, end) var(--plane-blink-offset, 0ms) infinite;
+    filter: drop-shadow(0 0 2.5px rgba(201, 233, 255, .83));
+  }
+  .night-sky__plane-beacon {
+    fill: #ec8791;
+    animation: night-plane-beacon var(--plane-beacon-time, 1.9s) steps(1, end) var(--plane-beacon-offset, 0ms) infinite;
+    filter: drop-shadow(0 0 1.5px rgba(233, 118, 135, .6));
   }
 
-  /* A single slim blue-gray gradient follows the tail in either direction.
-     No particles: low GPU/DOM cost even when two airplanes overlap. */
   .night-sky__plane-trail {
     position: absolute;
     left: calc(-1 * var(--plane-trail-length, 50px) + 4px);
-    top: 58%;
+    top: 55%;
     transform: translateY(-50%);
     width: var(--plane-trail-length, 50px);
-    height: var(--plane-trail-thickness, 1.5px);
-    border-radius: 99px;
-    background: linear-gradient(to right,
-      transparent 0%,
-      rgba(169, 189, 204, .12) 38%,
-      rgba(192, 214, 228, var(--plane-trail-opacity, .35)) 100%);
+    height: var(--plane-trail-height, 10px);
+    overflow: hidden;
+    opacity: var(--plane-trail-opacity, .45);
     pointer-events: none;
   }
-
+  .night-sky__plane-trail canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+  .night-sky__plane-trail:empty {
+    height: 2px;
+    background: linear-gradient(to right, transparent, rgba(168, 191, 207, .18));
+  }
   @keyframes night-plane-flight {
-    /* Opacity stays visible from the first edge to the opposite edge.
-       The plane starts and finishes outside the clipped viewport. */
-    0% { opacity: var(--plane-opacity, .42); transform: translate3d(0, 0, 0) rotate(var(--plane-tilt)); }
+    0% { opacity: var(--plane-opacity, .65); transform: translate3d(0, 0, 0) rotate(var(--plane-tilt)); }
     100% {
-      opacity: var(--plane-opacity, .42);
+      opacity: var(--plane-opacity, .65);
       transform: translate3d(var(--plane-dx), var(--plane-dy), 0) rotate(var(--plane-tilt));
     }
   }
-  @keyframes night-plane-blink {
-    0%, 49% { opacity: .2; }
-    50%, 70% { opacity: 1; }
-    71%, 100% { opacity: .27; }
+  /* Short double flash, not a permanently glowing airplane icon. */
+  @keyframes night-plane-strobe {
+    0%, 3%, 8%, 13% { opacity: 1; }
+    4%, 7%, 14%, 100% { opacity: .1; }
+  }
+  @keyframes night-plane-beacon {
+    0%, 6%, 50%, 100% { opacity: .13; }
+    7%, 26% { opacity: .92; }
   }
 
   /* A noise-based aurora curtain. The GPU canvas remains idle between events. */
@@ -283,6 +307,7 @@
   import { getCloudState, type CloudEvent } from '../lib/sky/cloud-schedule';
   import { buildCloudPixels, CLOUD_TEXTURE_WIDTH, CLOUD_TEXTURE_HEIGHT } from '../lib/sky/cloud-texture';
   import { createAuroraRenderer, type AuroraRenderer } from '../lib/sky/aurora-renderer';
+  import { buildContrailPixels, buildMeteorTrailPixels, METEOR_WIDTH, METEOR_HEIGHT, CONTRAIL_WIDTH, CONTRAIL_HEIGHT } from '../lib/sky/sky-trails';
 
   // This element persists across Astro navigation; start timers only once.
   const mountNightSky = () => {
@@ -433,10 +458,10 @@
       const roll = Math.random();
       const sizeScale = Math.min(Math.max(Math.sqrt(width / 1440), .8), 1.25);
       const requestedLength = desktop
-        ? (roll < .18 ? randomBetween(180, 300)
-          : roll < .88 ? randomBetween(340, 610) : randomBetween(660, 890)) * sizeScale
-        : (roll < .24 ? randomBetween(72, 115)
-          : roll < .91 ? randomBetween(115, 190) : randomBetween(195, 255));
+        ? (roll < .19 ? randomBetween(155, 260)
+          : roll < .92 ? randomBetween(260, 450) : randomBetween(485, 680)) * sizeScale
+        : (roll < .24 ? randomBetween(70, 108)
+          : roll < .93 ? randomBetween(108, 177) : randomBetween(185, 235));
       // Keep the entire trail and starting point inside the same viewport.
       const maxTailLength = Math.min(width * .60 / Math.max(.14, Math.cos(rad)), height * .57 / Math.max(.14, Math.sin(rad)));
       const length = Math.max(45, Math.min(requestedLength, maxTailLength));
@@ -457,6 +482,19 @@
       const duration = randomBetween(2, 6);
       const meteor = document.createElement('span');
       meteor.className = 'night-sky__meteor';
+      const ribbon = document.createElement('canvas');
+      ribbon.className = 'night-sky__meteor-ribbon';
+      ribbon.width = METEOR_WIDTH;
+      ribbon.height = METEOR_HEIGHT;
+      const ctx = ribbon.getContext('2d', { alpha: true });
+      if (ctx) {
+        const pixels = buildMeteorTrailPixels(Math.floor(randomBetween(0, 16)));
+        ctx.putImageData(new ImageData(pixels, METEOR_WIDTH, METEOR_HEIGHT), 0, 0);
+        meteor.appendChild(ribbon);
+      }
+      const head = document.createElement('span');
+      head.className = 'night-sky__meteor-head';
+      meteor.appendChild(head);
       const props: Record<string, string> = {
         '--meteor-x': `${x.toFixed(0)}px`,
         '--meteor-y': `${y.toFixed(0)}px`,
@@ -465,25 +503,20 @@
         '--meteor-travel-x': `${((goesLeft ? -1 : 1) * travel * Math.cos(rad)).toFixed(0)}px`,
         '--meteor-travel-y': `${(travel * Math.sin(rad)).toFixed(0)}px`,
         '--meteor-duration': `${duration.toFixed(2)}s`,
-        '--meteor-thickness': `${randomBetween(1.2, 2.7).toFixed(1)}px`,
-        '--meteor-head-size': `${randomBetween(3.5, 7.2).toFixed(1)}px`,
-        '--meteor-glow': `${randomBetween(2, 5).toFixed(1)}px`,
-        '--meteor-head-glow': `${randomBetween(4, 10).toFixed(1)}px`,
+        '--meteor-height': `${randomBetween(11.5, 17).toFixed(1)}px`,
+        '--meteor-head-size': `${randomBetween(3.8, 6.5).toFixed(1)}px`,
+        '--meteor-glow': `${randomBetween(1.5, 3.8).toFixed(1)}px`,
+        '--meteor-head-glow': `${randomBetween(4, 9).toFixed(1)}px`,
         '--meteor-peak-opacity': brightness.toFixed(2),
-        '--meteor-head-alpha': brightness.toFixed(2),
-        '--meteor-mid-alpha': (brightness * randomBetween(.66, .90)).toFixed(2),
-        '--meteor-tail-alpha': (brightness * randomBetween(.29, .49)).toFixed(2),
-        '--meteor-glow-alpha': (brightness * randomBetween(.25, .55)).toFixed(2),
-        '--meteor-bright-stop': `${randomBetween(18, 37).toFixed(0)}%`,
-        '--meteor-fade-stop': `${randomBetween(77, 93).toFixed(0)}%`,
       };
       for (const [name, value] of Object.entries(props)) meteor.style.setProperty(name, value);
       activeMeteors.add(meteor);
       meteors.appendChild(meteor);
-      meteor.addEventListener('animationend', () => {
+      meteor.addEventListener('animationend', (animationEvent) => {
+        if (animationEvent.animationName !== 'night-meteor-flight') return;
         meteor.remove();
         activeMeteors.delete(meteor);
-      }, { once: true });
+      });
 
       // Occasional pair, never more than two simultaneous meteors on desktop.
       if (desktop && allowBurst && activeMeteors.size === 1 && meteorBurstTimer === undefined && Math.random() < .13) {
@@ -508,7 +541,7 @@
     const spawnPlane = (event: PlaneEvent, now: number) => {
       const { width, height } = viewport();
       const desktop = width > 900;
-      const size = (desktop ? 28 : 24) + event.sizeFactor * (desktop ? 9 : 7);
+      const size = (desktop ? 23 : 20) + Math.pow(event.sizeFactor, 1.3) * (desktop ? 15 : 12);
       const margin = size + 8;
       const fromX = event.fromLeft ? -margin : width + margin;
       const toX = event.fromLeft ? width + margin : -margin;
@@ -518,47 +551,74 @@
       const deltaY = toY - fromY;
       const plane = document.createElement('span');
       plane.className = 'night-sky__plane';
+      const strobeMs = event.blinkSeconds * 1000;
+      const beaconMs = strobeMs * 1.38;
       const props: Record<string, string> = {
         '--plane-x': `${fromX.toFixed(0)}px`,
         '--plane-y': `${fromY.toFixed(0)}px`,
         '--plane-dx': `${deltaX.toFixed(0)}px`,
         '--plane-dy': `${deltaY.toFixed(0)}px`,
         '--plane-size': `${size.toFixed(1)}px`,
-        '--plane-opacity': Math.max(.73, event.opacity).toFixed(2),
+        '--plane-opacity': Math.min(.91, .63 + (event.opacity - .58) * .32 + event.sizeFactor * .20).toFixed(2),
+        '--plane-softness': `${(.09 + (1 - event.sizeFactor) * .27).toFixed(2)}px`,
         '--plane-facing': event.fromLeft ? '1' : '-1',
-        '--plane-trail-length': `${((desktop ? 42 : 22) + event.trailFactor * (desktop ? 32 : 20)).toFixed(0)}px`,
-        '--plane-trail-thickness': `${(1 + event.sizeFactor).toFixed(1)}px`,
-        '--plane-trail-opacity': event.trailOpacity.toFixed(2),
+        '--plane-trail-length': `${((desktop ? 31 : 18) + event.trailFactor * (desktop ? 30 : 20)).toFixed(0)}px`,
+        '--plane-trail-height': `${(8 + event.sizeFactor * 5).toFixed(1)}px`,
+        '--plane-trail-opacity': (.29 + event.trailOpacity * .80).toFixed(2),
         '--plane-duration': `${event.durationMs}ms`,
         '--plane-delay': `${event.startsAt - now}ms`,
         // Left-moving planes mirror the silhouette horizontally, not by a 180-degree rotation.
         '--plane-tilt': `${((event.fromLeft ? 1 : -1) * Math.atan2(deltaY, Math.abs(deltaX)) * 180 / Math.PI).toFixed(1)}deg`,
         '--plane-blink-time': `${event.blinkSeconds.toFixed(2)}s`,
+        '--plane-beacon-time': `${(beaconMs / 1000).toFixed(2)}s`,
+        '--plane-blink-offset': `${(event.startsAt - now) % strobeMs}ms`,
+        '--plane-beacon-offset': `${(event.startsAt - now) % beaconMs}ms`,
       };
       for (const [name, value] of Object.entries(props)) plane.style.setProperty(name, value);
-      // Original, simple side-profile jet silhouette. Fuselage points right;
-      // scaleX(-1) mirrors the entire drawing for flights in the other direction.
+      // One coherent side-view silhouette with swept wings and small engines.
+      // The entire scene mirrors for right-to-left flights.
       plane.innerHTML = `
         <span class="night-sky__plane-art">
           <span class="night-sky__plane-trail"></span>
-          <svg class="night-sky__plane-shape" viewBox="22 8 148 55" aria-hidden="true">
+          <svg class="night-sky__plane-shape" viewBox="18 8 154 56" aria-hidden="true">
+            <path class="night-sky__plane-wing"
+              d="M 93 33 L 74 23 Q 74 22 77 22 L 88 22 L 112 33 Z" />
             <path class="night-sky__plane-silhouette"
-              d="M 80 31 L 69 21 L 81 21 L 102 31 Z" />
+              d="M 35 34 L 31 15 Q 31 12 35 12 L 42 12
+                 C 48 20 51 26 60 34 Z" />
             <path class="night-sky__plane-silhouette"
-              d="M 42 33 L 36 13 Q 36 11 39 11 L 47 11 L 63 33 Z" />
-            <path class="night-sky__plane-silhouette"
-              d="M 27 33 Q 33 30 44 30 L 119 30
-                 Q 141 30 153 35 Q 163 37 164 40
-                 Q 163 44 151 45 L 53 45
-                 Q 34 44 28 41 Q 25 38 27 33 Z" />
-            <path class="night-sky__plane-silhouette"
-              d="M 111 39 L 80 57 Q 78 59 83 59 L 96 57 L 133 40 Z" />
-            <path class="night-sky__plane-silhouette"
-              d="M 52 40 L 40 50 L 53 49 L 66 40 Z" />
-            <circle class="night-sky__plane-light night-sky__plane-light--red" cx="82" cy="58" r="2.4" />
-            <circle class="night-sky__plane-light night-sky__plane-light--white" cx="79" cy="21" r="2.2" />
+              d="M 28 35 C 33 32 43 31 55 31 L 124 31
+                 C 140 31 157 36 163 39 Q 168 41 163 43
+                 C 155 48 142 47 131 47 L 56 47
+                 C 42 47 32 43 28 40 Q 25 38 28 35 Z" />
+            <path class="night-sky__plane-wing"
+              d="M 114 41 L 78 57 Q 76 60 82 60 L 97 59 L 137 43 Z" />
+            <path class="night-sky__plane-wing"
+              d="M 51 42 L 36 52 L 49 50 L 68 44 Z" />
+            <path class="night-sky__plane-engine"
+              d="M 108 46 Q 116 46 120 48 Q 119 52 114 52 L 107 51 Z" />
+            <circle class="night-sky__plane-nav-red" cx="82" cy="58" r="2.4" />
+            <circle class="night-sky__plane-nav-green" cx="80" cy="23" r="2.0" />
+            <circle class="night-sky__plane-strobe" cx="163" cy="40" r="2.3" />
+            <circle class="night-sky__plane-beacon" cx="105" cy="47" r="1.8" />
           </svg>
         </span>`;
+      // Procedural smoke has irregular edges and faint separated strands.
+      const trailHolder = plane.querySelector<HTMLElement>('.night-sky__plane-trail');
+      if (trailHolder) {
+        const wake = document.createElement('canvas');
+        wake.width = CONTRAIL_WIDTH;
+        wake.height = CONTRAIL_HEIGHT;
+        const ctx = wake.getContext('2d', { alpha: true });
+        if (ctx) {
+          const variant = ((event.id % 12) + 12) % 12;
+          ctx.putImageData(
+            new ImageData(buildContrailPixels(variant), CONTRAIL_WIDTH, CONTRAIL_HEIGHT),
+            0, 0,
+          );
+          trailHolder.appendChild(wake);
+        }
+      }
       activePlanes.set(event.id, plane);
       aircraft.appendChild(plane);
       plane.addEventListener('animationend', (animationEvent) => {
