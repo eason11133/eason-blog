@@ -17,7 +17,8 @@ describe('procedural night-sky trails', () => {
 
     const center = Math.floor(METEOR_HEIGHT / 2) * METEOR_WIDTH;
     const alpha = (x: number) => a[(center + x) * 4 + 3];
-    expect(alpha(0)).toBeGreaterThan(alpha(60));
+    expect(alpha(0)).toBe(0);
+    expect(alpha(8)).toBeGreaterThan(alpha(60));
     expect(alpha(60)).toBeGreaterThan(alpha(220));
     expect(alpha(METEOR_WIDTH - 1)).toBe(0);
   });

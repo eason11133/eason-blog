@@ -31,16 +31,19 @@ export function buildMeteorTrailPixels(seed: number): Uint8ClampedArray {
   const mid = (METEOR_HEIGHT - 1) / 2;
   for (let x = 0; x < METEOR_WIDTH; x++) {
     const u = x / (METEOR_WIDTH - 1);
-    const taper = Math.pow(1 - u, 1.52);
-    const grain = .79 + .21 * smoothNoise(u * 28 + 2.3, seed);
+    // Round the leading tip; an opaque first pixel created a hard cut.
+    const tip = Math.min(1, u / .027);
+    const tipFade = tip * tip * (3 - 2 * tip);
+    const taper = Math.pow(1 - u, 1.43) * tipFade;
+    const grain = .81 + .19 * smoothNoise(u * 28 + 2.3, seed);
     const sway = (smoothNoise(u * 9 + 7, seed + 9) - .5) * u * 1.9;
-    const coreRadius = .3 + (1 - u) * 1.24;
-    const haloRadius = .9 + (1 - u) * 4.5;
+    const coreRadius = .52 + (1 - u) * .69;
+    const haloRadius = 1.0 + (1 - u) * 3.15;
     for (let y = 0; y < METEOR_HEIGHT; y++) {
       const d = y - mid - sway;
       const core = gaussian(d, coreRadius);
       const halo = gaussian(d, haloRadius);
-      const alpha = Math.min(1, taper * grain * (.79 * core + .18 * halo));
+      const alpha = Math.min(1, taper * grain * (.86 * core + .14 * halo));
       const i = (y * METEOR_WIDTH + x) * 4;
       pixels[i] = Math.round(207 + (1 - u) * 31);
       pixels[i + 1] = Math.round(226 + (1 - u) * 22);

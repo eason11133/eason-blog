@@ -122,22 +122,26 @@
     width: 100%;
     height: 100%;
     display: block;
-    filter: drop-shadow(0 0 var(--meteor-glow, 3px) rgba(145, 210, 249, .35));
+    filter: none;
   }
-  /* The head and its glow are part of the SAME procedural ribbon texture;
-     free-flight meteors never fade midair. */
+  /* Free-flight meteors continue until the entire tail leaves the screen. */
   @keyframes night-meteor-flight {
     0% { opacity: 0; transform: translate3d(0, 0, 0) rotate(var(--meteor-angle)); }
-    7%, 99% { opacity: var(--meteor-peak-opacity, .8); }
+    10%, 99% { opacity: var(--meteor-peak-opacity, .8); }
     100% {
       opacity: var(--meteor-peak-opacity, .8);
       transform: translate3d(var(--meteor-travel-x), var(--meteor-travel-y), 0) rotate(var(--meteor-angle));
     }
   }
   .night-sky__meteor.is-impact { animation-name: night-meteor-impact; }
+  /* End movement at the collision, then briefly dissolve in place. */
   @keyframes night-meteor-impact {
     0% { opacity: 0; transform: translate3d(0, 0, 0) rotate(var(--meteor-angle)); }
-    7%, 94% { opacity: var(--meteor-peak-opacity, .8); }
+    7% { opacity: var(--meteor-peak-opacity, .8); }
+    84% {
+      opacity: var(--meteor-peak-opacity, .8);
+      transform: translate3d(var(--meteor-travel-x), var(--meteor-travel-y), 0) rotate(var(--meteor-angle));
+    }
     100% {
       opacity: 0;
       transform: translate3d(var(--meteor-travel-x), var(--meteor-travel-y), 0) rotate(var(--meteor-angle));
@@ -171,29 +175,25 @@
     width: 100%;
     height: 100%;
     overflow: visible;
-    filter: blur(var(--plane-softness, .12px)) drop-shadow(0 0 1px rgba(156, 186, 207, .28));
+    filter: none;
   }
   .night-sky__plane-silhouette {
-    fill: #30414d;
-    stroke: rgba(141, 171, 191, .36);
-    stroke-width: 1.3;
-    stroke-linejoin: round;
+    fill: #182b3b;
+    stroke: none;
   }
   .night-sky__plane-wing {
-    fill: #374c5a;
-    stroke: rgba(151, 180, 196, .23);
-    stroke-width: .9;
-    stroke-linejoin: round;
+    fill: #21384a;
+    stroke: none;
   }
-  .night-sky__plane-engine { fill: #243645; }
+  .night-sky__plane-engine { fill: #122434; }
   .night-sky__plane-nav-red {
-    fill: #d77c84;
-    opacity: .68;
+    fill: #cb737c;
+    opacity: .64;
     filter: drop-shadow(0 0 2px rgba(242, 111, 125, .6));
   }
   .night-sky__plane-nav-green {
-    fill: #90c2b5;
-    opacity: .50;
+    fill: #83ad9f;
+    opacity: .45;
     filter: drop-shadow(0 0 2px rgba(128, 223, 194, .34));
   }
   .night-sky__plane-strobe {
@@ -504,7 +504,7 @@
       const desktop = width > 900;
       if (activeMeteors.size >= (desktop ? 2 : 1)) return;
 
-      const angle = randomBetween(13, 73);
+      const angle = randomBetween(23, 67);
       const rad = angle * Math.PI / 180;
       const goesLeft = Math.random() < .72;
       const direction = {
@@ -517,10 +517,11 @@
           : roll < .90 ? randomBetween(225, 415) : randomBetween(425, 550))
         : (roll < .20 ? randomBetween(65, 100)
           : roll < .92 ? randomBetween(105, 175) : randomBetween(180, 215)));
-      const origin = {
-        x: randomBetween(width * .16, width * .85),
-        y: randomBetween(height * .13, height * .63),
-      };
+      // Enter naturally from outside the viewport, not from empty sky.
+      const entersFromSide = Math.random() < .67;
+      const origin = entersFromSide
+        ? { x: goesLeft ? width + 22 : -22, y: randomBetween(height * .12, height * .50) }
+        : { x: randomBetween(width * .22, width * .78), y: -22 };
       const total = meteorExitDistance(origin, direction, length, width, height);
       const farPoint = {
         x: origin.x + direction.x * total,
@@ -528,9 +529,13 @@
       };
       const targets = collectMeteorTargets(width, height);
       const collision = firstMeteorCollision(origin, farPoint, targets);
-      const impact = collision !== null && collision < .98;
-      const travel = total * (impact ? collision : 1);
-      const duration = Math.max(.3, randomBetween(2, 6) * travel / total);
+      // Avoid hits so early that the meteor seems to blink and disappear.
+      const hitDistance = total * (collision ?? 1);
+      const impact = collision !== null && collision < .96 &&
+        hitDistance > Math.max(120, length * .45);
+      const travel = impact ? hitDistance : total;
+      const flightSeconds = Math.max(.78, randomBetween(2, 6) * travel / total);
+      const duration = impact ? flightSeconds / .84 : flightSeconds;
       const brightnessRoll = Math.random();
       const brightness = brightnessRoll < .45 ? randomBetween(.18, .42)
         : brightnessRoll < .85 ? randomBetween(.43, .72) : randomBetween(.73, .98);
@@ -612,8 +617,7 @@
         '--plane-dx': `${deltaX.toFixed(0)}px`,
         '--plane-dy': `${deltaY.toFixed(0)}px`,
         '--plane-size': `${size.toFixed(1)}px`,
-        '--plane-opacity': Math.min(.91, .63 + (event.opacity - .58) * .32 + event.sizeFactor * .20).toFixed(2),
-        '--plane-softness': `${(.09 + (1 - event.sizeFactor) * .27).toFixed(2)}px`,
+        '--plane-opacity': Math.min(.89, .69 + (event.opacity - .58) * .24 + event.sizeFactor * .12).toFixed(2),
         '--plane-facing': event.fromLeft ? '1' : '-1',
         '--plane-trail-length': `${((desktop ? 31 : 18) + event.trailFactor * (desktop ? 30 : 20)).toFixed(0)}px`,
         '--plane-trail-height': `${(8 + event.sizeFactor * 5).toFixed(1)}px`,
