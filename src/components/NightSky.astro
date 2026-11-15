@@ -124,28 +124,22 @@
     display: block;
     filter: none;
   }
-  /* Free-flight meteors continue until the entire tail leaves the screen. */
+  /* Full-flight animation never cuts short on text collision.
+     A separate quick texture fade occurs at the planned glyph hit time. */
   @keyframes night-meteor-flight {
     0% { opacity: 0; transform: translate3d(0, 0, 0) rotate(var(--meteor-angle)); }
-    10%, 99% { opacity: var(--meteor-peak-opacity, .8); }
+    9%, 99% { opacity: var(--meteor-peak-opacity, .8); }
     100% {
       opacity: var(--meteor-peak-opacity, .8);
       transform: translate3d(var(--meteor-travel-x), var(--meteor-travel-y), 0) rotate(var(--meteor-angle));
     }
   }
-  .night-sky__meteor.is-impact { animation-name: night-meteor-impact; }
-  /* End movement at the collision, then briefly dissolve in place. */
-  @keyframes night-meteor-impact {
-    0% { opacity: 0; transform: translate3d(0, 0, 0) rotate(var(--meteor-angle)); }
-    7% { opacity: var(--meteor-peak-opacity, .8); }
-    84% {
-      opacity: var(--meteor-peak-opacity, .8);
-      transform: translate3d(var(--meteor-travel-x), var(--meteor-travel-y), 0) rotate(var(--meteor-angle));
-    }
-    100% {
-      opacity: 0;
-      transform: translate3d(var(--meteor-travel-x), var(--meteor-travel-y), 0) rotate(var(--meteor-angle));
-    }
+  .night-sky__meteor.is-impact .night-sky__meteor-ribbon {
+    animation: night-meteor-hit-dissolve .25s linear var(--meteor-hit-delay, 3s) both;
+  }
+  @keyframes night-meteor-hit-dissolve {
+    0% { opacity: 1; }
+    100% { opacity: 0; }
   }
 
   /* Airliner v2: keep the compact dark profile, but refine the outline,
@@ -529,13 +523,15 @@
       };
       const targets = collectMeteorTargets(width, height);
       const collision = firstMeteorCollision(origin, farPoint, targets);
-      // Avoid hits so early that the meteor seems to blink and disappear.
+      // Keep movement to the screen edge. A text collision only dissolves
+      // the ribbon, and never changes the speed or creates a short jump.
       const hitDistance = total * (collision ?? 1);
       const impact = collision !== null && collision < .96 &&
-        hitDistance > Math.max(120, length * .45);
-      const travel = impact ? hitDistance : total;
-      const flightSeconds = Math.max(.78, randomBetween(2, 6) * travel / total);
-      const duration = impact ? flightSeconds / .84 : flightSeconds;
+        hitDistance > Math.max(165, length * .65);
+      const travel = total;
+      const speed = desktop ? randomBetween(155, 230) : randomBetween(92, 145);
+      const duration = Math.max(2.8, travel / speed);
+      const impactAtSeconds = impact ? duration * collision! : 0;
       const brightnessRoll = Math.random();
       const brightness = brightnessRoll < .45 ? randomBetween(.18, .42)
         : brightnessRoll < .85 ? randomBetween(.43, .72) : randomBetween(.73, .98);
@@ -560,6 +556,7 @@
         '--meteor-travel-x': (direction.x * travel).toFixed(0) + 'px',
         '--meteor-travel-y': (direction.y * travel).toFixed(0) + 'px',
         '--meteor-duration': duration.toFixed(2) + 's',
+        '--meteor-hit-delay': impactAtSeconds.toFixed(3) + 's',
         '--meteor-height': randomBetween(11.5, 17).toFixed(1) + 'px',
         '--meteor-glow': randomBetween(1.5, 3.8).toFixed(1) + 'px',
         '--meteor-peak-opacity': brightness.toFixed(2),
@@ -567,11 +564,15 @@
       for (const [name, value] of Object.entries(props)) {
         meteor.style.setProperty(name, value);
       }
+      // When scrolling, only future text hits become invalid. The meteor
+      // always continues flying regardless of old page geometry.
+      if (impact) {
+        meteor.dataset.impactDeadline = String(performance.now() + impactAtSeconds * 1000);
+      }
       activeMeteors.add(meteor);
       meteors.appendChild(meteor);
       meteor.addEventListener('animationend', (event) => {
-        if (event.animationName !== 'night-meteor-flight' &&
-            event.animationName !== 'night-meteor-impact') return;
+        if (event.animationName !== 'night-meteor-flight') return;
         meteor.remove();
         activeMeteors.delete(meteor);
       });
@@ -809,6 +810,20 @@
       synchronizePlanes();
       synchronizeAurora();
     };
+    // Sky is fixed; text moves when the visitor scrolls or navigates.
+    // Cancel pending text fades (not the flight) without scanning layout.
+    const invalidateMeteorHits = () => {
+      const now = performance.now();
+      for (const meteor of activeMeteors) {
+        if (meteor.classList.contains('is-impact') &&
+            Number(meteor.dataset.impactDeadline ?? 0) > now) {
+          meteor.classList.remove('is-impact');
+          delete meteor.dataset.impactDeadline;
+        }
+      }
+    };
+    window.addEventListener('scroll', invalidateMeteorHits, { passive: true });
+    document.addEventListener('astro:page-load', invalidateMeteorHits);
     document.addEventListener('visibilitychange', onVisibility);
     motion.addEventListener('change', onVisibility);
     onVisibility();
