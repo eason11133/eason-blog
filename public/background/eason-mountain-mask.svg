@@ -1,20 +1,7 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1536" width="1024" height="1536">
-  <!-- Traced against the background image's mountain ridge, sharing
-       its exact 1024 by 1536 coordinate system and cover alignment. -->
-  <path fill="white" d="M0 1356
-    C46 1354 64 1352 85 1358
-    C115 1362 138 1369 171 1375
-    C202 1383 229 1387 256 1385
-    C290 1383 318 1378 341 1380
-    C381 1384 408 1393 427 1395
-    C463 1395 487 1402 512 1397
-    C547 1391 570 1387 597 1386
-    C627 1380 653 1373 683 1375
-    C719 1376 745 1369 768 1370
-    C795 1364 821 1355 853 1352
-    C886 1345 918 1330 939 1328
-    C971 1334 991 1344 1024 1348
-    L1024 1536 L0 1536 Z"/>
-  <path fill="white" d="M922 1329 Q924 1317 933 1316
-    Q945 1316 948 1332 L952 1340 H919 Z"/>
+<svg xmlns="http://www.w3.org/2000/svg" width="1024" height="1536" viewBox="0 0 1024 1536">
+  <!-- Sky occlusion silhouette sampled against eason-night.svg's embedded image.
+       Both background and mask use center bottom / cover, with identical dimensions.
+       Ridge points must stay aligned with src/lib/sky/meteor-path.ts. -->
+  <path fill="#fff" d="M0 1353 L32 1351 L64 1348 L96 1350 L128 1357 L160 1360 L192 1364 L224 1368 L256 1372 L288 1370 L320 1371 L352 1375 L384 1376 L416 1375 L448 1376 L480 1378 L512 1381 L544 1381 L576 1377 L608 1374 L640 1373 L672 1367 L704 1355 L736 1361 L768 1363 L800 1360 L832 1354 L864 1346 L896 1338 L928 1333 L960 1333 L992 1339 L1024 1344 L1024 1536 L0 1536 Z"/>
+  <path fill="#fff" d="M918 1334 Q922 1319 929 1316 Q944 1311 949 1328 L954 1337 Z"/>
 </svg>
