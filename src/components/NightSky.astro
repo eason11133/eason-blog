@@ -113,7 +113,7 @@
     opacity: 0;
     transform-origin: left center;
     pointer-events: none;
-    animation: night-meteor-flight var(--meteor-duration) linear forwards;
+    animation: night-meteor-flight var(--meteor-duration) linear var(--meteor-delay, 0ms) both;
     will-change: transform, opacity;
   }
   .night-sky__meteor-ribbon {
@@ -337,7 +337,7 @@
   import { getCloudState, type CloudEvent } from '../lib/sky/cloud-schedule';
   import { buildCloudPixels, CLOUD_TEXTURE_WIDTH, CLOUD_TEXTURE_HEIGHT } from '../lib/sky/cloud-texture';
   import { createAuroraRenderer, type AuroraRenderer } from '../lib/sky/aurora-renderer';
-  import { createMeteorRoute } from '../lib/sky/meteor-path';
+  import { getMeteorState, meteorSample, type MeteorEvent } from '../lib/sky/meteor-schedule';
   import { buildContrailPixels, buildMeteorTrailPixels, METEOR_WIDTH, METEOR_HEIGHT, CONTRAIL_WIDTH, CONTRAIL_HEIGHT } from '../lib/sky/sky-trails';
 
   // This element persists across Astro navigation; start timers only once.
@@ -363,26 +363,30 @@
     for (let i = 0; i < starCount; i++) {
       const star = document.createElement('i');
       const bright = i < Math.ceil(starCount * .29);
+      const sample = (salt: number, min: number, max: number) =>
+        min + meteorSample(i + 7901, salt) * (max - min);
+      const twinkleSeconds = sample(0x51ea, 4, 10);
+      const cycleMs = twinkleSeconds * 2000; // alternate animation is a full 2x cycle
+      const phaseMs = (Date.now() + sample(0x9a27, 0, cycleMs)) % cycleMs;
       star.className = 'night-sky__star';
-      star.style.left = `${randomBetween(1, 99).toFixed(2)}%`;
-      star.style.top = `${randomBetween(2, 98).toFixed(2)}%`;
-      star.style.setProperty('--star-size', `${randomBetween(bright ? 1.6 : .7, bright ? 2.8 : 1.4).toFixed(2)}px`);
-      star.style.setProperty('--star-opacity', randomBetween(bright ? .64 : .26, bright ? .90 : .58).toFixed(2));
-      star.style.setProperty('--star-glow', `${randomBetween(bright ? 5 : 1.5, bright ? 9 : 4).toFixed(1)}px`);
-      star.style.setProperty('--twinkle-time', `${randomBetween(4, 10).toFixed(1)}s`);
-      star.style.setProperty('--twinkle-delay', `${randomBetween(-10, 0).toFixed(1)}s`);
+      star.style.left = `${sample(0x13ac, 1, 99).toFixed(2)}%`;
+      star.style.top = `${sample(0x273f, 2, 98).toFixed(2)}%`;
+      star.style.setProperty('--star-size', `${sample(0x14d8, bright ? 1.6 : .7, bright ? 2.8 : 1.4).toFixed(2)}px`);
+      star.style.setProperty('--star-opacity', sample(0x732a, bright ? .64 : .26, bright ? .90 : .58).toFixed(2));
+      star.style.setProperty('--star-glow', `${sample(0x449b, bright ? 5 : 1.5, bright ? 9 : 4).toFixed(1)}px`);
+      star.style.setProperty('--twinkle-time', `${twinkleSeconds.toFixed(3)}s`);
+      star.style.setProperty('--twinkle-delay', `${(-phaseMs / 1000).toFixed(3)}s`);
       stars.appendChild(star);
     }
 
-    const activeMeteors = new Set<HTMLElement>();
+    const activeMeteors = new Map<number, HTMLElement>();
     const activeClouds = new Map<number, HTMLElement>();
     // Only 32 texture presets (16 variants × 2 cloud families) can be generated.
     // Canvas pixels are cached; CSS alone animates the cloud afterwards.
     const cloudPixelCache = new Map<string, Uint8ClampedArray>();
     const activePlanes = new Map<number, HTMLElement>();
     let cloudTimer: number | undefined;
-    let meteorTimer: number | undefined;
-    let meteorBurstTimer: number | undefined;
+    let meteorSyncTimer: number | undefined;
     let planeSyncTimer: number | undefined;
     let auroraSyncTimer: number | undefined;
     let auroraEventId: number | null = null;
@@ -481,19 +485,9 @@
       );
     };
 
-    const shootMeteor = (allowBurst = true) => {
-      if (!canAnimate()) return;
-      const { width, height } = viewport();
-      const desktop = width > 900;
-      if (activeMeteors.size >= (desktop ? 2 : 1)) return;
-
-      const route = createMeteorRoute(width, height, desktop);
-      if (!route) return;
-      const duration = route.travel / route.speed;
-      const brightnessRoll = Math.random();
-      const brightness = brightnessRoll < .45 ? randomBetween(.18, .42)
-        : brightnessRoll < .85 ? randomBetween(.43, .72) : randomBetween(.73, .98);
-
+    // Join any active flight at the correct wall-clock point, just like planes.
+    const spawnMeteor = (event: MeteorEvent, now: number) => {
+      const { route } = event;
       const meteor = document.createElement('span');
       meteor.className = 'night-sky__meteor';
       const ribbon = document.createElement('canvas');
@@ -502,8 +496,10 @@
       ribbon.height = METEOR_HEIGHT;
       const context = ribbon.getContext('2d', { alpha: true });
       if (context) {
-        const pixels = buildMeteorTrailPixels(Math.floor(randomBetween(0, 16)));
-        context.putImageData(new ImageData(new Uint8ClampedArray(pixels), METEOR_WIDTH, METEOR_HEIGHT), 0, 0);
+        const pixels = buildMeteorTrailPixels(event.textureVariant);
+        context.putImageData(
+          new ImageData(new Uint8ClampedArray(pixels), METEOR_WIDTH, METEOR_HEIGHT), 0, 0,
+        );
         meteor.appendChild(ribbon);
       }
       const props: Record<string, string> = {
@@ -513,39 +509,45 @@
         '--meteor-angle': (route.goesLeft ? -route.angle : 180 + route.angle).toFixed(1) + 'deg',
         '--meteor-travel-x': route.dx.toFixed(0) + 'px',
         '--meteor-travel-y': route.dy.toFixed(0) + 'px',
-        '--meteor-duration': duration.toFixed(2) + 's',
-        '--meteor-height': randomBetween(11.5, 17).toFixed(1) + 'px',
-        '--meteor-peak-opacity': brightness.toFixed(2),
+        '--meteor-duration': event.durationMs + 'ms',
+        '--meteor-delay': (event.startsAt - now) + 'ms',
+        '--meteor-height': event.height.toFixed(1) + 'px',
+        '--meteor-peak-opacity': event.brightness.toFixed(2),
       };
-      for (const [name, value] of Object.entries(props)) {
-        meteor.style.setProperty(name, value);
-      }
-      activeMeteors.add(meteor);
+      for (const [name, value] of Object.entries(props)) meteor.style.setProperty(name, value);
+      activeMeteors.set(event.id, meteor);
       meteors.appendChild(meteor);
-      meteor.addEventListener('animationend', (event) => {
-        if (event.animationName !== 'night-meteor-flight') return;
+      meteor.addEventListener('animationend', (animationEvent) => {
+        if (animationEvent.animationName !== 'night-meteor-flight') return;
         meteor.remove();
-        activeMeteors.delete(meteor);
+        if (activeMeteors.get(event.id) === meteor) activeMeteors.delete(event.id);
       });
-
-      if (desktop && allowBurst && activeMeteors.size === 1 &&
-          meteorBurstTimer === undefined && Math.random() < .13) {
-        meteorBurstTimer = window.setTimeout(() => {
-          meteorBurstTimer = undefined;
-          shootMeteor(false);
-        }, randomBetween(400, 1000));
-      }
     };
 
-    const scheduleMeteor = () => {
-      window.clearTimeout(meteorTimer);
+    const synchronizeMeteors = () => {
+      window.clearTimeout(meteorSyncTimer);
       if (!canAnimate()) return;
-      meteorTimer = window.setTimeout(() => {
-        shootMeteor();
-        scheduleMeteor();
-      }, randomBetween(6000, 18000));
+      const now = Date.now();
+      const { width, height } = viewport();
+      const { active, next } = getMeteorState(now, width, height, width > 900);
+      const activeIds = new Set(active.map(event => event.id));
+      for (const [id, meteor] of activeMeteors) {
+        if (!activeIds.has(id)) {
+          meteor.remove();
+          activeMeteors.delete(id);
+        }
+      }
+      for (const event of active) {
+        if (!activeMeteors.has(event.id)) spawnMeteor(event, now);
+      }
+      const earliestEnd = active.length > 0
+        ? Math.min(...active.map(event => event.endsAt)) : next.startsAt;
+      const boundary = Math.min(earliestEnd, next.startsAt);
+      meteorSyncTimer = window.setTimeout(
+        synchronizeMeteors,
+        Math.min(10_000, Math.max(100, boundary - Date.now() + 30)),
+      );
     };
-
     // Planes use the shared wall-clock schedule, so the footer countdown always
     // matches actual flights. Multiple overlapping flights are allowed.
     const spawnPlane = (event: PlaneEvent, now: number) => {
@@ -771,14 +773,12 @@
 
     const onVisibility = () => {
       stopAuroraFrames();
-      window.clearTimeout(meteorTimer);
-      window.clearTimeout(meteorBurstTimer);
+      window.clearTimeout(meteorSyncTimer);
       window.clearTimeout(cloudTimer);
       window.clearTimeout(planeSyncTimer);
       window.clearTimeout(auroraSyncTimer);
-      meteorBurstTimer = undefined;
       if (!canAnimate()) {
-        for (const meteor of activeMeteors) meteor.remove();
+        for (const meteor of activeMeteors.values()) meteor.remove();
         activeMeteors.clear();
         for (const cloud of activeClouds.values()) cloud.remove();
         activeClouds.clear();
@@ -792,7 +792,7 @@
         synchronizeAurora(); // Static visible aurora if reduced motion is enabled.
         return;
       }
-      scheduleMeteor();
+      synchronizeMeteors();
       synchronizeClouds();
       synchronizePlanes();
       synchronizeAurora();
