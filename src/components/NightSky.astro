@@ -365,17 +365,17 @@
       const bright = i < Math.ceil(starCount * .29);
       const sample = (salt: number, min: number, max: number) =>
         min + meteorSample(i + 7901, salt) * (max - min);
-      const twinkleSeconds = sample(0x51ea, 4, 10);
-      const cycleMs = twinkleSeconds * 2000; // alternate animation is a full 2x cycle
-      const phaseMs = (Date.now() + sample(0x9a27, 0, cycleMs)) % cycleMs;
+      const twinkleMs = Math.round(sample(0x51ea, 4, 10) * 1000);
+      const cycleMs = twinkleMs * 2; // alternate animation is a full 2x cycle
+      const phaseMs = (Date.now() + Math.round(sample(0x9a27, 0, cycleMs))) % cycleMs;
       star.className = 'night-sky__star';
       star.style.left = `${sample(0x13ac, 1, 99).toFixed(2)}%`;
       star.style.top = `${sample(0x273f, 2, 98).toFixed(2)}%`;
       star.style.setProperty('--star-size', `${sample(0x14d8, bright ? 1.6 : .7, bright ? 2.8 : 1.4).toFixed(2)}px`);
       star.style.setProperty('--star-opacity', sample(0x732a, bright ? .64 : .26, bright ? .90 : .58).toFixed(2));
       star.style.setProperty('--star-glow', `${sample(0x449b, bright ? 5 : 1.5, bright ? 9 : 4).toFixed(1)}px`);
-      star.style.setProperty('--twinkle-time', `${twinkleSeconds.toFixed(3)}s`);
-      star.style.setProperty('--twinkle-delay', `${(-phaseMs / 1000).toFixed(3)}s`);
+      star.style.setProperty('--twinkle-time', `${twinkleMs}ms`);
+      star.style.setProperty('--twinkle-delay', `${-phaseMs}ms`);
       stars.appendChild(star);
     }
 
