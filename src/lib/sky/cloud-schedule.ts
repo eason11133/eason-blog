@@ -10,7 +10,6 @@ const WEATHER_SLOT_MS = 330_000; // 5.5 min
 const WEATHER_JITTER_MS = 75_000; // 3–8 min between boundaries
 const CLOUD_SLOT_MS = 12_000;
 const CLOUD_JITTER_MS = 2_000;
-const MAX_DURATION_MS = 165_000;
 
 function sample(slot: number, salt: number): number {
   let v = (slot ^ salt) >>> 0;

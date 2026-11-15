@@ -423,7 +423,7 @@
       canvas.height = CLOUD_TEXTURE_HEIGHT;
       const ctx = canvas.getContext('2d', { alpha: true });
       if (ctx) {
-        const image = new ImageData(pixels, CLOUD_TEXTURE_WIDTH, CLOUD_TEXTURE_HEIGHT);
+        const image = new ImageData(new Uint8ClampedArray(pixels), CLOUD_TEXTURE_WIDTH, CLOUD_TEXTURE_HEIGHT);
         ctx.putImageData(image, 0, 0);
         cloud.appendChild(canvas);
       }
@@ -503,7 +503,7 @@
       const context = ribbon.getContext('2d', { alpha: true });
       if (context) {
         const pixels = buildMeteorTrailPixels(Math.floor(randomBetween(0, 16)));
-        context.putImageData(new ImageData(pixels, METEOR_WIDTH, METEOR_HEIGHT), 0, 0);
+        context.putImageData(new ImageData(new Uint8ClampedArray(pixels), METEOR_WIDTH, METEOR_HEIGHT), 0, 0);
         meteor.appendChild(ribbon);
       }
       const props: Record<string, string> = {
@@ -657,7 +657,7 @@
           if (ctx) {
             const variant = ((event.id % 12) + 12) % 12;
             ctx.putImageData(
-              new ImageData(buildContrailPixels(variant), CONTRAIL_WIDTH, CONTRAIL_HEIGHT),
+              new ImageData(new Uint8ClampedArray(buildContrailPixels(variant)), CONTRAIL_WIDTH, CONTRAIL_HEIGHT),
               0, 0,
             );
             trailHolder.appendChild(wake);
