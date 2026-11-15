@@ -1,5 +1,6 @@
 ---
 import { Content as AboutContent } from '../content/about.md';
+import Typewriter from '../components/Typewriter.astro';
 import PageShell from '../layouts/PageShell.astro';
 import { siteTitle } from '../config';
 ---
@@ -12,6 +13,9 @@ import { siteTitle } from '../config';
   pageId="about"
 >
   <main class="about-page">
+    <header class="about-heading">
+      <Typewriter text="關於我" tag="h1" id="about-typewriter" animateOnNavigation={true} />
+    </header>
     <article class="prose about-prose">
       <AboutContent />
     </article>
@@ -29,6 +33,24 @@ import { siteTitle } from '../config';
     margin: 0;
     padding: clamp(135px, 20vh, 220px) 24px 100px;
     background: transparent;
+  }
+
+  .about-heading {
+    max-width: 760px;
+    margin: 0 auto clamp(3rem, 7vh, 5rem);
+    display: flex;
+    justify-content: center;
+    text-align: center;
+  }
+
+  .about-heading :global(h1.typewriter) {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    color: #f0f5ff;
+    font-size: clamp(2.2rem, 5vw, 3.2rem);
+    font-weight: 700;
+    line-height: 1.4;
   }
 
   .about-prose {

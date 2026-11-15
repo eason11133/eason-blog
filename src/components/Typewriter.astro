@@ -5,14 +5,15 @@ interface Props {
     class?: string;
     id?: string;
     disappearAfterTyping?: boolean;
+    animateOnNavigation?: boolean;
 }
 
-const { text, tag = 'h1', class: className = '', id, disappearAfterTyping = false } = Astro.props;
+const { text, tag = 'h1', class: className = '', id, disappearAfterTyping = false, animateOnNavigation = false } = Astro.props;
 const Tag = tag;
 const elementId = id || `typewriter-${Math.random().toString(36).substring(7)}`;
 ---
 
-<Tag class:list={['typewriter', className]} id={elementId} data-text={text} data-disappear-after-typing={disappearAfterTyping ? "true" : undefined}>
+<Tag class:list={['typewriter', className]} id={elementId} data-text={text} data-disappear-after-typing={disappearAfterTyping ? "true" : undefined} data-animate-on-navigation={animateOnNavigation ? "true" : undefined}>
     <span class="typewriter-reserve" aria-hidden="true">{text}</span>
     <span class="typewriter-animation"><span class="typed-text">{text}</span><span class="cursor" aria-hidden="true">_</span></span>
 </Tag>
@@ -66,9 +67,9 @@ const elementId = id || `typewriter-${Math.random().toString(36).substring(7)}`;
 
     document.addEventListener('astro:page-load', () => {
         // Only the first document load types text. Navigation retains SSR text.
-        const shouldAnimate = firstPageLoad
-            && document.documentElement.dataset.clientNavigated !== 'true'
-            && !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        const isFirstDocumentLoad = firstPageLoad
+            && document.documentElement.dataset.clientNavigated !== 'true';
+        const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
         firstPageLoad = false;
         cleanups.forEach((cleanup) => cleanup());
         cleanups = [];
@@ -79,6 +80,7 @@ const elementId = id || `typewriter-${Math.random().toString(36).substring(7)}`;
             if (!typedText || !fullText) return;
 
             const autoFade = element.dataset.disappearAfterTyping === 'true';
+            const shouldAnimate = !prefersReducedMotion && (isFirstDocumentLoad || element.dataset.animateOnNavigation === 'true');
             const timers = new Set<ReturnType<typeof setTimeout>>();
             let disposed = false;
             let generation = 0;
