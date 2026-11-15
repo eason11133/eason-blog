@@ -32,7 +32,12 @@ if (cutoutImage) heroClass += ' hero-cutout-mode';
     {cutoutImage ? (
         <img class="hero-cutout" src={cutoutImage} alt="Stephen Curry 背影" />
     ) : (
-        <div class="hero-bg" style={`background-image: url('${backgroundImageSrc}')`}></div>
+        <>
+            <div class="hero-bg" style={`background-image: url('${backgroundImageSrc}')`}></div>
+            {interactive && (
+                <div class="hero-portrait" style={`background-image: url('${backgroundImageSrc}')`}></div>
+            )}
+        </>
     )}
     <div class="hero-overlay"></div>
     <div class="hero-content">
@@ -89,6 +94,41 @@ if (cutoutImage) heroClass += ' hero-cutout-mode';
     .hero-header.hero-interactive .hero-bg {
         background-position: center 68%;
         transform: scale(1.08);
+    }
+
+    /* The narrow/windowed viewport keeps the established cover composition.
+       On wide screens a separate, width-constrained copy of the SAME photo
+       shows Curry's head and jersey, while a soft full-bleed copy fills the sides.
+       This avoids scaling the portrait image to the monitor's full width. */
+    .hero-portrait { display: none; }
+
+    @media (min-width: 900px) and (min-aspect-ratio: 7/5) {
+        .hero-header.hero-interactive {
+            background: #0d1724;
+        }
+
+        .hero-header.hero-interactive .hero-bg {
+            background-position: center 55%;
+            transform: scale(1.06);
+            filter: blur(20px) brightness(.57) saturate(.82);
+        }
+
+        .hero-header.hero-interactive .hero-portrait {
+            position: absolute;
+            display: block;
+            z-index: 0;
+            left: 50%;
+            top: 0;
+            height: 100%;
+            width: min(960px, 70vw, 115vh);
+            transform: translateX(-50%);
+            background-position: center 40%;
+            background-size: cover;
+            background-repeat: no-repeat;
+            -webkit-mask-image: radial-gradient(ellipse 76% 83% at 50% 34%, #000 47%, rgba(0,0,0,.95) 61%, transparent 94%);
+            mask-image: radial-gradient(ellipse 76% 83% at 50% 34%, #000 47%, rgba(0,0,0,.95) 61%, transparent 94%);
+            pointer-events: none;
+        }
     }
 
     /* Use the uploaded transparent Curry PNG on top of the shared galaxy photo. */
@@ -245,6 +285,13 @@ if (cutoutImage) heroClass += ' hero-cutout-mode';
         }
     }
     
+    /* Keep the subject still when hovering on wide displays. */
+    @media (min-width: 900px) and (min-aspect-ratio: 7/5) and (hover: hover) and (pointer: fine) {
+        .hero-header.hero-interactive:has(.hero-content:hover) .hero-bg {
+            transform: scale(1.06);
+        }
+    }
+
     @media (max-width: 720px) {
         .hero-cutout {
             height: 96%;
