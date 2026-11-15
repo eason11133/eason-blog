@@ -1,12 +1,10 @@
 ---
 import ContentCard from '../components/ContentCard.astro';
-import HeroHeader from '../components/HeroHeader.astro';
 import PageShell from '../layouts/PageShell.astro';
-import { heroConfig, profileConfig, siteTitle } from '../config';
+import { profileConfig, siteTitle } from '../config';
 import { buildSameAsLinks } from '../lib/profile/social';
 
 const profile = profileConfig;
-const aboutHero = heroConfig.about;
 const siteURL = Astro.site ?? Astro.url;
 const sameAs = buildSameAsLinks(profile);
 const profileAvatarSrc = typeof profile.avatar === 'string' ? profile.avatar : profile.avatar?.src;
@@ -29,16 +27,9 @@ const personSchema = {
   title={`About | ${siteTitle}`}
   description="關於 Eason 的個人網站（版型預覽）"
   schema={personSchema}
-  transparentHeader={true}
+  transparentHeader={false}
   pageId="about"
 >
-  <HeroHeader
-    text={aboutHero.text}
-    subtitle={aboutHero.subtitle}
-    backgroundImage={aboutHero.backgroundImage}
-    compact={true}
-  />
-
   <main class="about-main">
     <ContentCard id="about-preview">
       <div class="about-sheet">
@@ -111,7 +102,7 @@ const personSchema = {
     </ContentCard>
   </main>
   <style>
-    .about-main{position:relative;margin-top:-88px;padding-bottom:85px;background:linear-gradient(to bottom,transparent 88px,var(--color-bg) 88px)}
+    .about-main{position:relative;margin-top:0;padding:clamp(135px,20vh,220px) 0 85px;background:transparent}
     .about-sheet{max-width:990px;margin:auto;padding:25px 42px 56px;background:var(--color-surface);border:1px solid var(--color-border);border-radius:16px;box-shadow:var(--shadow-card)}
     .preview-label{display:flex;align-items:center;gap:9px;color:var(--color-text-muted);font-size:12px;letter-spacing:.03em;border-bottom:1px solid var(--color-border);padding-bottom:18px}
     .preview-dot{width:7px;height:7px;border-radius:50%;background:var(--accent)}
@@ -158,6 +149,6 @@ const personSchema = {
     .closing-line{display:flex;justify-content:space-between;gap:15px;color:var(--color-text-muted);font-size:12px;padding-top:24px}
     .closing-line span:first-child{font-style:italic}
     @media(max-width:780px){.about-sheet{padding:22px 27px 42px}.identity{grid-template-columns:minmax(0,1fr) 155px;gap:20px}.portrait-frame{width:150px;height:190px}.editorial-section{grid-template-columns:125px minmax(0,1fr);gap:20px}}
-    @media(max-width:600px){.about-main{margin-top:-56px;background:linear-gradient(to bottom,transparent 56px,var(--color-bg) 56px);padding-bottom:45px}.about-sheet{padding:19px 21px 36px;border-radius:0}.identity{display:flex;flex-direction:column-reverse;align-items:flex-start;gap:23px;padding:34px 0 41px}.portrait-area{align-self:flex-start;text-align:left;display:flex;align-items:center;gap:15px}.portrait-frame{width:88px;height:88px;border-radius:50%;gap:0}.portrait-frame svg{height:39px;width:39px}.portrait-frame span{font-size:7px}.portrait-area small{margin-top:0;max-width:95px;line-height:1.5}.identity h1{font-size:39px;margin:11px 0 15px}.identity-desc{font-size:15px;margin-bottom:18px}.social-links{margin-top:22px}.editorial-section{display:block;padding:35px 0}.section-marker{margin-bottom:16px;padding-top:0}.section-content h2{font-size:25px;margin-bottom:15px}.section-content>p{font-size:14px;line-height:1.9}.heading-row{align-items:start}.history-row{grid-template-columns:55px minmax(0,1fr);gap:10px}.closing-line{padding-top:21px}.hobby-line{gap:8px}.hobby-line span{padding:9px 12px;font-size:13px}}
+    @media(max-width:600px){.about-main{padding-top:clamp(110px,16vh,150px);padding-bottom:45px}.about-sheet{padding:19px 21px 36px;border-radius:0}.identity{display:flex;flex-direction:column-reverse;align-items:flex-start;gap:23px;padding:34px 0 41px}.portrait-area{align-self:flex-start;text-align:left;display:flex;align-items:center;gap:15px}.portrait-frame{width:88px;height:88px;border-radius:50%;gap:0}.portrait-frame svg{height:39px;width:39px}.portrait-frame span{font-size:7px}.portrait-area small{margin-top:0;max-width:95px;line-height:1.5}.identity h1{font-size:39px;margin:11px 0 15px}.identity-desc{font-size:15px;margin-bottom:18px}.social-links{margin-top:22px}.editorial-section{display:block;padding:35px 0}.section-marker{margin-bottom:16px;padding-top:0}.section-content h2{font-size:25px;margin-bottom:15px}.section-content>p{font-size:14px;line-height:1.9}.heading-row{align-items:start}.history-row{grid-template-columns:55px minmax(0,1fr);gap:10px}.closing-line{padding-top:21px}.hobby-line{gap:8px}.hobby-line span{padding:9px 12px;font-size:13px}}
   </style>
 </PageShell>
