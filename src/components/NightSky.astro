@@ -12,6 +12,7 @@
   <div class="night-sky__clouds"></div>
   <div class="night-sky__meteors"></div>
   <div class="night-sky__aircraft"></div>
+  <div class="night-sky__mountain-foreground"></div>
 </div>
 
 <style is:global>
@@ -23,6 +24,17 @@
     pointer-events: none;
     background: #07121f url('/background/eason-night.svg') center bottom / cover no-repeat;
     contain: paint;
+  }
+
+  /* The existing night background doubles as the *foreground* only over the
+     mountain silhouette, hiding sky effects once they pass the ridge. */
+  .night-sky__mountain-foreground {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background: url('/background/eason-night.svg') center bottom / cover no-repeat;
+    -webkit-mask: url('/background/eason-mountain-mask.svg') center bottom / cover no-repeat;
+    mask: url('/background/eason-mountain-mask.svg') center bottom / cover no-repeat;
   }
 
   .night-sky__glow {
@@ -112,24 +124,20 @@
     display: block;
     filter: drop-shadow(0 0 var(--meteor-glow, 3px) rgba(145, 210, 249, .35));
   }
-  .night-sky__meteor-head {
-    position: absolute;
-    left: 0;
-    top: 50%;
-    width: var(--meteor-head-size, 5px);
-    height: var(--meteor-head-size, 5px);
-    transform: translate(-50%, -50%);
-    border-radius: 50%;
-    background: radial-gradient(circle, #fbfdff 0%, #dcefff 37%, rgba(156, 211, 255, .15) 83%, transparent 100%);
-    box-shadow:
-      0 0 var(--meteor-head-glow, 8px) rgba(179, 226, 255, .69),
-      0 0 calc(var(--meteor-head-glow, 8px) * 1.7) rgba(84, 179, 242, .18);
-  }
+  /* The head and its glow are part of the SAME procedural ribbon texture;
+     free-flight meteors never fade midair. */
   @keyframes night-meteor-flight {
     0% { opacity: 0; transform: translate3d(0, 0, 0) rotate(var(--meteor-angle)); }
-    7% { opacity: var(--meteor-peak-opacity, .8); }
-    64% { opacity: var(--meteor-peak-opacity, .8); }
-    86% { opacity: calc(var(--meteor-peak-opacity, .8) * .54); }
+    7%, 99% { opacity: var(--meteor-peak-opacity, .8); }
+    100% {
+      opacity: var(--meteor-peak-opacity, .8);
+      transform: translate3d(var(--meteor-travel-x), var(--meteor-travel-y), 0) rotate(var(--meteor-angle));
+    }
+  }
+  .night-sky__meteor.is-impact { animation-name: night-meteor-impact; }
+  @keyframes night-meteor-impact {
+    0% { opacity: 0; transform: translate3d(0, 0, 0) rotate(var(--meteor-angle)); }
+    7%, 94% { opacity: var(--meteor-peak-opacity, .8); }
     100% {
       opacity: 0;
       transform: translate3d(var(--meteor-travel-x), var(--meteor-travel-y), 0) rotate(var(--meteor-angle));
@@ -307,6 +315,7 @@
   import { getCloudState, type CloudEvent } from '../lib/sky/cloud-schedule';
   import { buildCloudPixels, CLOUD_TEXTURE_WIDTH, CLOUD_TEXTURE_HEIGHT } from '../lib/sky/cloud-texture';
   import { createAuroraRenderer, type AuroraRenderer } from '../lib/sky/aurora-renderer';
+  import { meteorExitDistance, firstMeteorCollision, type SkyRect } from '../lib/sky/meteor-geometry';
   import { buildContrailPixels, buildMeteorTrailPixels, METEOR_WIDTH, METEOR_HEIGHT, CONTRAIL_WIDTH, CONTRAIL_HEIGHT } from '../lib/sky/sky-trails';
 
   // This element persists across Astro navigation; start timers only once.
@@ -446,80 +455,124 @@
       );
     };
 
+    // Query only the CURRENT page's visible headings, pills and navigation.
+    // This one small scan occurs at spawn (every 6–18s), not per animation frame.
+    const collectMeteorTargets = (width: number, height: number): SkyRect[] => {
+      const selector = [
+        '[data-meteor-target]',
+        'header .site-home-link', 'header .internal-links a',
+        'main h1', 'main h2', 'main h3',
+        'main .status-tag', 'main .tag', 'main .post-tag', 'main .badge',
+        'main .post-tags a',
+      ].join(', ');
+      const elements = document.querySelectorAll<HTMLElement>(selector);
+      const targets: SkyRect[] = [];
+      const range = document.createRange();
+      const limit = width <= 900 ? 28 : 48;
+      let examined = 0;
+      for (const element of elements) {
+        if (targets.length >= limit || ++examined > 96) break;
+        if (element.closest('[hidden], [aria-hidden="true"]')) continue;
+        const bounding = element.getBoundingClientRect();
+        if (bounding.width < 3 || bounding.height < 3 ||
+            bounding.bottom < 0 || bounding.right < 0 ||
+            bounding.top > height || bounding.left > width) continue;
+        // Block headings can fill an entire row; use glyph bounds rather than
+        // colliding with the invisible empty width of the heading element.
+        let rects: DOMRect[] = [bounding];
+        if (/^H[1-3]$/.test(element.tagName)) {
+          range.selectNodeContents(element);
+          rects = Array.from(range.getClientRects());
+        }
+        for (const rect of rects) {
+          if (targets.length >= limit) break;
+          if (rect.width < 3 || rect.height < 3 ||
+              rect.bottom < 0 || rect.right < 0 ||
+              rect.top > height || rect.left > width) continue;
+          targets.push({
+            left: rect.left, top: rect.top,
+            right: rect.right, bottom: rect.bottom,
+          });
+        }
+      }
+      return targets;
+    };
+
     const shootMeteor = (allowBurst = true) => {
       if (!canAnimate()) return;
       const { width, height } = viewport();
       const desktop = width > 900;
       if (activeMeteors.size >= (desktop ? 2 : 1)) return;
 
-      const angle = randomBetween(9, 78);
+      const angle = randomBetween(13, 73);
       const rad = angle * Math.PI / 180;
-      const goesLeft = Math.random() < .77;
+      const goesLeft = Math.random() < .72;
+      const direction = {
+        x: (goesLeft ? -1 : 1) * Math.cos(rad),
+        y: Math.sin(rad),
+      };
       const roll = Math.random();
-      const sizeScale = Math.min(Math.max(Math.sqrt(width / 1440), .8), 1.25);
-      const requestedLength = desktop
-        ? (roll < .19 ? randomBetween(155, 260)
-          : roll < .92 ? randomBetween(260, 450) : randomBetween(485, 680)) * sizeScale
-        : (roll < .24 ? randomBetween(70, 108)
-          : roll < .93 ? randomBetween(108, 177) : randomBetween(185, 235));
-      // Keep the entire trail and starting point inside the same viewport.
-      const maxTailLength = Math.min(width * .60 / Math.max(.14, Math.cos(rad)), height * .57 / Math.max(.14, Math.sin(rad)));
-      const length = Math.max(45, Math.min(requestedLength, maxTailLength));
-      const tailX = length * Math.cos(rad);
-      const tailY = length * Math.sin(rad);
-      const minX = goesLeft ? Math.min(width * .51, width - tailX - 14) : tailX + 14;
-      const maxX = goesLeft ? width - tailX - 14 : Math.max(minX, width * .53);
-      const x = randomBetween(Math.max(14, minX), Math.max(Math.max(14, minX), Math.min(width - 12, maxX)));
-      const y = randomBetween(tailY + 15, Math.max(tailY + 15, height * .76));
-
-      const availableX = goesLeft ? x - 14 : width - x - 14;
-      const availableY = height - y - 20;
-      const maxTravel = Math.max(0, Math.min(availableX / Math.max(.14, Math.cos(rad)), availableY / Math.max(.14, Math.sin(rad))));
-      const travel = Math.min(randomBetween(width * .26, width * .65), maxTravel);
+      const length = Math.min(width * .47, desktop
+        ? (roll < .18 ? randomBetween(130, 215)
+          : roll < .90 ? randomBetween(225, 415) : randomBetween(425, 550))
+        : (roll < .20 ? randomBetween(65, 100)
+          : roll < .92 ? randomBetween(105, 175) : randomBetween(180, 215)));
+      const origin = {
+        x: randomBetween(width * .16, width * .85),
+        y: randomBetween(height * .13, height * .63),
+      };
+      const total = meteorExitDistance(origin, direction, length, width, height);
+      const farPoint = {
+        x: origin.x + direction.x * total,
+        y: origin.y + direction.y * total,
+      };
+      const targets = collectMeteorTargets(width, height);
+      const collision = firstMeteorCollision(origin, farPoint, targets);
+      const impact = collision !== null && collision < .98;
+      const travel = total * (impact ? collision : 1);
+      const duration = Math.max(.3, randomBetween(2, 6) * travel / total);
       const brightnessRoll = Math.random();
       const brightness = brightnessRoll < .45 ? randomBetween(.18, .42)
         : brightnessRoll < .85 ? randomBetween(.43, .72) : randomBetween(.73, .98);
-      const duration = randomBetween(2, 6);
+
       const meteor = document.createElement('span');
-      meteor.className = 'night-sky__meteor';
+      meteor.className = impact ? 'night-sky__meteor is-impact' : 'night-sky__meteor';
       const ribbon = document.createElement('canvas');
       ribbon.className = 'night-sky__meteor-ribbon';
       ribbon.width = METEOR_WIDTH;
       ribbon.height = METEOR_HEIGHT;
-      const ctx = ribbon.getContext('2d', { alpha: true });
-      if (ctx) {
+      const context = ribbon.getContext('2d', { alpha: true });
+      if (context) {
         const pixels = buildMeteorTrailPixels(Math.floor(randomBetween(0, 16)));
-        ctx.putImageData(new ImageData(pixels, METEOR_WIDTH, METEOR_HEIGHT), 0, 0);
+        context.putImageData(new ImageData(pixels, METEOR_WIDTH, METEOR_HEIGHT), 0, 0);
         meteor.appendChild(ribbon);
       }
-      const head = document.createElement('span');
-      head.className = 'night-sky__meteor-head';
-      meteor.appendChild(head);
       const props: Record<string, string> = {
-        '--meteor-x': `${x.toFixed(0)}px`,
-        '--meteor-y': `${y.toFixed(0)}px`,
-        '--meteor-length': `${length.toFixed(0)}px`,
-        '--meteor-angle': `${(goesLeft ? -angle : 180 + angle).toFixed(1)}deg`,
-        '--meteor-travel-x': `${((goesLeft ? -1 : 1) * travel * Math.cos(rad)).toFixed(0)}px`,
-        '--meteor-travel-y': `${(travel * Math.sin(rad)).toFixed(0)}px`,
-        '--meteor-duration': `${duration.toFixed(2)}s`,
-        '--meteor-height': `${randomBetween(11.5, 17).toFixed(1)}px`,
-        '--meteor-head-size': `${randomBetween(3.8, 6.5).toFixed(1)}px`,
-        '--meteor-glow': `${randomBetween(1.5, 3.8).toFixed(1)}px`,
-        '--meteor-head-glow': `${randomBetween(4, 9).toFixed(1)}px`,
+        '--meteor-x': origin.x.toFixed(0) + 'px',
+        '--meteor-y': origin.y.toFixed(0) + 'px',
+        '--meteor-length': length.toFixed(0) + 'px',
+        '--meteor-angle': (goesLeft ? -angle : 180 + angle).toFixed(1) + 'deg',
+        '--meteor-travel-x': (direction.x * travel).toFixed(0) + 'px',
+        '--meteor-travel-y': (direction.y * travel).toFixed(0) + 'px',
+        '--meteor-duration': duration.toFixed(2) + 's',
+        '--meteor-height': randomBetween(11.5, 17).toFixed(1) + 'px',
+        '--meteor-glow': randomBetween(1.5, 3.8).toFixed(1) + 'px',
         '--meteor-peak-opacity': brightness.toFixed(2),
       };
-      for (const [name, value] of Object.entries(props)) meteor.style.setProperty(name, value);
+      for (const [name, value] of Object.entries(props)) {
+        meteor.style.setProperty(name, value);
+      }
       activeMeteors.add(meteor);
       meteors.appendChild(meteor);
-      meteor.addEventListener('animationend', (animationEvent) => {
-        if (animationEvent.animationName !== 'night-meteor-flight') return;
+      meteor.addEventListener('animationend', (event) => {
+        if (event.animationName !== 'night-meteor-flight' &&
+            event.animationName !== 'night-meteor-impact') return;
         meteor.remove();
         activeMeteors.delete(meteor);
       });
 
-      // Occasional pair, never more than two simultaneous meteors on desktop.
-      if (desktop && allowBurst && activeMeteors.size === 1 && meteorBurstTimer === undefined && Math.random() < .13) {
+      if (desktop && allowBurst && activeMeteors.size === 1 &&
+          meteorBurstTimer === undefined && Math.random() < .13) {
         meteorBurstTimer = window.setTimeout(() => {
           meteorBurstTimer = undefined;
           shootMeteor(false);
