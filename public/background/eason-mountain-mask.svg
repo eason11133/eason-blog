@@ -1,18 +1,20 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1536" width="1024" height="1536">
-  <!-- Matched to the distant horizon of eason-night.svg. The same cover
-       scaling and bottom alignment is used by both layers. -->
-  <path fill="white" d="M0 1346
-    C29 1347 51 1344 83 1341
-    C111 1342 134 1350 159 1357
-    C195 1368 227 1377 268 1380
-    C314 1382 344 1390 382 1388
-    C425 1389 460 1371 510 1372
-    C559 1374 585 1355 633 1354
-    C683 1354 703 1369 738 1363
-    C778 1358 822 1348 866 1339
-    C892 1334 907 1332 922 1333
-    L922 1325 Q925 1318 933 1317
-    Q943 1316 950 1324 L952 1334
-    C975 1337 997 1338 1024 1344
+  <!-- Traced against the background image's mountain ridge, sharing
+       its exact 1024 by 1536 coordinate system and cover alignment. -->
+  <path fill="white" d="M0 1356
+    C46 1354 64 1352 85 1358
+    C115 1362 138 1369 171 1375
+    C202 1383 229 1387 256 1385
+    C290 1383 318 1378 341 1380
+    C381 1384 408 1393 427 1395
+    C463 1395 487 1402 512 1397
+    C547 1391 570 1387 597 1386
+    C627 1380 653 1373 683 1375
+    C719 1376 745 1369 768 1370
+    C795 1364 821 1355 853 1352
+    C886 1345 918 1330 939 1328
+    C971 1334 991 1344 1024 1348
     L1024 1536 L0 1536 Z"/>
+  <path fill="white" d="M922 1329 Q924 1317 933 1316
+    Q945 1316 948 1332 L952 1340 H919 Z"/>
 </svg>
