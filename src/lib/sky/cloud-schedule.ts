@@ -44,6 +44,10 @@ export function cloudWeatherForSlot(slot: number): CloudWeather {
 
 export function getCloudWeather(nowMs: number = Date.now()): CloudWeather {
   const slot = Math.floor(nowMs / WEATHER_SLOT_MS);
+  // A jittered weather interval may start before its nominal slot boundary.
+  // Check the next slot first so early transitions aren't delayed.
+  const upcoming = cloudWeatherForSlot(slot + 1);
+  if (upcoming.startsAt <= nowMs) return upcoming;
   const current = cloudWeatherForSlot(slot);
   return current.startsAt <= nowMs ? current : cloudWeatherForSlot(slot - 1);
 }
