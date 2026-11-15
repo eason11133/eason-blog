@@ -56,11 +56,10 @@
     animation: night-cloud-drift var(--cloud-duration) linear var(--cloud-delay, 0ms) forwards;
     will-change: transform, opacity;
   }
-  .night-sky__cloud svg {
+  .night-sky__cloud canvas {
     display: block;
     width: 100%;
     height: 100%;
-    overflow: visible;
   }
   @keyframes night-cloud-drift {
     0% {
@@ -282,6 +281,7 @@
   import { getAuroraState } from '../lib/sky/aurora-schedule';
   import { getPlaneState, type PlaneEvent } from '../lib/sky/plane-schedule';
   import { getCloudState, type CloudEvent } from '../lib/sky/cloud-schedule';
+  import { buildCloudPixels, CLOUD_TEXTURE_WIDTH, CLOUD_TEXTURE_HEIGHT } from '../lib/sky/cloud-texture';
   import { createAuroraRenderer, type AuroraRenderer } from '../lib/sky/aurora-renderer';
 
   // This element persists across Astro navigation; start timers only once.
@@ -320,6 +320,9 @@
 
     const activeMeteors = new Set<HTMLElement>();
     const activeClouds = new Map<number, HTMLElement>();
+    // Only 32 texture presets (16 variants × 2 cloud families) can be generated.
+    // Canvas pixels are cached; CSS alone animates the cloud afterwards.
+    const cloudPixelCache = new Map<string, Uint8ClampedArray>();
     const activePlanes = new Map<number, HTMLElement>();
     let cloudTimer: number | undefined;
     let meteorTimer: number | undefined;
@@ -350,40 +353,24 @@
 
       const cloud = document.createElement('span');
       cloud.className = 'night-sky__cloud';
-      const gradientId = 'sky-cloud-gradient-' + event.id;
-      const shape = isCirrus
-        ? `<path fill="url(#${gradientId})"
-             d="M 3 80 C 32 72 49 70 76 64 C 96 55 111 48 133 50
-                C 155 35 170 35 188 41 C 202 29 234 33 248 43
-                C 271 41 294 48 308 56 C 332 53 358 63 376 68
-                C 396 68 409 72 420 80 C 377 87 348 82 315 87
-                C 273 94 230 85 189 92 C 158 89 128 94 97 87
-                C 61 89 25 89 3 80 Z" />
-           <path fill="#8da3b5" opacity=".14"
-             d="M 50 69 C 87 66 122 52 143 56 C 175 45 192 46 219 51
-                C 257 52 277 60 304 68 C 277 69 262 65 238 67
-                C 189 64 151 73 118 72 C 91 75 63 72 50 69 Z" />`
-        : `<path fill="url(#${gradientId})"
-             d="M 4 87 C 30 84 46 80 65 76 C 72 58 100 57 117 65
-                C 123 46 151 39 173 51 C 194 33 219 34 238 48
-                C 257 44 274 50 287 62 C 312 57 340 66 356 75
-                C 382 73 402 81 420 85 C 396 99 371 96 340 98
-                C 308 103 279 96 250 103 C 205 106 177 102 143 104
-                C 99 106 57 102 4 87 Z" />
-           <path fill="#8ca3b4" opacity=".12"
-             d="M 91 72 Q 112 66 124 73 Q 152 53 184 65
-                Q 223 52 245 65 Q 273 65 293 77
-                Q 250 83 219 79 Q 176 86 148 80 Q 116 84 91 72 Z" />`;
-      cloud.innerHTML = `<svg viewBox="0 0 424 120" aria-hidden="true">
-        <defs>
-          <linearGradient id="${gradientId}" x1="0%" y1="0%" x2="0%" y2="100%">
-            <stop offset="0%" stop-color="#8297a9" stop-opacity=".34" />
-            <stop offset="36%" stop-color="#657d90" stop-opacity=".70" />
-            <stop offset="100%" stop-color="#26374b" stop-opacity=".64" />
-          </linearGradient>
-        </defs>
-        ${shape}
-      </svg>`;
+      // Pre-render the softly feathered procedural cloud once; no per-frame
+      // pixel work or additional WebGL context is required.
+      const variant = ((event.id % 16) + 16) % 16;
+      const key = `${isCirrus ? 'cirrus' : 'scattered'}:${variant}`;
+      let pixels = cloudPixelCache.get(key);
+      if (!pixels) {
+        pixels = buildCloudPixels(variant, isCirrus);
+        cloudPixelCache.set(key, pixels);
+      }
+      const canvas = document.createElement('canvas');
+      canvas.width = CLOUD_TEXTURE_WIDTH;
+      canvas.height = CLOUD_TEXTURE_HEIGHT;
+      const ctx = canvas.getContext('2d', { alpha: true });
+      if (ctx) {
+        const image = new ImageData(pixels, CLOUD_TEXTURE_WIDTH, CLOUD_TEXTURE_HEIGHT);
+        ctx.putImageData(image, 0, 0);
+        cloud.appendChild(canvas);
+      }
       const props: Record<string, string> = {
         '--cloud-x': `${fromX.toFixed(0)}px`,
         '--cloud-y': `${y.toFixed(0)}px`,
