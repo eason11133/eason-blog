@@ -1,35 +1,36 @@
 import { describe, expect, it } from 'vitest';
 import { getPlaneState, planeEventForSlot } from './plane-schedule';
 
-describe('shared clock-based random airplane flights', () => {
-  it('spaces flights randomly-looking between 10 seconds and 3 minutes', () => {
-    let hasQuickOverlap = false;
-    for (let id = 18_000_000; id < 18_010_000; id++) {
-      const event = planeEventForSlot(id);
-      const next = planeEventForSlot(id + 1);
-      const gap = next.startsAt - event.startsAt;
-      expect(gap).toBeGreaterThanOrEqual(10_000);
-      expect(gap).toBeLessThanOrEqual(180_000);
-      expect(event.durationMs).toBeGreaterThanOrEqual(15_000);
-      expect(event.durationMs).toBeLessThanOrEqual(30_000);
-      if (gap < event.durationMs) hasQuickOverlap = true;
+describe('five clock-synced airplane streams', () => {
+  it('gives five different reproducible flight times', () => {
+    const flights = Array.from({ length: 5 }, (_, stream) => planeEventForSlot(18_000_000, stream));
+    expect(new Set(flights.map(event => event.id)).size).toBe(5);
+    expect(new Set(flights.map(event => event.startsAt)).size).toBe(5);
+    expect(flights).toEqual(Array.from({ length: 5 }, (_, stream) => planeEventForSlot(18_000_000, stream)));
+    for (const flight of flights) {
+      expect(flight.durationMs).toBeGreaterThanOrEqual(24_000);
+      expect(flight.durationMs).toBeLessThanOrEqual(39_000);
     }
-    expect(hasQuickOverlap).toBe(true);
   });
-
-  it('shows simultaneous planes and advances even when the site was closed', () => {
-    let overlap = 18_000_000;
-    while (planeEventForSlot(overlap + 1).startsAt >= planeEventForSlot(overlap).endsAt) overlap++;
-    const start = planeEventForSlot(overlap + 1).startsAt;
-    const state = getPlaneState(start + 10);
-    expect(state.active.some((event) => event.id === overlap)).toBe(true);
-    expect(state.active.some((event) => event.id === overlap + 1)).toBe(true);
-    expect(getPlaneState(start + 10)).toEqual(state);
+  it('allows overlap but never draws more than three simultaneous planes', () => {
+    let hasTwo = false;
+    for (let i = 0; i < 5000; i++) {
+      const state = getPlaneState(2_610_000_000_000 + i * 17_000);
+      expect(state.active.length).toBeLessThanOrEqual(3);
+      hasTwo = hasTwo || state.active.length >= 2;
+    }
+    expect(hasTwo).toBe(true);
   });
-
-  it('shows a plane halfway through its scheduled crossing', () => {
-    const event = planeEventForSlot(18_000_000);
-    expect(getPlaneState(event.startsAt + 5_000).active.some((plane) => plane.id === event.id)).toBe(true);
-    expect(getPlaneState(event.endsAt).active.some((plane) => plane.id === event.id)).toBe(false);
+  it('joins an ongoing flight mid-way without restarting it', () => {
+    const flight = planeEventForSlot(18_000_000, 4);
+    const now = flight.startsAt + 1_000;
+    expect(getPlaneState(now).active.some(event => event.id === flight.id)).toBe(true);
+    expect(getPlaneState(now)).toEqual(getPlaneState(now));
+  });
+  it('always provides the next future plane for the footer countdown', () => {
+    const now = 2_610_000_000_000;
+    const next = getPlaneState(now).next;
+    expect(next.startsAt).toBeGreaterThan(now);
+    expect(getPlaneState(next.startsAt + 100).next.startsAt).toBeGreaterThan(next.startsAt);
   });
 });
