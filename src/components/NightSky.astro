@@ -177,6 +177,31 @@
   .night-sky__plane-engine { fill: #344b5b; opacity: var(--plane-body-opacity, .62); }
   .night-sky__plane-window { fill: #8ca9b9; opacity: var(--plane-window-opacity, .24); }
 
+  /* Lamp dots are sized in CSS pixels, so a far aircraft does not lose
+     all of its lights when the SVG shrinks down to 13–20 pixels. */
+  .night-sky__plane-light {
+    position: absolute;
+    display: block;
+    width: var(--plane-light-size, 2px);
+    height: var(--plane-light-size, 2px);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+  }
+  .night-sky__plane-nav-green,
+  .night-sky__plane-strobe--upper { left: 36%; top: 26%; }
+  .night-sky__plane-nav-red,
+  .night-sky__plane-strobe--lower { left: 38%; top: 77%; }
+  .night-sky__plane-beacon { left: 64%; top: 52%; }
+  .night-sky__plane-strobe {
+    width: var(--plane-strobe-size, 3px);
+    height: var(--plane-strobe-size, 3px);
+  }
+  .night-sky__plane-beacon {
+    width: var(--plane-beacon-size, 2px);
+    height: var(--plane-beacon-size, 2px);
+  }
+
   /* Steady port-red / starboard-green navigation lights. */
   .night-sky__plane-nav-red {
     fill: #db7e84;
@@ -429,7 +454,11 @@
 
       const now = Date.now();
       const { active, next } = getCloudState(now);
-      const activeIds = new Set(active.map((event) => event.id));
+      // Limit composites on smaller screens. Keep older in-flight clouds until
+      // they leave; do not abruptly remove them to make room for newcomers.
+      const maxVisibleClouds = window.innerWidth > 900 ? 12 : 8;
+      const visible = active.slice(0, maxVisibleClouds);
+      const activeIds = new Set(visible.map((event) => event.id));
 
       for (const [id, cloud] of activeClouds) {
         if (!activeIds.has(id)) {
@@ -437,7 +466,7 @@
           activeClouds.delete(id);
         }
       }
-      for (const event of active) {
+      for (const event of visible) {
         if (!activeClouds.has(event.id)) spawnCloud(event, now);
       }
 
@@ -524,8 +553,14 @@
       const desktop = width > 900;
       // Far planes primarily read as moving light points; near ones have a
       // subtle, correctly proportioned airliner silhouette.
+      const mode = event.sizeFactor < .80 ? 'far'
+        : event.sizeFactor < .95 ? 'mid' : 'near';
       const proximity = Math.pow(event.sizeFactor, .78);
-      const size = (desktop ? 34 : 26) + proximity * (desktop ? 28 : 18);
+      const size = mode === 'far'
+        ? (desktop ? 13 : 11) + (event.sizeFactor / .80) * (desktop ? 8 : 6)
+        : mode === 'mid'
+          ? (desktop ? 27 : 22) + ((event.sizeFactor - .80) / .15) * (desktop ? 9 : 7)
+          : (desktop ? 42 : 33) + ((event.sizeFactor - .95) / .05) * (desktop ? 10 : 9);
       const margin = size + 10;
       const fromX = event.fromLeft ? -margin : width + margin;
       const toX = event.fromLeft ? width + margin : -margin;
@@ -534,7 +569,7 @@
       const deltaX = toX - fromX;
       const deltaY = toY - fromY;
       const plane = document.createElement('span');
-      plane.className = 'night-sky__plane';
+      plane.className = 'night-sky__plane night-sky__plane--' + mode;
 
       // Stable phase during a flight, including navigation / late arrival.
       const strobeMs = 2500 + event.blinkSeconds * 190;
@@ -548,17 +583,20 @@
         '--plane-dx': deltaX.toFixed(0) + 'px',
         '--plane-dy': deltaY.toFixed(0) + 'px',
         '--plane-size': size.toFixed(1) + 'px',
-        '--plane-opacity': (.92 + proximity * .07).toFixed(2),
-        '--plane-body-opacity': (.40 + proximity * .42).toFixed(2),
-        '--plane-window-opacity': (.06 + proximity * .22).toFixed(2),
-        '--plane-nav-red-opacity': ((lightSide ? .72 : .26) + proximity * .10).toFixed(2),
-        '--plane-nav-green-opacity': ((lightSide ? .25 : .68) + proximity * .10).toFixed(2),
-        '--plane-strobe-opacity': (.77 + proximity * .19).toFixed(2),
-        '--plane-beacon-opacity': (.48 + proximity * .27).toFixed(2),
+        '--plane-opacity': (mode === 'far' ? .94 : .97).toFixed(2),
+        '--plane-body-opacity': (mode === 'far' ? .025 : mode === 'mid' ? .21 : .54).toFixed(3),
+        '--plane-window-opacity': (mode === 'far' ? 0 : mode === 'mid' ? .03 : .12).toFixed(2),
+        '--plane-nav-red-opacity': (lightSide ? .78 : .17).toFixed(2),
+        '--plane-nav-green-opacity': (lightSide ? .18 : .73).toFixed(2),
+        '--plane-strobe-opacity': (mode === 'far' ? .95 : .9).toFixed(2),
+        '--plane-beacon-opacity': (mode === 'far' ? .7 : .6).toFixed(2),
+        '--plane-light-size': (mode === 'far' ? 1.7 : mode === 'mid' ? 2 : 2.3) + 'px',
+        '--plane-strobe-size': (mode === 'far' ? 2.8 : mode === 'mid' ? 3.3 : 3.9) + 'px',
+        '--plane-beacon-size': (mode === 'far' ? 1.7 : mode === 'mid' ? 1.9 : 2.2) + 'px',
         '--plane-facing': event.fromLeft ? '1' : '-1',
         '--plane-trail-length': (20 + event.trailFactor * (desktop ? 28 : 19)).toFixed(0) + 'px',
         '--plane-trail-height': (6 + proximity * 4).toFixed(1) + 'px',
-        '--plane-trail-opacity': (.08 + proximity * .08).toFixed(2),
+        '--plane-trail-opacity': (mode === 'near' ? .09 : 0).toFixed(2),
         '--plane-duration': event.durationMs + 'ms',
         '--plane-delay': (event.startsAt - now) + 'ms',
         '--plane-tilt': ((event.fromLeft ? 1 : -1) * angle).toFixed(1) + 'deg',
@@ -600,17 +638,16 @@
                  M 131 39 H 134 V 40 H 131 Z M 140 39 H 143 V 40 H 140 Z
                  M 149 39 H 152 V 40 H 149 Z M 158 39 H 161 V 40 H 158 Z
                  M 189 41 L 200 43 L 197 44 L 188 42 Z" />
-            <circle class="night-sky__plane-nav-green" cx="79" cy="22" r="2.25" />
-            <circle class="night-sky__plane-nav-red" cx="83" cy="65" r="2.25" />
-            <circle class="night-sky__plane-strobe" cx="79" cy="22" r="2.5" />
-            <circle class="night-sky__plane-strobe" cx="83" cy="65" r="2.5" />
-            <circle class="night-sky__plane-beacon" cx="141" cy="35" r="1.65" />
-            <circle class="night-sky__plane-beacon" cx="143" cy="52" r="1.65" />
           </svg>
+          <i class="night-sky__plane-light night-sky__plane-nav-green"></i>
+          <i class="night-sky__plane-light night-sky__plane-nav-red"></i>
+          <i class="night-sky__plane-light night-sky__plane-strobe night-sky__plane-strobe--upper"></i>
+          <i class="night-sky__plane-light night-sky__plane-strobe night-sky__plane-strobe--lower"></i>
+          <i class="night-sky__plane-light night-sky__plane-beacon"></i>
         </span>`;
 
       // No permanent haze: faint contrail on a small minority of near flights.
-      if (event.trailFactor > .84 && proximity > .45) {
+      if (mode === 'near' && event.trailFactor > .68) {
         const trailHolder = plane.querySelector<HTMLElement>('.night-sky__plane-trail');
         if (trailHolder) {
           const wake = document.createElement('canvas');
