@@ -78,14 +78,14 @@ const posts = await getBlogPosts();
       color:var(--night-text);
       text-decoration:none;
       display:inline;
-      background-image:linear-gradient(rgba(184,201,215,.65),rgba(184,201,215,.65));
+      background-image:linear-gradient(var(--accent),var(--accent));
       background-position:0% 100%;
       background-repeat:no-repeat;
-      background-size:0% 1px;
+      background-size:0% 2px;
       transition:background-size .3s cubic-bezier(.25,.46,.45,.94),color .3s ease;
       padding-bottom:2px;
     }
-    .tag-post-title a:hover, .tag-post-item:hover .tag-post-title a { color:var(--night-text); background-size:100% 1px; }
+    .tag-post-title a:hover, .tag-post-item:hover .tag-post-title a { color:var(--night-text); background-size:100% 2px; }
     /* Stretch only the article-title link across the card. The tag links sit above it. */
     .tag-post-title a::after { content:''; position:absolute; inset:0; z-index:1; }
     .tag-post-title a:focus-visible { outline:2px solid var(--night-accent); outline-offset:4px; }
