@@ -194,6 +194,7 @@ if (last > 1) paginationList.push(last);
       }
 
       .blog-posts-list :global(.blog-tag-link) {
+        border: 1px solid var(--night-chip-border);
         display: inline-flex;
         align-items: center;
         gap: 0.2em;
@@ -212,10 +213,10 @@ if (last > 1) paginationList.push(last);
       }
 
       .blog-posts-list :global(.blog-tag-link:hover) {
-        background: var(--accent);
-        color: white;
+        background: var(--night-chip-hover);
+        color: var(--night-accent-hover);
         transform: translateY(-2px) scale(1.05);
-        box-shadow: 0 3px 8px rgba(var(--accent-rgb), 0.25);
+        box-shadow: none;
       }
 
       .blog-posts-list :global(.blog-tag-link:active) {
@@ -250,7 +251,7 @@ if (last > 1) paginationList.push(last);
         align-items: center;
         margin-top: 3em;
         padding-top: 2em;
-        border-top: 1px solid var(--color-border);
+        border-top: 0;
         gap: 1em;
       }
 
@@ -314,10 +315,10 @@ if (last > 1) paginationList.push(last);
       }
 
       .page-btn.active {
-        background: var(--accent);
-        color: white;
+        background: var(--night-chip-hover);
+        color: var(--night-accent-hover);
         font-weight: 600;
-        box-shadow: 0 4px 16px rgba(var(--accent-rgb), 0.35);
+        box-shadow: inset 0 0 0 1px var(--night-chip-border);
         transform: scale(1.08);
         transition:
           color 0.4s cubic-bezier(0.2, 0, 0, 1),
@@ -421,16 +422,16 @@ if (last > 1) paginationList.push(last);
         z-index: 2;
         /* The Hero already overlaps the next section by 88px. Keep that
            region transparent so the rounded article card sits over the photo. */
-        background: linear-gradient(to bottom, transparent 88px, #171c25 88px);
+        background: linear-gradient(to bottom, transparent 88px, var(--night-bg) 88px);
         min-height: 44vh;
         padding: 0 1.5rem 5rem;
-        color: #ecf1f8;
+        color: var(--night-text);
       }
       .articles-inner {
         width: min(100%, 960px);
         margin: 0 auto;
         padding: 2rem clamp(1.2rem, 3vw, 2.5rem);
-        background: #222936;
+        background: var(--night-hover-gradient);
         border: 1px solid rgba(155, 177, 214, .19);
         border-radius: 18px;
         box-sizing: border-box;
@@ -450,29 +451,29 @@ if (last > 1) paginationList.push(last);
         gap: .35rem;
         text-decoration: none;
         padding: .4rem .72rem;
-        background: rgba(145, 175, 207, .08);
-        border: 1px solid rgba(155, 177, 214, .18);
+        background: var(--night-chip-bg);
+        border: 1px solid var(--night-chip-border);
         border-radius: 9px;
-        color: #c5d4e7;
+        color: var(--night-chip-text);
         font-size: .88rem;
         transition: background .2s, color .2s, transform .2s;
       }
       .tag-filter:hover {
-        background: rgba(145,175,207,.16);
-        color: #fff;
+        background: var(--night-chip-hover);
+        color: var(--night-accent-hover);
         transform: translateY(-2px);
       }
-      .tag-filter.all-tag { color: #f0f5ff; }
-      .tag-hash { color: #9abce6; }
+      .tag-filter.all-tag { color: var(--night-text); }
+      .tag-hash { color: var(--night-accent); }
       .tag-filter .tag-count, .tag-filter.all-tag span {
-        color: #9dadc4;
+        color: var(--night-text-muted);
         font-size: .78rem;
         margin-left: .15rem;
       }
       .articles-list { display: flex; flex-direction: column; }
-      .articles-empty { color: #bbc6d7; padding: 1.4rem 0; }
+      .articles-empty { color: var(--night-text-secondary); padding: 1.4rem 0; }
       .pinned-mark {
-        color: #abc9ef;
+        color: var(--night-accent);
         font-size: .8rem;
         font-weight: 600;
         padding-top: .8rem;
@@ -488,7 +489,7 @@ if (last > 1) paginationList.push(last);
         transition: background-color .22s ease, transform .22s ease;
       }
       .articles-list :global(.blog-post-item:hover) {
-        background: rgba(145,175,207,.08);
+        background: var(--night-chip-bg);
         box-shadow: inset 0 0 0 1px rgba(157,186,234,.16);
         transform: none;
       }
@@ -497,7 +498,7 @@ if (last > 1) paginationList.push(last);
         font-size: 1.35rem;
         line-height: 1.4;
         margin: 0 0 .65rem;
-        color: #f0f4fa;
+        color: var(--night-text);
       }
       /* Full-card article link, with independent clickable category tags. */
       .articles-list :global(.blog-post-title a)::after {
@@ -549,22 +550,23 @@ if (last > 1) paginationList.push(last);
         transition: background-color .3s cubic-bezier(.2,0,0,1), color .3s cubic-bezier(.2,0,0,1), transform .3s cubic-bezier(.2,0,0,1), box-shadow .3s cubic-bezier(.2,0,0,1);
         transform-origin: center;
       }
-      .articles-list :global(.blog-tag-link:hover) { transform: translateY(-2px) scale(1.05); }
+      .articles-list :global(.blog-tag-link:hover) { transform: translateY(-1px); background: var(--night-chip-hover); color: var(--night-accent-hover); }
       .articles-list :global(.blog-tag-link:active) { transform: translateY(0) scale(.97); }
       .articles-list :global(.blog-post-excerpt) {
-        color: #bfcbdc;
+        color: var(--night-text-secondary);
         font-size: .94rem;
         line-height: 1.75;
         margin: 0 0 .8rem;
       }
-      .articles-list :global(.blog-post-meta) { color: #9eafc7; }
+      .articles-list :global(.blog-post-meta) { color: var(--night-text-muted); }
       .articles-list :global(.blog-tag-link) {
-        background: rgba(145,175,207,.13);
-        color: #b9d2f3;
+        border: 1px solid var(--night-chip-border);
+        background: var(--night-chip-bg);
+        color: var(--night-chip-text);
       }
       @media (max-width: 720px) {
         .articles-area {
-          background: linear-gradient(to bottom, transparent 56px, #171c25 56px);
+          background: linear-gradient(to bottom, transparent 56px, var(--night-bg) 56px);
           padding: 0 .8rem 3rem;
         }
         .articles-inner { padding: 1.25rem 1rem; }
