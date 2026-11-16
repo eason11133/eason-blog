@@ -7,7 +7,7 @@ import { siteTitle } from '../config';
 
 <PageShell
   title={`關於我 | ${siteTitle}`}
-  description="關於 Eason"
+  description="Eason 的個人介紹、做過的系統和其他興趣"
   transparentHeader={false}
   useMainWrapper={false}
   pageId="about"
@@ -15,9 +15,216 @@ import { siteTitle } from '../config';
   <main class="about-page">
     <div class="about-inner">
       <InteriorHeading title="關於我" centered={true} animated={true} />
-      <article class="prose about-prose">
-        <AboutContent />
-      </article>
+
+      <div class="about-layout">
+        <aside class="about-profile" aria-label="個人資訊">
+          <div class="about-profile-inner">
+            <p class="about-name">Eason</p>
+            <p class="about-tagline">從棒球到資訊</p>
+            <p class="about-school">台北市立陽明高中<br />人工智慧學程</p>
+
+            <div class="about-profile-details">
+              <div class="about-profile-detail">
+                <span class="about-detail-label">目前</span>
+                <span>高中三年級</span>
+              </div>
+              <div class="about-profile-detail">
+                <span class="about-detail-label">在做的事</span>
+                <span>系統開發、LINE Bot</span>
+              </div>
+            </div>
+
+            <nav class="about-profile-links" aria-label="個人連結">
+              <a href="/blog/" data-astro-prefetch="viewport">文章 <span aria-hidden="true">↗</span></a>
+              <a href="https://github.com/eason11133" target="_blank" rel="noopener noreferrer">GitHub <span aria-hidden="true">↗</span></a>
+            </nav>
+          </div>
+        </aside>
+
+        <article class="prose about-prose">
+          <AboutContent />
+        </article>
+      </div>
     </div>
   </main>
 </PageShell>
+
+<style>
+  .about-layout {
+    display: grid;
+    grid-template-columns: minmax(0, 210px) minmax(0, 1fr);
+    gap: clamp(38px, 7vw, 84px);
+    align-items: start;
+    padding: 0 0 1rem;
+  }
+
+  .about-profile {
+    min-width: 0;
+  }
+
+  .about-profile-inner {
+    position: sticky;
+    top: 104px;
+  }
+
+  .about-name {
+    margin: 0 0 .35rem;
+    font-size: clamp(1.9rem, 3vw, 2.2rem);
+    line-height: 1.2;
+    letter-spacing: -.04em;
+    font-weight: 730;
+    color: #e8eaed;
+  }
+
+  .about-tagline {
+    margin: 0 0 1.45rem;
+    color: #e8eaed;
+    font-size: .95rem;
+    line-height: 1.7;
+  }
+
+  .about-school {
+    margin: 0;
+    color: #e8eaed;
+    opacity: .84;
+    font-size: .89rem;
+    line-height: 1.85;
+  }
+
+  .about-profile-details {
+    display: flex;
+    flex-direction: column;
+    gap: .85rem;
+    margin-top: 1.65rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid rgba(145, 175, 207, .24);
+  }
+
+  .about-profile-detail {
+    display: flex;
+    flex-direction: column;
+    gap: .25rem;
+    color: #e8eaed;
+    font-size: .88rem;
+    line-height: 1.55;
+  }
+
+  .about-detail-label {
+    color: #e8eaed;
+    opacity: .6;
+    font-size: .76rem;
+  }
+
+  .about-profile-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .6rem 1.1rem;
+    margin-top: 1.6rem;
+  }
+
+  .about-profile-links a {
+    display: inline-flex;
+    align-items: baseline;
+    gap: .2rem;
+    color: #e8eaed;
+    font-size: .87rem;
+    text-decoration: none;
+    background-image: linear-gradient(#91afcf, #91afcf);
+    background-position: 0 100%;
+    background-repeat: no-repeat;
+    background-size: 0 2px;
+    padding-bottom: 3px;
+    transition: background-size .3s cubic-bezier(.25,.46,.45,.94);
+  }
+
+  .about-profile-links a:hover,
+  .about-profile-links a:focus-visible {
+    background-size: 100% 2px;
+  }
+
+  .about-prose {
+    min-width: 0;
+    width: 100%;
+    padding-left: clamp(0px, 1vw, 12px);
+  }
+
+  .about-prose :global(h2) {
+    font-size: 1.23rem;
+    font-weight: 700;
+    line-height: 1.4;
+    color: #e8eaed;
+    letter-spacing: -.015em;
+    margin: 0 0 1rem;
+    padding: 0;
+    border: 0;
+  }
+
+  .about-prose :global(h2:not(:first-child)) {
+    margin-top: 2.75rem;
+    padding-top: 2.05rem;
+    border-top: 1px solid rgba(145, 175, 207, .2);
+  }
+
+  .about-prose :global(h3) {
+    color: #e8eaed;
+    font-size: 1rem;
+    line-height: 1.55;
+    font-weight: 680;
+    margin: 1.45rem 0 .4rem;
+    padding-left: .8rem;
+    border-left: 2px solid #91afcf;
+  }
+
+  .about-prose :global(p) {
+    color: #e8eaed;
+    font-size: 1rem;
+    line-height: 1.95;
+    margin: 0 0 1.05rem;
+    opacity: .88;
+  }
+
+  .about-prose :global(a) {
+    color: #e8eaed;
+    text-underline-offset: 4px;
+    text-decoration-color: #91afcf;
+  }
+
+  @media (max-width: 720px) {
+    .about-layout {
+      grid-template-columns: minmax(0, 1fr);
+      gap: 2.4rem;
+    }
+    .about-profile-inner {
+      position: static;
+    }
+    .about-name {
+      font-size: 1.8rem;
+    }
+    .about-tagline {
+      margin-bottom: .8rem;
+    }
+    .about-profile-details {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1rem;
+      margin-top: 1.1rem;
+      padding-top: 1rem;
+    }
+    .about-profile-links {
+      margin-top: 1.25rem;
+    }
+    .about-prose {
+      padding-left: 0;
+    }
+    .about-prose :global(h2:not(:first-child)) {
+      margin-top: 2.2rem;
+      padding-top: 1.65rem;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .about-profile-links a {
+      transition: none;
+    }
+  }
+</style>
