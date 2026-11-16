@@ -16,25 +16,37 @@
 </div>
 
 <style is:global>
+  /* Landscape and portrait use separate, high-quality photographs.
+     Background and ridge mask share right-bottom cover geometry so that
+     observatory, mountains and meteor occlusion remain lined up. */
   .night-sky {
+    --night-photo: url('/background/eason-night-landscape.webp');
+    --night-ridge-mask: url('/background/eason-mountain-mask-landscape.svg');
     position: fixed;
     inset: 0;
     z-index: 0;
     overflow: hidden;
     pointer-events: none;
-    background: #07121f url('/background/eason-night.svg') center bottom / cover no-repeat;
+    background: #07121f var(--night-photo) right bottom / cover no-repeat;
     contain: paint;
   }
 
-  /* The existing night background doubles as the *foreground* only over the
-     mountain silhouette, hiding sky effects once they pass the ridge. */
+  @media (max-aspect-ratio: 1/1) {
+    .night-sky {
+      --night-photo: url('/background/eason-night-portrait.webp');
+      --night-ridge-mask: url('/background/eason-mountain-mask-portrait.svg');
+    }
+  }
+
+  /* Repeat only the ridges in front of moving sky effects, never add a
+     second independent wallpaper or bake animation effects into the photo. */
   .night-sky__mountain-foreground {
     position: absolute;
     inset: 0;
     pointer-events: none;
-    background: url('/background/eason-night.svg') center bottom / cover no-repeat;
-    -webkit-mask: url('/background/eason-mountain-mask.svg') center bottom / cover no-repeat;
-    mask: url('/background/eason-mountain-mask.svg') center bottom / cover no-repeat;
+    background: var(--night-photo) right bottom / cover no-repeat;
+    -webkit-mask: var(--night-ridge-mask) right bottom / cover no-repeat;
+    mask: var(--night-ridge-mask) right bottom / cover no-repeat;
   }
 
   .night-sky__glow {

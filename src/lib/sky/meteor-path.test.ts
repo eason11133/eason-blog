@@ -18,6 +18,20 @@ describe('stable meteor flight generation', () => {
     }
   });
 
+  it('uses different matching mountain silhouettes for portrait and landscape', () => {
+    const landscape = mountainHorizonAt(1920 * .9, 1920, 1080);
+    const portrait = mountainHorizonAt(390 * .9, 390, 844);
+    expect(landscape).toBeGreaterThan(1080 * .65);
+    expect(landscape).toBeLessThan(1080 * .85);
+    expect(portrait).toBeGreaterThan(844 * .72);
+    expect(portrait).toBeLessThan(844 * .95);
+
+    // CSS uses right-bottom alignment for cropping, as does this projection.
+    expect(mountainHorizonAt(1900, 1920, 1080)).toBeLessThan(
+      mountainHorizonAt(700, 1920, 1080),
+    );
+  });
+
   it('rejects trajectories that disappear immediately behind the mountain', () => {
     for (const [width, height, desktop] of [
       [1440, 810, true], [390, 844, false], [1000, 720, true],

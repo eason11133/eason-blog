@@ -1,16 +1,17 @@
 import { meteorExitDistance } from './meteor-geometry';
 
 /**
- * Choose a whole on-screen meteor route before creating an element.
- * No DOM reads, collision timers or per-frame JavaScript.
- *
- * Image-space ridge data is sampled from eason-night.svg. Update alongside
- * public/background/eason-mountain-mask.svg if the background art changes.
+ * Meteor routes share the selected wallpaper's actual photo-space skyline.
+ * Keep these points aligned with the corresponding SVG mountain masks.
  */
-export const SKY_IMAGE_WIDTH = 1024;
-export const SKY_IMAGE_HEIGHT = 1536;
-export const RIDGE_STEP = 32;
-export const RIDGE_Y = [1353,1351,1348,1350,1357,1360,1364,1368,1372,1370,1371,1375,1376,1375,1376,1378,1381,1381,1377,1374,1373,1367,1355,1361,1363,1360,1354,1346,1338,1333,1333,1339,1344] as const;
+const LANDSCAPE = {
+  width: 1672, height: 941,
+  ridge: [[0,706],[80,699],[160,702],[240,703],[315,694],[390,711],[470,708],[530,725],[630,725],[710,740],[800,733],[880,736],[980,734],[1060,719],[1140,709],[1240,719],[1320,716],[1410,705],[1480,691],[1540,691],[1620,698],[1672,703]],
+};
+const PORTRAIT = {
+  width: 941, height: 1672,
+  ridge: [[0,1443],[75,1436],[145,1452],[220,1466],[310,1472],[410,1472],[480,1464],[545,1460],[610,1449],[690,1454],[760,1452],[820,1436],[880,1429],[941,1437]],
+};
 
 export interface MeteorRoute {
   x: number;
@@ -28,16 +29,21 @@ export interface MeteorRoute {
 const clamp = (n: number, min: number, max: number) => Math.max(min, Math.min(max, n));
 const interpolate = (a: number, b: number, t: number) => a + (b - a) * t;
 
-/** Foreground silhouette height in viewport pixels using background-size: cover. */
+/** Photo and mask both use right bottom / cover. */
 export function mountainHorizonAt(x: number, width: number, height: number): number {
-  const scale = Math.max(width / SKY_IMAGE_WIDTH, height / SKY_IMAGE_HEIGHT);
-  const pictureWidth = SKY_IMAGE_WIDTH * scale;
-  const pictureTop = height - SKY_IMAGE_HEIGHT * scale;
-  const pictureLeft = (width - pictureWidth) / 2;
-  const imageX = clamp((x - pictureLeft) / scale, 0, SKY_IMAGE_WIDTH);
-  const index = Math.min(RIDGE_Y.length - 2, Math.floor(imageX / RIDGE_STEP));
-  const fraction = clamp((imageX - index * RIDGE_STEP) / RIDGE_STEP, 0, 1);
-  return pictureTop + interpolate(RIDGE_Y[index], RIDGE_Y[index + 1], fraction) * scale;
+  const photo = height >= width ? PORTRAIT : LANDSCAPE;
+  const scale = Math.max(width / photo.width, height / photo.height);
+  const pictureWidth = photo.width * scale;
+  const pictureTop = height - photo.height * scale;
+  const pictureLeft = width - pictureWidth; // CSS background-position: right bottom
+  const imageX = clamp((x - pictureLeft) / scale, 0, photo.width);
+  const ridge = photo.ridge;
+  let index = 0;
+  while (index < ridge.length - 2 && imageX > ridge[index + 1][0]) index++;
+  const [x1, y1] = ridge[index];
+  const [x2, y2] = ridge[index + 1];
+  const fraction = clamp((imageX - x1) / (x2 - x1), 0, 1);
+  return pictureTop + interpolate(y1, y2, fraction) * scale;
 }
 
 /** First distance where the moving head meets the mountain skyline. */

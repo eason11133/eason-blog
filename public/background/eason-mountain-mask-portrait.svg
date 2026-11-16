@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="941" height="1672" viewBox="0 0 941 1672">
+  <!-- Covers the photo's distant ridge and observatory; same cover/right-bottom alignment as background. -->
+  <path fill="#fff" d="M0 1443 L75 1436 L145 1452 L220 1466 L310 1472 L410 1472 L480 1464 L545 1460 L610 1449 L690 1454 L760 1452 L820 1436 L880 1429 L941 1437 L941 1672 L0 1672 Z"/>
+  <path fill="#fff" d="M828 1434 L828 1418 Q830 1405 846 1403 Q861 1405 863 1420 L863 1433 Z M884 1432 L884 1399 L886 1399 L886 1432 Z"/>
+</svg>
