@@ -6,9 +6,9 @@
 
 html[data-theme="dark"] body[data-page-id]:not([data-page-id="home"]) {
   --interior-width: 880px;
-  --interior-color: #e7effa;
-  --interior-muted: #a7b9d3;
-  --interior-line: rgba(158, 186, 221, .20);
+  --interior-color: #e9eaed;
+  --interior-muted: #b8bcc5;
+  --interior-line: rgba(184, 196, 211, .15);
 }
 
 html[data-theme="dark"] body[data-page-id="blog-list"] .articles-area,
@@ -60,9 +60,9 @@ html[data-theme="dark"] body[data-page-id="blog-list"] .articles-list > .scroll-
   pointer-events: none;
   opacity: 0;
   border-radius: 14px;
-  border: 1px solid rgba(167, 195, 232, .3);
-  background: linear-gradient(145deg, rgba(25, 49, 78, .91), rgba(14, 31, 54, .85));
-  box-shadow: 0 18px 46px rgba(0, 6, 18, .4), 0 4px 15px rgba(0, 6, 18, .14);
+  border: 1px solid rgba(183, 201, 217, .18);
+  background: linear-gradient(145deg, rgba(12, 24, 35, .72), rgba(8, 19, 30, .64));
+  box-shadow: 0 14px 35px rgba(0, 5, 14, .28), 0 3px 10px rgba(0, 5, 14, .10);
   transform: scale(.992);
   transition: opacity .23s ease, transform .26s ease;
 }
@@ -122,7 +122,7 @@ html[data-theme="dark"] body[data-page-id="blog-list"] .articles-list .blog-post
 }
 html[data-theme="dark"] body[data-page-id="blog-list"] .articles-list .blog-post-title,
 html[data-theme="dark"] body[data-page-id^="tag"] .tag-post-title {
-  color: #edf3fc;
+  color: #eef1f5;
   font-size: clamp(1.2rem, 2.2vw, 1.43rem) !important;
   line-height: 1.4;
 }
@@ -173,7 +173,7 @@ html[data-theme="dark"] body[data-page-id="experience"] .experience-body {
   line-height: 1.85;
 }
 html[data-theme="dark"] body[data-page-id="experience"] .experience-body a {
-  color: #b3d2f6;
+  color: #b9c7d5;
 }
 
 /* Article pages: title and metadata above the text, no hero or giant box. */
@@ -191,10 +191,10 @@ html[data-theme="dark"] body[data-page-id="post"] .post-back-link {
   align-items: center;
   margin: 0 0 1.75rem;
   text-decoration: none;
-  color: #a9c5e8;
+  color: #b5c4d3;
   font-size: .9rem;
 }
-html[data-theme="dark"] body[data-page-id="post"] .post-back-link:hover { color: #e2f0ff; }
+html[data-theme="dark"] body[data-page-id="post"] .post-back-link:hover { color: #f0f3f6; }
 html[data-theme="dark"] body[data-page-id="post"] .post-head .interior-heading {
   margin-bottom: 1.1rem;
 }
@@ -213,7 +213,7 @@ html[data-theme="dark"] body[data-page-id="post"] .post-head .meta-row {
 }
 html[data-theme="dark"] body[data-page-id="post"] .post-head .pdf-export-button {
   background: transparent;
-  color: #b4cdec;
+  color: #b8c7d6;
   border-color: var(--interior-line);
   font-size: .85rem;
 }
