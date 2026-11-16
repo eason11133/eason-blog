@@ -294,11 +294,11 @@ html[data-theme="dark"] body[data-page-id="post"] .toc-container {
 /* Moonlight blue: preview article ink, metadata, and translucent chips.
    Preview blog listing only. All geometry and interaction rules above remain. */
 html[data-theme="dark"] body[data-page-id="blog-list"] {
-  --blog-title-ink: #b9daf9;
-  --blog-title-hover: #cde7ff;
+  --blog-title-ink: #92bef4;
+  --blog-title-hover: #92bef4;
   --blog-excerpt-ink: #a0bfdf;
   --blog-meta-ink: #789fcd;
-  --blog-line-ink: #91bbed;
+  --blog-line-ink: #92bef4;
   --blog-filter-ink: #92bef4;
   --blog-filter-count: #789fcd;
   --blog-filter-bg: rgba(51, 106, 177, .13);
