@@ -133,7 +133,7 @@
 	--accent-dark: #91aec3;
 	--accent-rgb: 174, 202, 221;
 	--black: 232, 234, 237;
-	--gray: 140, 155, 185;
+	--gray: 150, 169, 185;
 	--gray-light: 39, 42, 48;
 	--gray-dark: 223, 232, 240;
 	--gray-gradient: rgba(var(--gray-light), 50%), var(--color-bg);
@@ -208,7 +208,7 @@
 	/* Misc */
 	--color-skill-bar-bg: #1b3547;
 	--color-gradient-start: #aecadd;
-	--color-hobby-gradient: linear-gradient(135deg, #2d3036, #30343b);
+	--color-hobby-gradient: linear-gradient(135deg, #142b3d, #1a3447);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -1232,7 +1232,7 @@ hr {
 [data-theme="dark"] body[data-page-id="blog-list"],
 [data-theme="dark"] body[data-page-id="tags-index"],
 [data-theme="dark"] body[data-page-id="tag-detail"] {
-  background-color: #101b2b !important;
+  background-color: var(--night-bg) !important;
 }
 [data-theme="dark"] body[data-page-id] #main-content {
   background: transparent;
@@ -1258,10 +1258,10 @@ hr {
   height: clamp(140px, 24vh, 270px);
   pointer-events: none;
   background: linear-gradient(to bottom,
-    rgba(16, 27, 43, 0) 0%,
-    rgba(16, 27, 43, .15) 27%,
-    rgba(16, 27, 43, .65) 69%,
-    #101b2b 100%);
+    rgba(7, 18, 31, 0) 0%,
+    rgba(7, 18, 31, .15) 27%,
+    rgba(7, 18, 31, .65) 69%,
+    var(--night-bg) 100%);
 }
 [data-theme="dark"] body[data-page-id="home"] .stats-wrapper::before,
 [data-theme="dark"] body[data-page-id="about"] .about-main::before,
@@ -1273,7 +1273,7 @@ hr {
   pointer-events: none;
   inset: 0 0 auto;
   height: clamp(150px, 25vh, 270px);
-  background: linear-gradient(to bottom, #101b2b 0%, rgba(16, 27, 43, 0) 100%);
+  background: linear-gradient(to bottom, var(--night-bg) 0%, rgba(7, 18, 31, 0) 100%);
 }
 [data-theme="dark"] body[data-page-id="home"] .stats-wrapper > *,
 [data-theme="dark"] body[data-page-id="about"] .about-main > *,
@@ -1355,7 +1355,7 @@ hr {
 [data-theme="dark"] body[data-page-id="home"] .home-post-item:hover,
 [data-theme="dark"] body[data-page-id="tags-index"] .tag-post-item:hover,
 [data-theme="dark"] body[data-page-id="tag-detail"] .tag-post-item:hover {
-  background: rgba(39, 79, 111, .18) !important;
+  background: var(--night-hover-gradient) !important;
 }
 @media (max-width: 720px) {
   [data-theme="dark"] body[data-page-id="home"] .stats-container,
@@ -1386,7 +1386,7 @@ hr {
   inset: 0 0 auto;
   height: clamp(150px, 25vh, 270px);
   pointer-events: none;
-  background: linear-gradient(to bottom, #101b2b, rgba(16,27,43,0));
+  background: linear-gradient(to bottom, var(--night-bg), rgba(7,18,31,0));
 }
 [data-theme="dark"] body[data-page-id="blog-list"] .articles-inner {
   position: relative;
@@ -1423,7 +1423,7 @@ hr {
 /* Persisted sky replaces body wallpaper, preventing a second image load during
    Astro ClientRouter swaps. The background is one shared mounted layer. */
 [data-theme="dark"] body[data-page-id] {
-  background: #101b2b !important;
+  background: var(--night-bg) !important;
 }
 [data-theme="dark"] body[data-page-id] #main-content {
   position: relative;
@@ -1442,7 +1442,7 @@ hr {
    Every PageShell route has the same persistent sky beneath page content;
    photo Heroes remain unchanged. */
 [data-theme="dark"] body {
-  background-color: #101b2b !important;
+  background-color: var(--night-bg) !important;
   background-image: none !important;
 }
 [data-theme="dark"] body #main-content,
@@ -1465,7 +1465,7 @@ hr {
   background: transparent !important;
 }
 [data-theme="dark"] body[data-page-id="post"] .stats-wrapper::before {
-  background: linear-gradient(to bottom, #101b2b 0%, rgba(16,27,43,0) 240px) !important;
+  background: linear-gradient(to bottom, var(--night-bg) 0%, rgba(7,18,31,0) 240px) !important;
   z-index: 0 !important;
   pointer-events: none;
 }
@@ -1501,7 +1501,7 @@ hr {
   inset: auto 0 0;
   height: clamp(140px, 24vh, 270px);
   pointer-events: none;
-  background: linear-gradient(to bottom,rgba(16,27,43,0),rgba(16,27,43,.2) 32%,rgba(16,27,43,.72) 75%,#101b2b);
+  background: linear-gradient(to bottom,rgba(7,18,31,0),rgba(7,18,31,.2) 32%,rgba(7,18,31,.72) 75%,var(--night-bg));
 }
 @media(max-width:720px) {
   [data-theme="dark"] body[data-page-id="post"] .layout-container > .content-card {
@@ -1532,7 +1532,7 @@ hr {
 
 /* The NightSky is persistent: never re-paint the same large asset on body. */
 html[data-theme="dark"] body[data-page-id] {
-  background-color: #101b2b !important;
+  background-color: var(--night-bg) !important;
   background-image: none !important;
 }
 /* Reduce expensive blur layers on small devices without changing card colors. */
