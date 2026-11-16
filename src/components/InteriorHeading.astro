@@ -7,15 +7,16 @@ interface Props {
   description?: string;
   centered?: boolean;
   animated?: boolean;
+  animateOnNavigation?: boolean;
 }
 
-const { title, eyebrow, description, centered = false, animated = false } = Astro.props;
+const { title, eyebrow, description, centered = false, animated = false, animateOnNavigation = true } = Astro.props;
 ---
 
 <header class:list={['interior-heading', { 'interior-heading--centered': centered }]}>
   {eyebrow && <span class="interior-eyebrow">{eyebrow}</span>}
   {animated
-    ? <Typewriter text={title} tag="h1" animateOnNavigation={true} />
+    ? <Typewriter text={title} tag="h1" animateOnNavigation={animateOnNavigation} />
     : <h1>{title}</h1>}
   {description && <p class="interior-description">{description}</p>}
 </header>
