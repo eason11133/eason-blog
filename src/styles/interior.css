@@ -306,7 +306,6 @@ html[data-theme="dark"] body[data-page-id="blog-list"] {
   --blog-filter-hover: rgba(35, 90, 91, .22);
   --blog-tag-ink: #e1b4dd;
   --blog-tag-bg: rgba(87, 41, 89, .16);
-  --blog-tag-border: rgba(210, 147, 208, .20);
   --blog-tag-hover: rgba(87, 41, 89, .28);
 }
 html[data-theme="dark"] body[data-page-id="blog-list"] .articles-list .blog-post-title,
@@ -345,7 +344,6 @@ html[data-theme="dark"] body[data-page-id="blog-list"] .article-tags .all-tag sp
 html[data-theme="dark"] body[data-page-id="blog-list"] .articles-list .blog-tag-link {
   color: var(--blog-tag-ink) !important;
   background: var(--blog-tag-bg) !important;
-  border: 1px solid var(--blog-tag-border);
 }
 html[data-theme="dark"] body[data-page-id="blog-list"] .articles-list .blog-tag-link:hover {
   color: #edcbee !important;
