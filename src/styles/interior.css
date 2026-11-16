@@ -38,39 +38,52 @@ html[data-theme="dark"] body[data-page-id="tag-detail"] .tag-panel {
   -webkit-backdrop-filter: none !important;
 }
 
-/* Each entire blog preview floats as one card (title, excerpt, metadata,
-   labels and pin), without reverting to the old full-page floating panel. */
+/* Original clean article list at rest. Only on hover/focus does the
+   entire article gain depth; never leave card surfaces visible by default. */
 html[data-theme="dark"] body[data-page-id="blog-list"] .articles-list {
-  gap: clamp(.85rem, 1.8vw, 1.15rem) !important;
+  gap: 0 !important;
 }
 html[data-theme="dark"] body[data-page-id="blog-list"] .articles-list > .scroll-reveal {
-  box-sizing: border-box;
   position: relative;
-  padding: clamp(1.25rem, 2.6vw, 1.8rem);
-  border: 1px solid rgba(167, 191, 225, .24);
-  border-radius: 16px;
-  background: linear-gradient(145deg, rgba(21, 40, 65, .87), rgba(12, 27, 49, .77));
-  box-shadow: 0 12px 34px rgba(0, 6, 17, .32), 0 3px 10px rgba(0, 6, 17, .16);
+  isolation: isolate;
+  border: 0 !important;
+  border-radius: 0;
+  padding: 0;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+html[data-theme="dark"] body[data-page-id="blog-list"] .articles-list > .scroll-reveal::before {
+  content: '';
+  position: absolute;
+  inset: 6px -15px;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0;
+  border-radius: 14px;
+  border: 1px solid rgba(167, 195, 232, .3);
+  background: linear-gradient(145deg, rgba(25, 49, 78, .91), rgba(14, 31, 54, .85));
+  box-shadow: 0 18px 46px rgba(0, 6, 18, .4), 0 4px 15px rgba(0, 6, 18, .14);
+  transform: scale(.992);
+  transition: opacity .23s ease, transform .26s ease;
 }
 html[data-theme="dark"] body[data-page-id="blog-list"] .articles-list > .scroll-reveal.visible {
-  transition: transform .28s cubic-bezier(.2,.7,.2,1),
-    box-shadow .28s ease, border-color .28s ease, background .28s ease;
+  transition: transform .28s cubic-bezier(.2,.7,.2,1);
 }
 html[data-theme="dark"] body[data-page-id="blog-list"] .articles-list > .scroll-reveal.visible:hover,
 html[data-theme="dark"] body[data-page-id="blog-list"] .articles-list > .scroll-reveal.visible:focus-within {
-  transform: translateY(-5px);
-  border-color: rgba(175, 205, 240, .45);
-  background: linear-gradient(145deg, rgba(25, 48, 77, .91), rgba(15, 33, 58, .83));
-  box-shadow: 0 21px 49px rgba(0, 6, 17, .4), 0 6px 18px rgba(0, 6, 17, .18);
+  transform: translateY(-4px);
 }
-html[data-theme="dark"] body[data-page-id="blog-list"] .articles-list .pinned-mark {
-  padding: 0 0 .8rem;
+html[data-theme="dark"] body[data-page-id="blog-list"] .articles-list > .scroll-reveal:hover::before,
+html[data-theme="dark"] body[data-page-id="blog-list"] .articles-list > .scroll-reveal:focus-within::before {
+  opacity: 1;
+  transform: scale(1);
 }
 html[data-theme="dark"] body[data-page-id="blog-list"] .articles-list .blog-post-item {
-  padding: 0 !important;
+  padding: 1.45rem 0 !important;
   margin: 0 !important;
-  border: 0 !important;
   border-radius: 0 !important;
+  border: 0 !important;
+  border-bottom: 1px solid var(--interior-line) !important;
   background: transparent !important;
   box-shadow: none !important;
   transform: none !important;
@@ -96,7 +109,8 @@ html[data-theme="dark"] body[data-page-id^="tag"] .tag-post-item:hover {
   transform: none !important;
 }
 @media (prefers-reduced-motion: reduce) {
-  html[data-theme="dark"] body[data-page-id="blog-list"] .articles-list > .scroll-reveal.visible {
+  html[data-theme="dark"] body[data-page-id="blog-list"] .articles-list > .scroll-reveal.visible,
+  html[data-theme="dark"] body[data-page-id="blog-list"] .articles-list > .scroll-reveal::before {
     transition: none;
   }
   html[data-theme="dark"] body[data-page-id="blog-list"] .articles-list > .scroll-reveal.visible:hover,
