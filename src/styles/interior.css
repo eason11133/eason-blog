@@ -1,0 +1,227 @@
+/*
+ * Minimal interior preview: Astro Nano's quiet, content-first rhythm and
+ * AstroPaper's legible article layout. The Curry home page is never targeted.
+ * Keep the persistent night, stars, cloud, meteor and aurora layers unchanged.
+ */
+
+html[data-theme="dark"] body[data-page-id]:not([data-page-id="home"]) {
+  --interior-width: 880px;
+  --interior-color: #e7effa;
+  --interior-muted: #a7b9d3;
+  --interior-line: rgba(158, 186, 221, .20);
+}
+
+html[data-theme="dark"] body[data-page-id="blog-list"] .articles-area,
+html[data-theme="dark"] body[data-page-id="tags-index"] .tag-area,
+html[data-theme="dark"] body[data-page-id="tag-detail"] .tag-area {
+  position: relative;
+  z-index: 1;
+  min-height: calc(100dvh - 64px) !important;
+  padding: clamp(126px, 17vh, 180px) clamp(20px, 4vw, 48px) 96px !important;
+  background: transparent !important;
+}
+
+html[data-theme="dark"] body[data-page-id="blog-list"] .articles-inner,
+html[data-theme="dark"] body[data-page-id="tags-index"] .tag-panel,
+html[data-theme="dark"] body[data-page-id="tag-detail"] .tag-panel {
+  box-sizing: border-box;
+  width: min(100%, var(--interior-width)) !important;
+  max-width: var(--interior-width) !important;
+  margin: 0 auto !important;
+  padding: 0 !important;
+  background: transparent !important;
+  background-image: none !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* Plain editorial rows instead of floating/glowing rounded cards. */
+html[data-theme="dark"] body[data-page-id="blog-list"] .articles-list .blog-post-item,
+html[data-theme="dark"] body[data-page-id^="tag"] .tag-post-item {
+  padding: 1.45rem 0 !important;
+  margin: 0 !important;
+  border-radius: 0 !important;
+  border-bottom: 1px solid var(--interior-line) !important;
+  box-shadow: none !important;
+  transform: none !important;
+  background: transparent !important;
+}
+html[data-theme="dark"] body[data-page-id="blog-list"] .articles-list .blog-post-item:hover,
+html[data-theme="dark"] body[data-page-id^="tag"] .tag-post-item:hover {
+  background: transparent !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+html[data-theme="dark"] body[data-page-id="blog-list"] .articles-list .blog-post-item::before {
+  display: none !important;
+}
+html[data-theme="dark"] body[data-page-id="blog-list"] .articles-list .blog-post-title,
+html[data-theme="dark"] body[data-page-id^="tag"] .tag-post-title {
+  color: #edf3fc;
+  font-size: clamp(1.2rem, 2.2vw, 1.43rem) !important;
+  line-height: 1.4;
+}
+html[data-theme="dark"] body[data-page-id="blog-list"] .articles-list .blog-post-excerpt,
+html[data-theme="dark"] body[data-page-id^="tag"] .tag-post-excerpt {
+  color: var(--interior-muted);
+  font-size: .94rem;
+  line-height: 1.8;
+}
+html[data-theme="dark"] body[data-page-id="blog-list"] .article-tags,
+html[data-theme="dark"] body[data-page-id^="tag"] .tags-cloud {
+  border-bottom: 1px solid var(--interior-line);
+  margin-bottom: .75rem;
+}
+html[data-theme="dark"] body[data-page-id^="tag"] .post-card-wrapper {
+  background: none !important;
+  border-bottom: 0 !important;
+}
+html[data-theme="dark"] body[data-page-id^="tag"] .tag-top {
+  display: none;
+}
+
+/* A shared content column for the other two interior entry pages. */
+html[data-theme="dark"] body[data-page-id="experience"] .experience-page,
+html[data-theme="dark"] body[data-page-id="about"] .about-page {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: calc(100dvh - 64px);
+  padding: clamp(126px, 17vh, 180px) clamp(20px, 4vw, 48px) 96px !important;
+  background: transparent !important;
+}
+html[data-theme="dark"] body[data-page-id="experience"] .interior-body,
+html[data-theme="dark"] body[data-page-id="about"] .about-inner {
+  max-width: var(--interior-width);
+  margin: 0 auto;
+}
+html[data-theme="dark"] body[data-page-id="about"] .about-prose {
+  max-width: 760px;
+  margin: 0 auto;
+  color: var(--interior-color);
+}
+html[data-theme="dark"] body[data-page-id="experience"] .experience-body {
+  color: var(--interior-muted);
+  font-size: 1rem;
+  line-height: 1.85;
+}
+html[data-theme="dark"] body[data-page-id="experience"] .experience-body a {
+  color: #b3d2f6;
+}
+
+/* Article pages: title and metadata above the text, no hero or giant box. */
+html[data-theme="dark"] body[data-page-id="post"] .post-head {
+  box-sizing: border-box;
+  max-width: 1160px;
+  padding: clamp(126px, 17vh, 180px) clamp(20px, 4vw, 48px) 0;
+  margin: 0 auto 2rem;
+}
+html[data-theme="dark"] body[data-page-id="post"] .post-head-content {
+  max-width: 810px;
+}
+html[data-theme="dark"] body[data-page-id="post"] .post-back-link {
+  display: inline-flex;
+  align-items: center;
+  margin: 0 0 1.75rem;
+  text-decoration: none;
+  color: #a9c5e8;
+  font-size: .9rem;
+}
+html[data-theme="dark"] body[data-page-id="post"] .post-back-link:hover { color: #e2f0ff; }
+html[data-theme="dark"] body[data-page-id="post"] .post-head .interior-heading {
+  margin-bottom: 1.1rem;
+}
+html[data-theme="dark"] body[data-page-id="post"] .post-head .hero-meta {
+  align-items: flex-start;
+  color: var(--interior-muted);
+  opacity: 1;
+  text-shadow: none;
+  margin: 0;
+  padding: 0;
+  gap: .5rem;
+}
+html[data-theme="dark"] body[data-page-id="post"] .post-head .meta-row {
+  justify-content: flex-start;
+  gap: .9rem;
+}
+html[data-theme="dark"] body[data-page-id="post"] .post-head .pdf-export-button {
+  background: transparent;
+  color: #b4cdec;
+  border-color: var(--interior-line);
+  font-size: .85rem;
+}
+html[data-theme="dark"] body[data-page-id="post"] .stats-wrapper {
+  min-height: 0 !important;
+  background: transparent !important;
+}
+html[data-theme="dark"] body[data-page-id="post"] .stats-wrapper::before {
+  display: none !important;
+}
+html[data-theme="dark"] body[data-page-id="post"] .layout-container {
+  box-sizing: border-box;
+  width: min(100%, 1160px);
+  max-width: 1160px !important;
+  grid-template-columns: minmax(0, 810px) minmax(180px, 240px);
+  gap: clamp(24px, 5vw, 60px);
+  margin: 0 auto;
+  padding: 0 clamp(20px, 4vw, 48px) 96px !important;
+}
+html[data-theme="dark"] body[data-page-id="post"] .layout-container > .content-card {
+  background: transparent !important;
+  background-image: none !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  padding: 0 !important;
+  min-height: 0;
+}
+html[data-theme="dark"] body[data-page-id="post"] .layout-container .prose {
+  max-width: 100%;
+  color: var(--interior-color);
+}
+html[data-theme="dark"] body[data-page-id="post"] .sidebar-container,
+html[data-theme="dark"] body[data-page-id="post"] .toc-container {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+@media (max-width: 1100px) {
+  html[data-theme="dark"] body[data-page-id="post"] .layout-container {
+    grid-template-columns: minmax(0, 1fr);
+    max-width: 860px !important;
+  }
+  html[data-theme="dark"] body[data-page-id="post"] .post-head {
+    max-width: 860px;
+  }
+}
+@media (max-width: 720px) {
+  html[data-theme="dark"] body[data-page-id="blog-list"] .articles-area,
+  html[data-theme="dark"] body[data-page-id^="tag"] .tag-area,
+  html[data-theme="dark"] body[data-page-id="about"] .about-page,
+  html[data-theme="dark"] body[data-page-id="experience"] .experience-page {
+    padding-top: 112px !important;
+    padding-bottom: 72px !important;
+  }
+  html[data-theme="dark"] body[data-page-id="post"] .post-head {
+    padding-top: 112px !important;
+  }
+  html[data-theme="dark"] body[data-page-id="post"] .layout-container {
+    padding-bottom: 72px !important;
+  }
+}
+@media print {
+  html[data-theme="dark"] body[data-page-id="post"] .post-head { display: none !important; }
+  html[data-theme="dark"] body[data-page-id="post"] .layout-container,
+  html[data-theme="dark"] body[data-page-id="post"] .layout-container > .content-card {
+    display: block !important;
+    max-width: none !important;
+    padding: 0 !important;
+    background: transparent !important;
+  }
+}

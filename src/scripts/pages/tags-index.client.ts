@@ -1,4 +1,3 @@
-import { setupParallax } from './parallax';
 import { initTagSearch } from './tag-search';
 
 function setupMagneticTags() {
@@ -41,6 +40,5 @@ function setupMagneticTags() {
 
 export function initTagsIndexPage() {
 	setupMagneticTags();
-	setupParallax({ desktopRise: 180, coarsePointerRise: 72 });
-	initTagSearch('index');
+		initTagSearch('index');
 }

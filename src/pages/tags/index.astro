@@ -1,21 +1,20 @@
 ---
 import DraftBadge from '../../components/DraftBadge.astro';
 import PostMeta from '../../components/PostMeta.astro';
-import HeroHeader from '../../components/HeroHeader.astro';
+import InteriorHeading from '../../components/InteriorHeading.astro';
 import PageShell from '../../layouts/PageShell.astro';
-import { heroConfig, siteTitle } from '../../config';
+import { siteTitle } from '../../config';
 import { getTagStats, getBlogPosts } from '../../lib/content/blog';
 import { getTagPath } from '../../lib/content/tag-path';
 import { extractExcerpt } from '../../lib/content/text';
 
 const sortedTags = await getTagStats();
 const posts = await getBlogPosts();
-const tagsHero = heroConfig.tags;
 ---
 <PageShell
   title={`標籤 | ${siteTitle}`}
   description={'依標籤尋找文章'}
-  transparentHeader={true}
+  transparentHeader={false}
   pageId="tags-index"
   useMainWrapper={false}
 >
@@ -132,13 +131,9 @@ const tagsHero = heroConfig.tags;
       .tag-post-item { padding:1.15rem .25rem; }
     }
   </style>
-  <HeroHeader text={"標籤"} backgroundImage={tagsHero.backgroundImage} compact={true} />
   <section class="tag-area" aria-label="標籤總覽" transition:animate="none">
     <div class="tag-panel">
-      <header class="tag-top">
-        <h2 class="tag-heading">文章標籤</h2>
-        <p class="tag-count-summary">共 {posts.length} 篇文章</p>
-      </header>
+      <InteriorHeading title="標籤" description={`依標籤找文章，目前共 ${posts.length} 篇。`} />
       <nav class="tags-cloud" aria-label="文章標籤">
   <a href="/tags/" data-astro-prefetch="viewport" class:list={['tag-pill',{ 'active-tag': true }]} data-tag="all">
     全部文章 <span class="tag-badge">{posts.length}</span>

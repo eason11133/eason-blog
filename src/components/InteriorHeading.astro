@@ -1,0 +1,59 @@
+---
+import Typewriter from './Typewriter.astro';
+
+interface Props {
+  title: string;
+  eyebrow?: string;
+  description?: string;
+  centered?: boolean;
+  animated?: boolean;
+}
+
+const { title, eyebrow, description, centered = false, animated = false } = Astro.props;
+---
+
+<header class:list={['interior-heading', { 'interior-heading--centered': centered }]}>
+  {eyebrow && <span class="interior-eyebrow">{eyebrow}</span>}
+  {animated
+    ? <Typewriter text={title} tag="h1" animateOnNavigation={true} />
+    : <h1>{title}</h1>}
+  {description && <p class="interior-description">{description}</p>}
+</header>
+
+<style>
+  .interior-heading {
+    max-width: 100%;
+    margin: 0 0 clamp(2rem, 4vw, 3.25rem);
+    text-align: left;
+  }
+  .interior-heading--centered { text-align: center; }
+  .interior-eyebrow {
+    display: block;
+    margin-bottom: .85rem;
+    color: #91a9c8;
+    font-size: .75rem;
+    font-weight: 650;
+    letter-spacing: .15em;
+    text-transform: uppercase;
+  }
+  h1,
+  .interior-heading :global(h1.typewriter) {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    font-size: clamp(2rem, 4.4vw, 3rem);
+    line-height: 1.25;
+    letter-spacing: -.035em;
+    font-weight: 760;
+    color: #f3f7ff;
+    overflow-wrap: anywhere;
+  }
+  .interior-description {
+    max-width: 68ch;
+    margin: 1rem 0 0;
+    color: #a9bbd2;
+    line-height: 1.85;
+    font-size: 1rem;
+  }
+  .interior-heading--centered .interior-description { margin-left: auto; margin-right: auto; }
+</style>

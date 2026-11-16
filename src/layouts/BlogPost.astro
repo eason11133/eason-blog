@@ -2,7 +2,7 @@
 import type { CollectionEntry } from 'astro:content';
 import DraftBadge from '../components/DraftBadge.astro';
 import FormattedDate from '../components/FormattedDate.astro';
-import HeroHeader from '../components/HeroHeader.astro';
+import InteriorHeading from '../components/InteriorHeading.astro';
 import TableOfContents from '../components/TableOfContents.astro';
 import PageShell from './PageShell.astro';
 import { heroConfig, locale, profileConfig, siteTitle } from '../config';
@@ -93,9 +93,9 @@ const articleSchema = {
 	canonical={canonicalURL}
 	useMainWrapper={false}
 	pageId="post"
+  transparentHeader={false}
 >
 	<Fragment slot="head">
-		<link rel="preload" as="image" href={displayHeroImageSrc} />
 		{loadKatexStyles && (
 			<>
 				<link rel="stylesheet" href={katexStylesheetUrl} />
@@ -635,13 +635,11 @@ const articleSchema = {
 			}
 		</style>
 	</Fragment>
-	<!-- Hero Header with injected content -->
-	<HeroHeader 
-            text={title} 
-            backgroundImage={displayHeroImageSrc}
-            compact={true}
-        >
-            <div class="hero-meta">
+	<header class="post-head">
+      <div class="post-head-content">
+        <a class="post-back-link" href="/blog/">← 所有文章</a>
+        <InteriorHeading title={title} />
+        <div class="hero-meta">
 				{import.meta.env.DEV && draft && (
 					<div class="meta-row">
 						<DraftBadge {draft} overlay={true} />
@@ -673,8 +671,9 @@ const articleSchema = {
 						<span>下载 PDF</span>
 					</button>
 				</div>
-            </div>
-	</HeroHeader>
+        </div>
+      </div>
+    </header>
 		
 	<div class="stats-wrapper">
 		<div class="layout-container">
