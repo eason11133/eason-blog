@@ -1,9 +1,9 @@
 ---
 import DraftBadge from '../../components/DraftBadge.astro';
 import PostMeta from '../../components/PostMeta.astro';
-import HeroHeader from '../../components/HeroHeader.astro';
+import InteriorHeading from '../../components/InteriorHeading.astro';
 import PageShell from '../../layouts/PageShell.astro';
-import { heroConfig, siteTitle } from '../../config';
+import { siteTitle } from '../../config';
 import { getBlogPosts, getTagStats } from '../../lib/content/blog';
 import { extractExcerpt } from '../../lib/content/text';
 import { getTagPath } from '../../lib/content/tag-path';
@@ -21,11 +21,10 @@ export async function getStaticPaths() {
   }));
 }
 const { tag, posts, sortedTags } = Astro.props;
-const tagsHero = heroConfig.tags;
 ---
 
 <PageShell title={`#${tag} | ${siteTitle}`} description={`查看標籤 #${tag} 的文章`}
-  transparentHeader={true} pageId="tag-detail" useMainWrapper={false}>
+  transparentHeader={false} pageId="tag-detail" useMainWrapper={false}>
   <style>
     .tag-area {
       position: relative;
@@ -138,15 +137,11 @@ const tagsHero = heroConfig.tags;
       .tag-post-item { padding:1.15rem .25rem; }
     }
   </style>
-  <HeroHeader text={`#${tag}`} backgroundImage={tagsHero.backgroundImage} compact={true} />
   <section class="tag-area" aria-label="標籤文章" transition:animate="none">
     <div class="tag-panel">
-      <header class="tag-top">
-        <h2 class="tag-heading">#{tag}</h2>
-        <p class="tag-count-summary">共 {posts.length} 篇文章</p>
-      </header>
+      <InteriorHeading title={`#${tag}`} eyebrow="文章標籤" description={`共 ${posts.length} 篇文章`} />
       <nav class="tags-cloud" aria-label="文章標籤">
-        <a href="/tags/" data-astro-prefetch="viewport" class="tag-pill" data-tag="all">全部文章</a>
+        <a href="/blog/" data-astro-prefetch="viewport" class="tag-pill" data-tag="all">全部文章</a>
         {sortedTags.map(([t, count]) => (
           <a href={getTagPath(t)} data-astro-prefetch="viewport" class:list={['tag-pill', {'active-tag': t === tag}]} data-tag={t} data-count={count}>
             <span class="tag-hash">#</span><span class="tag-name">{t}</span>

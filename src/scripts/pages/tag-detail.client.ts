@@ -1,4 +1,3 @@
-import { setupParallax } from './parallax';
 import { initTagSearch } from './tag-search';
 
 function setupBackLinkMagnet() {
@@ -40,6 +39,5 @@ function setupBackLinkMagnet() {
 
 export function initTagDetailPage() {
 	setupBackLinkMagnet();
-	setupParallax({ desktopRise: 180, coarsePointerRise: 72 });
-	initTagSearch('detail');
+		initTagSearch('detail');
 }

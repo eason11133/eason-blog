@@ -1,6 +1,6 @@
 ---
 import { Content as AboutContent } from '../content/about.md';
-import Typewriter from '../components/Typewriter.astro';
+import InteriorHeading from '../components/InteriorHeading.astro';
 import PageShell from '../layouts/PageShell.astro';
 import { siteTitle } from '../config';
 ---
@@ -13,82 +13,11 @@ import { siteTitle } from '../config';
   pageId="about"
 >
   <main class="about-page">
-    <header class="about-heading">
-      <Typewriter text="關於我" tag="h1" id="about-typewriter" animateOnNavigation={true} />
-    </header>
-    <article class="prose about-prose">
-      <AboutContent />
-    </article>
+    <div class="about-inner">
+      <InteriorHeading title="關於我" centered={true} animated={true} />
+      <article class="prose about-prose">
+        <AboutContent />
+      </article>
+    </div>
   </main>
 </PageShell>
-
-<style>
-  /* Use the same Markdown typography as the theme's article demo,
-     without its banner, content card or sidebar. */
-  .about-page {
-    box-sizing: border-box;
-    width: 100%;
-    max-width: none;
-    min-height: calc(100dvh - 64px);
-    margin: 0;
-    padding: clamp(135px, 20vh, 220px) 24px 100px;
-    background: transparent;
-  }
-
-  .about-heading {
-    max-width: 760px;
-    margin: 0 auto clamp(3rem, 7vh, 5rem);
-    display: flex;
-    justify-content: center;
-    text-align: center;
-  }
-
-  .about-heading :global(h1.typewriter) {
-    margin: 0;
-    padding: 0;
-    border: 0;
-    color: #f0f5ff;
-    font-size: clamp(2.2rem, 5vw, 3.2rem);
-    font-weight: 700;
-    line-height: 1.4;
-  }
-
-  .about-prose {
-    width: 100%;
-    max-width: 760px;
-    margin: 0 auto;
-    color: #d8e3f1;
-  }
-
-  .about-prose :global(h1),
-  .about-prose :global(h2),
-  .about-prose :global(h3),
-  .about-prose :global(h4),
-  .about-prose :global(h5),
-  .about-prose :global(h6) {
-    color: #f0f5ff;
-  }
-
-  .about-prose :global(h1) {
-    margin: 0 0 1.5em;
-    border-bottom-color: rgba(166, 191, 226, .22);
-  }
-
-  .about-prose :global(h2) {
-    border-bottom-color: rgba(166, 191, 226, .18);
-  }
-
-  .about-prose :global(a) {
-    color: #b5d4f4;
-  }
-
-  .about-prose :global(a:hover) {
-    color: #e3f1ff;
-  }
-
-  @media (max-width: 600px) {
-    .about-page {
-      padding: 110px 21px 72px;
-    }
-  }
-</style>

@@ -1,4 +1,3 @@
-import { setupParallax } from './parallax';
 
 function setupScrollReveal() {
 	const targets = Array.from(document.querySelectorAll<HTMLElement>('.scroll-reveal'));
@@ -54,6 +53,5 @@ function setupScrollReveal() {
 
 export function initBlogListPage() {
 	setupScrollReveal();
-	setupParallax({ desktopRise: 180, coarsePointerRise: 72 });
-}
+	}
 

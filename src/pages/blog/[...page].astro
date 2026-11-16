@@ -1,9 +1,9 @@
 ---
 import type { GetStaticPaths, Page } from 'astro';
-import HeroHeader from '../../components/HeroHeader.astro';
+import InteriorHeading from '../../components/InteriorHeading.astro';
 import PageShell from '../../layouts/PageShell.astro';
 import PostListItem from '../../components/PostListItem.astro';
-import { heroConfig, siteTitle } from '../../config';
+import { siteTitle } from '../../config';
 import { getBlogPosts, getTagStats, type BlogPost } from '../../lib/content/blog';
 import { getTagPath } from '../../lib/content/tag-path';
 import {
@@ -59,7 +59,6 @@ export const getStaticPaths: GetStaticPaths = async ({ paginate }) => {
 const { page } = Astro.props as { page: Page<BlogPost> };
 const siteURL = Astro.site ?? Astro.url;
 const hasPosts = page.total > 0;
-const blogHero = heroConfig.blog;
 const tags = await getTagStats();
 const pageTitle =
   !hasPosts || page.currentPage === 1
@@ -98,7 +97,7 @@ if (last > 1) paginationList.push(last);
   canonical={canonicalURL}
   prevURL={prevURL}
   nextURL={nextURL}
-  transparentHeader={true}
+  transparentHeader={false}
   pageId="blog-list"
 >
     <style>
@@ -573,14 +572,9 @@ if (last > 1) paginationList.push(last);
       }
     </style>
 
-  <HeroHeader
-    text="文章"
-    backgroundImage={blogHero.backgroundImage}
-    compact={true}
-  />
-
   <section class="articles-area" aria-label="文章列表">
     <div class="articles-inner">
+      <InteriorHeading title="文章" centered={true} animated={true} />
       {tags.length > 0 && (
         <nav class="article-tags" aria-label="文章標籤">
           <a class="tag-filter all-tag" href="/blog/">全部文章 <span>{page.total}</span></a>
