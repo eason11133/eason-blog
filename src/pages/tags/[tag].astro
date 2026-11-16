@@ -29,7 +29,7 @@ const { tag, posts, sortedTags } = Astro.props;
     .tag-area {
       position: relative;
       z-index: 2;
-      background: linear-gradient(to bottom, transparent 88px, #171c25 88px);
+      background: linear-gradient(to bottom, transparent 88px, var(--night-bg) 88px);
       padding: 0 1.5rem 4.5rem;
       min-height: 45vh;
     }
@@ -37,31 +37,31 @@ const { tag, posts, sortedTags } = Astro.props;
       max-width: 960px;
       margin: 0 auto;
       box-sizing: border-box;
-      background: #222936;
-      border: 1px solid rgba(155,177,214,.19);
+      background: var(--night-hover-gradient);
+      border: 1px solid var(--night-line);
       border-radius: 18px;
       padding: 2rem clamp(1.2rem, 3vw, 2.5rem);
-      color: #edf1f8;
+      color: var(--night-text);
     }
     .tag-top { margin: 0 0 1.35rem; }
-    .tag-heading { font-size: 1.6rem; font-weight: 700; margin: 0; color:#f2f5fa; }
-    .tag-count-summary { color:#adbbd0; font-size:.93rem; margin:.35rem 0 0; }
+    .tag-heading { font-size: 1.6rem; font-weight: 700; margin: 0; color:var(--night-text); }
+    .tag-count-summary { color:var(--night-text-secondary); font-size:.93rem; margin:.35rem 0 0; }
     .tags-cloud {
       display:flex;
       flex-wrap:wrap;
       align-items:center;
       gap:.55rem;
       padding: 0 0 1.5rem;
-      border-bottom:1px solid rgba(159,179,212,.2);
+      border-bottom:1px solid var(--night-line);
       margin-bottom:1.25rem;
     }
     .tag-pill {
       display:inline-flex;
       align-items:center;
       gap:.35rem;
-      color:#bdcfe6;
-      border:1px solid rgba(155,177,214,.18);
-      background:rgba(145,175,207,.08);
+      color:var(--night-chip-text);
+      border:1px solid var(--night-chip-border);
+      background:var(--night-chip-bg);
       padding:.36rem .7rem;
       border-radius:9px;
       text-decoration:none;
@@ -69,37 +69,37 @@ const { tag, posts, sortedTags } = Astro.props;
       line-height:1.5;
       transition:background .2s,color .2s,transform .2s;
     }
-    .tag-pill:hover { background:rgba(145,175,207,.16); color:#fff; transform:translateY(-2px); }
-    .tag-pill.active-tag { background:rgba(145,175,207,.2); border-color:rgba(145,175,207,.5); color:#e3efff; }
-    .tag-hash { color:#9bbdec; }
-    .tag-badge { font-size:.78rem; color:#9eb0c9; }
+    .tag-pill:hover { background:var(--night-chip-hover); color:var(--night-accent-hover); transform:translateY(-2px); }
+    .tag-pill.active-tag { background:var(--night-chip-hover); border-color:var(--night-accent); color:var(--night-text); }
+    .tag-hash { color:var(--night-accent); }
+    .tag-badge { font-size:.78rem; color:var(--night-text-muted); }
     .tag-posts-list { display:flex; flex-direction:column; }
     .tag-posts-list > .post-card-wrapper:nth-child(n+16) { display:none; }
-    .post-card-wrapper { border-bottom:1px solid rgba(159,179,212,.18); }
+    .post-card-wrapper { border:0; }
     .post-card-wrapper:last-child { border-bottom:0; }
     .tag-post-item { position:relative; padding:1.2em .5rem; border-radius:8px; cursor:pointer; transition:background .2s,box-shadow .2s; }
-    .tag-post-item:hover { background:rgba(145,175,207,.08); box-shadow:inset 0 0 0 1px rgba(157,186,234,.16); }
+    .tag-post-item:hover { background:var(--night-chip-bg); box-shadow:inset 0 0 0 1px var(--night-line); }
     .tag-post-title { font-size:1.2em; font-weight:600; line-height:1.45; margin:0 0 .5em; }
     .tag-post-title a {
-      color:#f0f4fa;
+      color:var(--night-text);
       text-decoration:none;
       display:inline;
-      background-image:linear-gradient(#a8caff,#a8caff);
+      background-image:linear-gradient(var(--night-accent),var(--night-accent));
       background-position:0% 100%;
       background-repeat:no-repeat;
       background-size:0% 2px;
       transition:background-size .3s cubic-bezier(.25,.46,.45,.94),color .3s ease;
       padding-bottom:2px;
     }
-    .tag-post-title a:hover, .tag-post-item:hover .tag-post-title a { color:#a8caff; background-size:100% 2px; }
+    .tag-post-title a:hover, .tag-post-item:hover .tag-post-title a { color:var(--night-accent); background-size:100% 2px; }
     /* Stretch only the article-title link across the card. The tag links sit above it. */
     .tag-post-title a::after { content:''; position:absolute; inset:0; z-index:1; }
-    .tag-post-title a:focus-visible { outline:2px solid #a8caff; outline-offset:4px; }
+    .tag-post-title a:focus-visible { outline:2px solid var(--night-accent); outline-offset:4px; }
     .tag-panel :global(.post-item-tags) { position:relative; z-index:2; }
     .tag-panel :global(.post-item-tag-badge) { display:inline-flex; text-decoration:none; }
-    .tag-panel :global(.post-item-tag-badge:hover) { color:#fff; background:rgba(145,175,207,.26); }
-    .tag-post-excerpt { color:#bdc9da; font-size:.94rem; line-height:1.75; margin:0 0 .9rem; }
-    .tag-panel :global(.tag-post-meta) { display:flex; flex-wrap:wrap; align-items:center; gap:1em; color:#9baec7; font-size:.85em; }
+    .tag-panel :global(.post-item-tag-badge:hover) { color:var(--night-accent-hover); background:var(--night-chip-hover); }
+    .tag-post-excerpt { color:var(--night-text-secondary); font-size:.94rem; line-height:1.75; margin:0 0 .9rem; }
+    .tag-panel :global(.tag-post-meta) { display:flex; flex-wrap:wrap; align-items:center; gap:1em; color:var(--night-text-muted); font-size:.85em; }
     .tag-panel :global(.tag-meta-item) { display:flex; align-items:center; gap:.3em; }
     .tag-panel :global(.tag-meta-item svg) { width:14px; height:14px; flex-shrink:0; }
     .tag-panel :global(.post-item-tags) { display:flex; flex-wrap:wrap; gap:.4em; }
@@ -107,8 +107,8 @@ const { tag, posts, sortedTags } = Astro.props;
       display:inline-flex;
       align-items:center;
       gap:.2em;
-      color:#b4cdee;
-      background:rgba(145,175,207,.12);
+      color:var(--night-chip-text);
+      background:var(--night-chip-bg);
       border-radius:4px;
       padding:2px 8px;
       font-size:.85em;
@@ -119,18 +119,18 @@ const { tag, posts, sortedTags } = Astro.props;
     .tag-panel :global(.post-item-tag-badge:hover) { transform:translateY(-2px) scale(1.05); }
     .tag-panel :global(.post-item-tag-badge:active) { transform:translateY(0) scale(.97); }
     .tag-panel :global(.post-item-tag-badge svg) { width:12px; height:12px; }
-    .pagination { display:flex; align-items:center; justify-content:center; gap:.55rem; padding:1.7rem 0 .2rem; border-top:1px solid rgba(159,179,212,.18); margin-top:1.5rem; }
+    .pagination { display:flex; align-items:center; justify-content:center; gap:.55rem; padding:1.7rem 0 .2rem; border-top:0; margin-top:1.5rem; }
     .pagination[hidden] { display:none !important; }
     .page-numbers { display:flex; gap:.4rem; align-items:center; }
-    .page-btn { cursor:pointer; display:inline-flex; align-items:center; justify-content:center; min-width:36px; height:36px; padding:0 .55rem; border-radius:8px; background:transparent; color:#bfcfe3; border:1px solid rgba(155,177,214,.2); font:inherit; font-size:.9rem; text-decoration:none; }
-    .page-btn:hover:not(:disabled) { background:rgba(145,175,207,.16); color:#fff; }
-    .page-btn.active { background:#6688b4; color:white; border-color:transparent; }
+    .page-btn { cursor:pointer; display:inline-flex; align-items:center; justify-content:center; min-width:36px; height:36px; padding:0 .55rem; border-radius:8px; background:transparent; color:var(--night-text-secondary); border:1px solid var(--night-chip-border); font:inherit; font-size:.9rem; text-decoration:none; }
+    .page-btn:hover:not(:disabled) { background:var(--night-chip-hover); color:var(--night-accent-hover); }
+    .page-btn.active { background:var(--night-chip-hover); color:var(--night-text); border-color:var(--night-chip-border); }
     .page-btn:disabled,.page-btn.disabled { opacity:.35; cursor:default; }
-    .page-ellipsis { color:#a1aec2; }
-    .empty-state { color:#bdc9da; text-align:center; padding:1.5rem; }
+    .page-ellipsis { color:var(--night-text-muted); }
+    .empty-state { color:var(--night-text-secondary); text-align:center; padding:1.5rem; }
     .tag-hidden-input { display:none !important; }
     @media (max-width:720px) {
-      .tag-area { background:linear-gradient(to bottom,transparent 56px,#171c25 56px); padding:0 .8rem 3rem; }
+      .tag-area { background:linear-gradient(to bottom,transparent 56px,var(--night-bg) 56px); padding:0 .8rem 3rem; }
       .tag-panel { padding:1.3rem 1rem; }
       .tag-heading { font-size:1.4rem; }
       .tag-post-title { font-size:1.2em; }
