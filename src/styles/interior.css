@@ -83,7 +83,6 @@ html[data-theme="dark"] body[data-page-id="blog-list"] .articles-list .blog-post
   margin: 0 !important;
   border-radius: 0 !important;
   border: 0 !important;
-  border-bottom: 1px solid var(--interior-line) !important;
   background: transparent !important;
   box-shadow: none !important;
   transform: none !important;
@@ -133,7 +132,10 @@ html[data-theme="dark"] body[data-page-id^="tag"] .tag-post-excerpt {
   font-size: .94rem;
   line-height: 1.8;
 }
-html[data-theme="dark"] body[data-page-id="blog-list"] .article-tags,
+html[data-theme="dark"] body[data-page-id="blog-list"] .article-tags {
+  border: 0 !important;
+  margin-bottom: .75rem;
+}
 html[data-theme="dark"] body[data-page-id^="tag"] .tags-cloud {
   border-bottom: 1px solid var(--interior-line);
   margin-bottom: .75rem;
