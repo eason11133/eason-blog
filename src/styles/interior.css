@@ -296,17 +296,17 @@ html[data-theme="dark"] body[data-page-id="post"] .toc-container {
 html[data-theme="dark"] body[data-page-id="blog-list"] {
   --blog-title-ink: #e8eaed;
   --blog-title-hover: #e8eaed;
-  --blog-excerpt-ink: rgba(232, 234, 237, .82);
-  --blog-meta-ink: rgba(232, 234, 237, .68);
+  --blog-excerpt-ink: #e8eaed;
+  --blog-meta-ink: #e8eaed;
   --blog-line-ink: #91afcf;
-  --blog-filter-ink: #bdd7ff;
-  --blog-filter-count: rgba(232, 234, 237, .62);
-  --blog-filter-bg: rgba(145, 175, 207, .10);
-  --blog-filter-border: rgba(145, 175, 207, .22);
-  --blog-filter-hover: rgba(145, 175, 207, .18);
-  --blog-tag-ink: #bdd7ff;
-  --blog-tag-bg: rgba(145, 175, 207, .13);
-  --blog-tag-hover: rgba(145, 175, 207, .22);
+  --blog-filter-ink: #e8eaed;
+  --blog-filter-count: #e8eaed;
+  --blog-filter-bg: #91afcf;
+  --blog-filter-border: #91afcf;
+  --blog-filter-hover: #91afcf;
+  --blog-tag-ink: #e8eaed;
+  --blog-tag-bg: #91afcf;
+  --blog-tag-hover: #91afcf;
 }
 html[data-theme="dark"] body[data-page-id="blog-list"] .articles-list .blog-post-title,
 html[data-theme="dark"] body[data-page-id="blog-list"] .articles-list .blog-post-title a {
@@ -331,11 +331,11 @@ html[data-theme="dark"] body[data-page-id="blog-list"] .article-tags .tag-filter
   border-color: var(--blog-filter-border) !important;
 }
 html[data-theme="dark"] body[data-page-id="blog-list"] .article-tags .tag-filter:hover {
-  color: #bdd7ff !important;
+  color: #e8eaed !important;
   background: var(--blog-filter-hover) !important;
 }
 html[data-theme="dark"] body[data-page-id="blog-list"] .article-tags .tag-hash {
-  color: var(--blog-line-ink) !important;
+  color: var(--blog-title-ink) !important;
 }
 html[data-theme="dark"] body[data-page-id="blog-list"] .article-tags .tag-count,
 html[data-theme="dark"] body[data-page-id="blog-list"] .article-tags .all-tag span {
@@ -346,7 +346,7 @@ html[data-theme="dark"] body[data-page-id="blog-list"] .articles-list .blog-tag-
   background: var(--blog-tag-bg) !important;
 }
 html[data-theme="dark"] body[data-page-id="blog-list"] .articles-list .blog-tag-link:hover {
-  color: #bdd7ff !important;
+  color: #e8eaed !important;
   background: var(--blog-tag-hover) !important;
 }
 
@@ -362,20 +362,37 @@ html[data-theme="dark"] body[data-page-id="tag-detail"] .tag-post-item:hover .ta
   color: #e8eaed !important;
 }
 html[data-theme="dark"] body[data-page-id="tag-detail"] .tag-post-excerpt {
-  color: rgba(232, 234, 237, .82) !important;
+  color: #e8eaed !important;
 }
 html[data-theme="dark"] body[data-page-id="tag-detail"] .tag-post-meta {
-  color: rgba(232, 234, 237, .68) !important;
+  color: #e8eaed !important;
 }
 html[data-theme="dark"] body[data-page-id="tag-detail"] .tag-pill,
 html[data-theme="dark"] body[data-page-id="tag-detail"] .post-item-tag-badge {
-  color: #bdd7ff !important;
-  background: rgba(145, 175, 207, .13) !important;
-  border-color: rgba(145, 175, 207, .22) !important;
+  color: #e8eaed !important;
+  background: #91afcf !important;
+  border-color: #91afcf !important;
 }
 html[data-theme="dark"] body[data-page-id="tag-detail"] .tag-hash {
-  color: #91afcf !important;
+  color: #e8eaed !important;
 }
 html[data-theme="dark"] body[data-page-id="tag-detail"] .tag-badge {
-  color: rgba(232, 234, 237, .62) !important;
+  color: #e8eaed !important;
+}
+
+/* Keep all small copy and badges on the same Eason text tone as the titles.
+   The tags use precisely the existing underline color as their background. */
+html[data-theme="dark"] body[data-page-id="blog-list"] .articles-list .pinned-mark,
+html[data-theme="dark"] body[data-page-id="blog-list"] .articles-list .articles-empty,
+html[data-theme="dark"] body[data-page-id="blog-list"] .articles-list .blog-post-meta-item,
+html[data-theme="dark"] body[data-page-id="blog-list"] .article-tags .tag-name,
+html[data-theme="dark"] body[data-page-id="tag-detail"] .tag-count-summary,
+html[data-theme="dark"] body[data-page-id="tag-detail"] .tag-meta-item {
+  color: #e8eaed !important;
+}
+html[data-theme="dark"] body[data-page-id="blog-list"] .article-tags .tag-filter,
+html[data-theme="dark"] body[data-page-id="blog-list"] .articles-list .blog-tag-link,
+html[data-theme="dark"] body[data-page-id="tag-detail"] .tags-cloud .tag-pill,
+html[data-theme="dark"] body[data-page-id="tag-detail"] .tag-panel .post-item-tag-badge {
+  text-shadow: 0 1px 2px rgba(5, 19, 39, .6);
 }
