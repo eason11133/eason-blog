@@ -155,7 +155,7 @@ if (last > 1) paginationList.push(last);
       }
 
       .blog-posts-list :global(.blog-post-title a:hover) {
-        color: var(--accent);
+        color: var(--night-text);
       }
 
       .blog-posts-list :global(.blog-post-excerpt) {
@@ -455,7 +455,7 @@ if (last > 1) paginationList.push(last);
         border: 1px solid var(--night-chip-border);
         border-radius: 9px;
         color: var(--night-chip-text);
-        font-size: .88rem;
+        font-size: .83rem;
         transition: background .2s, color .2s, transform .2s;
       }
       .tag-filter:hover {
@@ -463,7 +463,7 @@ if (last > 1) paginationList.push(last);
         color: var(--night-accent-hover);
         transform: translateY(-2px);
       }
-      .tag-filter.all-tag { color: var(--night-text); }
+      .tag-filter.all-tag { color: var(--night-chip-text); }
       .tag-hash { color: var(--night-accent); }
       .tag-filter .tag-count, .tag-filter.all-tag span {
         color: var(--night-text-muted);
@@ -519,16 +519,16 @@ if (last > 1) paginationList.push(last);
       }
       .articles-list :global(.blog-post-title a) {
         display: inline;
-        background-image: linear-gradient(var(--accent), var(--accent));
+        background-image: linear-gradient(rgba(184, 201, 215, .65), rgba(184, 201, 215, .65));
         background-position: 0% 100%;
         background-repeat: no-repeat;
-        background-size: 0% 2px;
+        background-size: 0% 1px;
         transition: background-size 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94), color 0.3s ease;
         padding-bottom: 2px;
       }
       .articles-list :global(.blog-post-item:hover .blog-post-title a) {
-        color: var(--accent);
-        background-size: 100% 2px;
+        color: var(--night-text);
+        background-size: 100% 1px;
       }
       .articles-list :global(.blog-post-meta) {
         display: flex;
@@ -558,11 +558,12 @@ if (last > 1) paginationList.push(last);
         line-height: 1.75;
         margin: 0 0 .8rem;
       }
-      .articles-list :global(.blog-post-meta) { color: var(--night-text-muted); }
+      .articles-list :global(.blog-post-meta) { color: var(--night-text-muted); opacity: .88; }
       .articles-list :global(.blog-tag-link) {
         border: 1px solid var(--night-chip-border);
         background: var(--night-chip-bg);
         color: var(--night-chip-text);
+        font-size: .76em;
       }
       @media (max-width: 720px) {
         .articles-area {
