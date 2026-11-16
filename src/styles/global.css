@@ -114,9 +114,24 @@
    舒适、质感、高级感
    ═══════════════════════════════════════ */
 [data-theme="dark"] {
-	--accent: #91afcf;
-	--accent-dark: #7295bd;
-	--accent-rgb: 145, 175, 207;
+  /* Eason night-sky design tokens shared by every page and interactive state. */
+  --night-bg: #07121f;
+  --night-text: #edf3f7;
+  --night-text-secondary: #bdcbd5;
+  --night-text-muted: #9aacbc;
+  --night-accent: #aecadd;
+  --night-accent-hover: #dfedf6;
+  --night-line: rgba(174, 198, 214, .18);
+  --night-chip-bg: rgba(132, 163, 185, .12);
+  --night-chip-hover: rgba(132, 163, 185, .22);
+  --night-chip-border: rgba(174, 198, 214, .19);
+  --night-chip-text: #c8dbe8;
+  --night-hover-gradient: linear-gradient(145deg, rgba(15, 33, 48, .75), rgba(8, 22, 35, .65));
+  --night-hover-shadow: 0 15px 38px rgba(0, 6, 17, .31), 0 3px 10px rgba(0, 6, 17, .12);
+
+	--accent: #aecadd;
+	--accent-dark: #91aec3;
+	--accent-rgb: 174, 202, 221;
 	--black: 232, 234, 237;
 	--gray: 140, 155, 185;
 	--gray-light: 39, 42, 48;
@@ -124,28 +139,28 @@
 	--gray-gradient: rgba(var(--gray-light), 50%), var(--color-bg);
 
 	/* Surfaces */
-	--color-bg: #17191d;
-	--color-surface: #272a30;
-	--color-surface-hover: #31353c;
-	--color-surface-elevated: #2d3036;
-	--color-surface-input: #30343b;
+	--color-bg: var(--night-bg);
+	--color-surface: #102333;
+	--color-surface-hover: #1b3547;
+	--color-surface-elevated: #193042;
+	--color-surface-input: #1a3243;
 
 	/* Text */
-	--color-text: #e9eaed;
-	--color-text-secondary: #b8bcc5;
-	--color-text-tertiary: #989da8;
-	--color-text-muted: #858b96;
-	--color-text-strong: #f5f5f6;
+	--color-text: var(--night-text);
+	--color-text-secondary: var(--night-text-secondary);
+	--color-text-tertiary: var(--night-text-muted);
+	--color-text-muted: #94a8b9;
+	--color-text-strong: var(--night-text);
 
 	/* Borders */
-	--color-border: #3b4048;
-	--color-border-subtle: #343840;
-	--color-border-strong: #4b515b;
+	--color-border: var(--night-line);
+	--color-border-subtle: rgba(174, 198, 214, .13);
+	--color-border-strong: rgba(174, 198, 214, .26);
 
 	/* Interactive */
-	--color-tag-bg: #30343b;
-	--color-tag-bg-hover: #3b4048;
-	--color-tag-text: #b8bcc5;
+	--color-tag-bg: var(--night-chip-bg);
+	--color-tag-bg-hover: var(--night-chip-hover);
+	--color-tag-text: var(--night-chip-text);
 
 	/* Shadows */
 	--shadow-color: 0, 0, 0;
@@ -153,11 +168,11 @@
 	--shadow-card-hover: 0 8px 32px rgba(0, 0, 0, 0.3);
 
 	/* Code */
-	--color-code-inline-bg: linear-gradient(135deg, #272a30 0%, #1c1e23 100%);
-	--color-code-inline-text: #f472b6;
+	--color-code-inline-bg: linear-gradient(135deg, #182f41 0%, #102334 100%);
+	--color-code-inline-text: #c9dcea;
 	--color-code-inline-border: rgba(255, 255, 255, 0.06);
-	--color-code-block-bg: #181a1f;
-	--color-code-block-text: #d1d5db;
+	--color-code-block-bg: #0b1c2b;
+	--color-code-block-text: var(--night-text-secondary);
 	--color-code-block-border: rgba(255, 255, 255, 0.06);
 	--color-code-block-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
 	--color-code-block-shadow-hover: 0 10px 25px -5px rgba(0, 0, 0, 0.4), 0 4px 6px -2px rgba(0, 0, 0, 0.3);
@@ -170,29 +185,29 @@
 	--color-line-numbers-text: rgba(255, 255, 255, 0.25);
 
 	/* Blockquote */
-	--color-blockquote-border: #42464f;
-	--color-blockquote-text: #8b8fa0;
+	--color-blockquote-border: var(--night-line);
+	--color-blockquote-text: var(--night-text-secondary);
 
 	/* Header / Glassmorphism */
-	--color-header-bg: #272a30;
-	--color-header-glass: rgba(23, 25, 29, 0.88);
-	--color-header-glass-border: rgba(255, 255, 255, 0.06);
+	--color-header-bg: #091b2b;
+	--color-header-glass: rgba(7, 18, 31, .88);
+	--color-header-glass-border: var(--night-line);
 	--color-header-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 
 	/* Search */
-	--color-search-bg: #272a30;
-	--color-search-footer-bg: #22252b;
-	--color-search-result-hover: #31353c;
-	--color-search-highlight-text: #f87171;
-	--color-search-highlight-bg: rgba(248, 113, 113, 0.15);
+	--color-search-bg: #102333;
+	--color-search-footer-bg: #0d2030;
+	--color-search-result-hover: #1b3547;
+	--color-search-highlight-text: #e0eff8;
+	--color-search-highlight-bg: rgba(151, 190, 216, .22);
 
 	/* Scrollbar */
 	--color-scrollbar: rgba(200, 200, 200, 0.15);
 	--color-scrollbar-hover: rgba(200, 200, 200, 0.3);
 
 	/* Misc */
-	--color-skill-bar-bg: #3b4048;
-	--color-gradient-start: #91afcf;
+	--color-skill-bar-bg: #1b3547;
+	--color-gradient-start: #aecadd;
 	--color-hobby-gradient: linear-gradient(135deg, #2d3036, #30343b);
 }
 
