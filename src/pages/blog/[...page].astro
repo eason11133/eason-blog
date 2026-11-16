@@ -519,16 +519,16 @@ if (last > 1) paginationList.push(last);
       }
       .articles-list :global(.blog-post-title a) {
         display: inline;
-        background-image: linear-gradient(rgba(184, 201, 215, .65), rgba(184, 201, 215, .65));
+        background-image: linear-gradient(var(--accent), var(--accent));
         background-position: 0% 100%;
         background-repeat: no-repeat;
-        background-size: 0% 1px;
+        background-size: 0% 2px;
         transition: background-size 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94), color 0.3s ease;
         padding-bottom: 2px;
       }
       .articles-list :global(.blog-post-item:hover .blog-post-title a) {
         color: var(--night-text);
-        background-size: 100% 1px;
+        background-size: 100% 2px;
       }
       .articles-list :global(.blog-post-meta) {
         display: flex;
