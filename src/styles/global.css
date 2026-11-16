@@ -116,22 +116,22 @@
 [data-theme="dark"] {
   /* Eason night-sky design tokens shared by every page and interactive state. */
   --night-bg: #07121f;
-  --night-text: #f2f3f4;
-  --night-text-secondary: #b6c1cb;
-  --night-text-muted: #889bac;
-  --night-accent: #b8c9d7;
-  --night-accent-hover: #f2f5f7;
+  --night-text: #f6f6f4;
+  --night-text-secondary: #c8cbd0;
+  --night-text-muted: #9da9b2;
+  --night-accent: #b5cadb;
+  --night-accent-hover: #f5f7f8;
   --night-line: rgba(180, 196, 210, .13);
-  --night-chip-bg: rgba(6, 17, 28, .27);
-  --night-chip-hover: rgba(163, 187, 207, .13);
-  --night-chip-border: rgba(181, 199, 213, .13);
-  --night-chip-text: #b3c0cc;
-  --night-hover-gradient: linear-gradient(145deg, rgba(8, 24, 38, .52), rgba(5, 18, 30, .42));
+  --night-chip-bg: rgba(9, 18, 29, .20);
+  --night-chip-hover: rgba(160, 182, 200, .13);
+  --night-chip-border: rgba(183, 197, 207, .12);
+  --night-chip-text: #b1bec8;
+  --night-hover-gradient: linear-gradient(145deg, rgba(10, 24, 37, .58), rgba(5, 18, 30, .48));
   --night-hover-shadow: 0 13px 34px rgba(0, 6, 17, .22);
 
-	--accent: #b8c9d7;
+	--accent: #b5cadb;
 	--accent-dark: #95adbf;
-	--accent-rgb: 184, 201, 215;
+	--accent-rgb: 181, 202, 219;
 	--black: 232, 234, 237;
 	--gray: 150, 169, 185;
 	--gray-light: 39, 42, 48;
@@ -149,7 +149,7 @@
 	--color-text: var(--night-text);
 	--color-text-secondary: var(--night-text-secondary);
 	--color-text-tertiary: var(--night-text-muted);
-	--color-text-muted: #889bac;
+	--color-text-muted: #9da9b2;
 	--color-text-strong: var(--night-text);
 
 	/* Borders */
@@ -207,7 +207,7 @@
 
 	/* Misc */
 	--color-skill-bar-bg: #1b3547;
-	--color-gradient-start: #b8c9d7;
+	--color-gradient-start: #b5cadb;
 	--color-hobby-gradient: linear-gradient(135deg, #142b3d, #1a3447);
 }
 
