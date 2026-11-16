@@ -301,12 +301,12 @@ html[data-theme="dark"] body[data-page-id="blog-list"] {
   --blog-line-ink: #91afcf;
   --blog-filter-ink: #e8eaed;
   --blog-filter-count: #e8eaed;
-  --blog-filter-bg: #91afcf;
-  --blog-filter-border: #91afcf;
-  --blog-filter-hover: #91afcf;
+  --blog-filter-bg: rgba(145, 175, 207, .15);
+  --blog-filter-border: rgba(145, 175, 207, .24);
+  --blog-filter-hover: rgba(145, 175, 207, .22);
   --blog-tag-ink: #e8eaed;
-  --blog-tag-bg: #91afcf;
-  --blog-tag-hover: #91afcf;
+  --blog-tag-bg: rgba(145, 175, 207, .15);
+  --blog-tag-hover: rgba(145, 175, 207, .22);
 }
 html[data-theme="dark"] body[data-page-id="blog-list"] .articles-list .blog-post-title,
 html[data-theme="dark"] body[data-page-id="blog-list"] .articles-list .blog-post-title a {
@@ -349,6 +349,10 @@ html[data-theme="dark"] body[data-page-id="blog-list"] .articles-list .blog-tag-
   color: #e8eaed !important;
   background: var(--blog-tag-hover) !important;
 }
+/* Add a faint border without altering the existing tag dimensions. */
+html[data-theme="dark"] body[data-page-id="blog-list"] .articles-list .blog-tag-link {
+  box-shadow: inset 0 0 0 1px rgba(145, 175, 207, .24);
+}
 
 /* On individual tag pages, use the exact same three colors already in Eason's header. */
 html[data-theme="dark"] body[data-page-id="tag-detail"] .tag-post-title,
@@ -370,8 +374,16 @@ html[data-theme="dark"] body[data-page-id="tag-detail"] .tag-post-meta {
 html[data-theme="dark"] body[data-page-id="tag-detail"] .tag-pill,
 html[data-theme="dark"] body[data-page-id="tag-detail"] .post-item-tag-badge {
   color: #e8eaed !important;
-  background: #91afcf !important;
-  border-color: #91afcf !important;
+  background: rgba(145, 175, 207, .15) !important;
+  border-color: rgba(145, 175, 207, .24) !important;
+}
+html[data-theme="dark"] body[data-page-id="tag-detail"] .tag-pill:hover,
+html[data-theme="dark"] body[data-page-id="tag-detail"] .post-item-tag-badge:hover,
+html[data-theme="dark"] body[data-page-id="tag-detail"] .tag-pill.active-tag {
+  background: rgba(145, 175, 207, .22) !important;
+}
+html[data-theme="dark"] body[data-page-id="tag-detail"] .post-item-tag-badge {
+  box-shadow: inset 0 0 0 1px rgba(145, 175, 207, .24);
 }
 html[data-theme="dark"] body[data-page-id="tag-detail"] .tag-hash {
   color: #e8eaed !important;
@@ -381,7 +393,7 @@ html[data-theme="dark"] body[data-page-id="tag-detail"] .tag-badge {
 }
 
 /* Keep all small copy and badges on the same Eason text tone as the titles.
-   The tags use precisely the existing underline color as their background. */
+   Tags use the underline blue at 15% opacity so the night sky remains visible. */
 html[data-theme="dark"] body[data-page-id="blog-list"] .articles-list .pinned-mark,
 html[data-theme="dark"] body[data-page-id="blog-list"] .articles-list .articles-empty,
 html[data-theme="dark"] body[data-page-id="blog-list"] .articles-list .blog-post-meta-item,
