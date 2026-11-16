@@ -102,14 +102,14 @@ const { transparent = true } = Astro.props;
 
     .home-mark {
         flex: none;
-        color: var(--night-accent);
-        filter: drop-shadow(0 0 5px rgba(174, 202, 221, .17));
+        color: #bdd7ff;
+        filter: drop-shadow(0 0 5px rgba(119, 171, 255, .22));
         transition: transform .25s ease, filter .25s ease;
     }
 
     h2 .site-home-link:hover .home-mark {
         transform: translateY(-2px);
-        filter: drop-shadow(0 0 8px rgba(174, 202, 221, .42));
+        filter: drop-shadow(0 0 8px rgba(123, 183, 255, .65));
     }
 
     /* Exquisite Underline Animation (Logo) */
@@ -278,13 +278,13 @@ const { transparent = true } = Astro.props;
 
 	/* Match the existing homepage's blue-black palette; keep drawer layout intact. */
 	:global([data-theme="dark"]) .mobile-nav-drawer {
-		background: var(--color-header-bg);
-		border-left-color: var(--night-line);
+		background: #151d29;
+		border-left-color: rgba(155, 177, 214, .19);
 	}
 
 	:global([data-theme="dark"]) .mobile-nav-link.active {
-		background: var(--night-chip-bg);
-		color: var(--night-chip-text);
+		background: rgba(145, 175, 207, .12);
+		color: #c6dbf6;
 	}
 
 	.mobile-nav-links {
@@ -523,8 +523,8 @@ const { transparent = true } = Astro.props;
     header.mobile-menu-open,
     header.transparent.mobile-menu-open,
     header.transparent.scrolled.mobile-menu-open {
-      background: var(--night-bg) !important;
-      border-bottom: 1px solid var(--night-line);
+      background: #101b2b !important;
+      border-bottom: 1px solid rgba(155, 177, 214, .16);
       box-shadow: 0 3px 20px rgba(3, 9, 21, .3) !important;
       backdrop-filter: none !important;
       -webkit-backdrop-filter: none !important;
@@ -532,7 +532,7 @@ const { transparent = true } = Astro.props;
     header.mobile-menu-open > nav .site-home-link,
     header.mobile-menu-open > nav .search-btn,
     header.mobile-menu-open > nav .mobile-menu-btn {
-      color: var(--night-text) !important;
+      color: #e9f2ff !important;
     }
     .mobile-nav-overlay {
       /* Dim the underlying content without costly backdrop blur. */
@@ -545,7 +545,7 @@ const { transparent = true } = Astro.props;
       /* The same persistent NightSky is visible through this drawer.
          No second wallpaper or re-positioned copy. */
       background: rgba(5, 13, 27, .20);
-      border-left-color: var(--night-line);
+      border-left-color: rgba(171, 207, 237, .17);
       box-shadow: -14px 0 40px rgba(0, 0, 0, .34);
     }
     /* Underline the text only, mirroring the top-left Eason logo;
@@ -575,7 +575,7 @@ const { transparent = true } = Astro.props;
     /* Keep the existing active item colors and highlight unchanged. */
     .mobile-nav-drawer .mobile-nav-link:not(.active),
     header.transparent .mobile-nav-drawer .mobile-nav-link:not(.active) {
-      color: var(--night-text);
+      color: #eaf3ff;
       text-shadow: 0 1px 10px rgba(2, 8, 19, .55);
     }
   }

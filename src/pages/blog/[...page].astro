@@ -155,7 +155,7 @@ if (last > 1) paginationList.push(last);
       }
 
       .blog-posts-list :global(.blog-post-title a:hover) {
-        color: var(--night-text);
+        color: var(--accent);
       }
 
       .blog-posts-list :global(.blog-post-excerpt) {
@@ -194,7 +194,6 @@ if (last > 1) paginationList.push(last);
       }
 
       .blog-posts-list :global(.blog-tag-link) {
-        border: 1px solid var(--night-chip-border);
         display: inline-flex;
         align-items: center;
         gap: 0.2em;
@@ -213,10 +212,10 @@ if (last > 1) paginationList.push(last);
       }
 
       .blog-posts-list :global(.blog-tag-link:hover) {
-        background: var(--night-chip-hover);
-        color: var(--night-accent-hover);
+        background: var(--accent);
+        color: white;
         transform: translateY(-2px) scale(1.05);
-        box-shadow: none;
+        box-shadow: 0 3px 8px rgba(var(--accent-rgb), 0.25);
       }
 
       .blog-posts-list :global(.blog-tag-link:active) {
@@ -251,7 +250,7 @@ if (last > 1) paginationList.push(last);
         align-items: center;
         margin-top: 3em;
         padding-top: 2em;
-        border-top: 0;
+        border-top: 1px solid var(--color-border);
         gap: 1em;
       }
 
@@ -315,10 +314,10 @@ if (last > 1) paginationList.push(last);
       }
 
       .page-btn.active {
-        background: var(--night-chip-hover);
-        color: var(--night-accent-hover);
+        background: var(--accent);
+        color: white;
         font-weight: 600;
-        box-shadow: inset 0 0 0 1px var(--night-chip-border);
+        box-shadow: 0 4px 16px rgba(var(--accent-rgb), 0.35);
         transform: scale(1.08);
         transition:
           color 0.4s cubic-bezier(0.2, 0, 0, 1),
@@ -422,16 +421,16 @@ if (last > 1) paginationList.push(last);
         z-index: 2;
         /* The Hero already overlaps the next section by 88px. Keep that
            region transparent so the rounded article card sits over the photo. */
-        background: linear-gradient(to bottom, transparent 88px, var(--night-bg) 88px);
+        background: linear-gradient(to bottom, transparent 88px, #171c25 88px);
         min-height: 44vh;
         padding: 0 1.5rem 5rem;
-        color: var(--night-text);
+        color: #ecf1f8;
       }
       .articles-inner {
         width: min(100%, 960px);
         margin: 0 auto;
         padding: 2rem clamp(1.2rem, 3vw, 2.5rem);
-        background: var(--night-hover-gradient);
+        background: #222936;
         border: 1px solid rgba(155, 177, 214, .19);
         border-radius: 18px;
         box-sizing: border-box;
@@ -451,29 +450,29 @@ if (last > 1) paginationList.push(last);
         gap: .35rem;
         text-decoration: none;
         padding: .4rem .72rem;
-        background: var(--night-chip-bg);
-        border: 1px solid var(--night-chip-border);
+        background: rgba(145, 175, 207, .08);
+        border: 1px solid rgba(155, 177, 214, .18);
         border-radius: 9px;
-        color: var(--night-chip-text);
-        font-size: .83rem;
+        color: #c5d4e7;
+        font-size: .88rem;
         transition: background .2s, color .2s, transform .2s;
       }
       .tag-filter:hover {
-        background: var(--night-chip-hover);
-        color: var(--night-accent-hover);
+        background: rgba(145,175,207,.16);
+        color: #fff;
         transform: translateY(-2px);
       }
-      .tag-filter.all-tag { color: var(--night-chip-text); }
-      .tag-hash { color: var(--night-accent); }
+      .tag-filter.all-tag { color: #f0f5ff; }
+      .tag-hash { color: #9abce6; }
       .tag-filter .tag-count, .tag-filter.all-tag span {
-        color: var(--night-text-muted);
+        color: #9dadc4;
         font-size: .78rem;
         margin-left: .15rem;
       }
       .articles-list { display: flex; flex-direction: column; }
-      .articles-empty { color: var(--night-text-secondary); padding: 1.4rem 0; }
+      .articles-empty { color: #bbc6d7; padding: 1.4rem 0; }
       .pinned-mark {
-        color: var(--night-accent);
+        color: #abc9ef;
         font-size: .8rem;
         font-weight: 600;
         padding-top: .8rem;
@@ -489,7 +488,7 @@ if (last > 1) paginationList.push(last);
         transition: background-color .22s ease, transform .22s ease;
       }
       .articles-list :global(.blog-post-item:hover) {
-        background: var(--night-chip-bg);
+        background: rgba(145,175,207,.08);
         box-shadow: inset 0 0 0 1px rgba(157,186,234,.16);
         transform: none;
       }
@@ -498,7 +497,7 @@ if (last > 1) paginationList.push(last);
         font-size: 1.35rem;
         line-height: 1.4;
         margin: 0 0 .65rem;
-        color: var(--night-text);
+        color: #f0f4fa;
       }
       /* Full-card article link, with independent clickable category tags. */
       .articles-list :global(.blog-post-title a)::after {
@@ -527,7 +526,7 @@ if (last > 1) paginationList.push(last);
         padding-bottom: 2px;
       }
       .articles-list :global(.blog-post-item:hover .blog-post-title a) {
-        color: var(--night-text);
+        color: var(--accent);
         background-size: 100% 2px;
       }
       .articles-list :global(.blog-post-meta) {
@@ -550,24 +549,22 @@ if (last > 1) paginationList.push(last);
         transition: background-color .3s cubic-bezier(.2,0,0,1), color .3s cubic-bezier(.2,0,0,1), transform .3s cubic-bezier(.2,0,0,1), box-shadow .3s cubic-bezier(.2,0,0,1);
         transform-origin: center;
       }
-      .articles-list :global(.blog-tag-link:hover) { transform: translateY(-1px); background: var(--night-chip-hover); color: var(--night-accent-hover); }
+      .articles-list :global(.blog-tag-link:hover) { transform: translateY(-2px) scale(1.05); }
       .articles-list :global(.blog-tag-link:active) { transform: translateY(0) scale(.97); }
       .articles-list :global(.blog-post-excerpt) {
-        color: var(--night-text-secondary);
+        color: #bfcbdc;
         font-size: .94rem;
         line-height: 1.75;
         margin: 0 0 .8rem;
       }
-      .articles-list :global(.blog-post-meta) { color: var(--night-text-muted); opacity: .88; }
+      .articles-list :global(.blog-post-meta) { color: #9eafc7; }
       .articles-list :global(.blog-tag-link) {
-        border: 1px solid var(--night-chip-border);
-        background: var(--night-chip-bg);
-        color: var(--night-chip-text);
-        font-size: .76em;
+        background: rgba(145,175,207,.13);
+        color: #b9d2f3;
       }
       @media (max-width: 720px) {
         .articles-area {
-          background: linear-gradient(to bottom, transparent 56px, var(--night-bg) 56px);
+          background: linear-gradient(to bottom, transparent 56px, #171c25 56px);
           padding: 0 .8rem 3rem;
         }
         .articles-inner { padding: 1.25rem 1rem; }

@@ -114,53 +114,38 @@
    舒适、质感、高级感
    ═══════════════════════════════════════ */
 [data-theme="dark"] {
-  /* Eason night-sky design tokens shared by every page and interactive state. */
-  --night-bg: #07121f;
-  --night-text: #f6f6f4;
-  --night-text-secondary: #c8cbd0;
-  --night-text-muted: #9da9b2;
-  --night-accent: #b5cadb;
-  --night-accent-hover: #f5f7f8;
-  --night-line: rgba(180, 196, 210, .13);
-  --night-chip-bg: rgba(9, 18, 29, .20);
-  --night-chip-hover: rgba(160, 182, 200, .13);
-  --night-chip-border: rgba(183, 197, 207, .12);
-  --night-chip-text: #b1bec8;
-  --night-hover-gradient: linear-gradient(145deg, rgba(10, 24, 37, .58), rgba(5, 18, 30, .48));
-  --night-hover-shadow: 0 13px 34px rgba(0, 6, 17, .22);
-
-	--accent: #b5cadb;
-	--accent-dark: #95adbf;
-	--accent-rgb: 181, 202, 219;
+	--accent: #91afcf;
+	--accent-dark: #7295bd;
+	--accent-rgb: 145, 175, 207;
 	--black: 232, 234, 237;
-	--gray: 150, 169, 185;
+	--gray: 140, 155, 185;
 	--gray-light: 39, 42, 48;
 	--gray-dark: 223, 232, 240;
 	--gray-gradient: rgba(var(--gray-light), 50%), var(--color-bg);
 
 	/* Surfaces */
-	--color-bg: var(--night-bg);
-	--color-surface: #102333;
-	--color-surface-hover: #1b3547;
-	--color-surface-elevated: #193042;
-	--color-surface-input: #1a3243;
+	--color-bg: #17191d;
+	--color-surface: #272a30;
+	--color-surface-hover: #31353c;
+	--color-surface-elevated: #2d3036;
+	--color-surface-input: #30343b;
 
 	/* Text */
-	--color-text: var(--night-text);
-	--color-text-secondary: var(--night-text-secondary);
-	--color-text-tertiary: var(--night-text-muted);
-	--color-text-muted: #9da9b2;
-	--color-text-strong: var(--night-text);
+	--color-text: #e9eaed;
+	--color-text-secondary: #b8bcc5;
+	--color-text-tertiary: #989da8;
+	--color-text-muted: #858b96;
+	--color-text-strong: #f5f5f6;
 
 	/* Borders */
-	--color-border: var(--night-line);
-	--color-border-subtle: rgba(174, 198, 214, .13);
-	--color-border-strong: rgba(174, 198, 214, .26);
+	--color-border: #3b4048;
+	--color-border-subtle: #343840;
+	--color-border-strong: #4b515b;
 
 	/* Interactive */
-	--color-tag-bg: var(--night-chip-bg);
-	--color-tag-bg-hover: var(--night-chip-hover);
-	--color-tag-text: var(--night-chip-text);
+	--color-tag-bg: #30343b;
+	--color-tag-bg-hover: #3b4048;
+	--color-tag-text: #b8bcc5;
 
 	/* Shadows */
 	--shadow-color: 0, 0, 0;
@@ -168,11 +153,11 @@
 	--shadow-card-hover: 0 8px 32px rgba(0, 0, 0, 0.3);
 
 	/* Code */
-	--color-code-inline-bg: linear-gradient(135deg, #182f41 0%, #102334 100%);
-	--color-code-inline-text: #c9dcea;
+	--color-code-inline-bg: linear-gradient(135deg, #272a30 0%, #1c1e23 100%);
+	--color-code-inline-text: #f472b6;
 	--color-code-inline-border: rgba(255, 255, 255, 0.06);
-	--color-code-block-bg: #0b1c2b;
-	--color-code-block-text: var(--night-text-secondary);
+	--color-code-block-bg: #181a1f;
+	--color-code-block-text: #d1d5db;
 	--color-code-block-border: rgba(255, 255, 255, 0.06);
 	--color-code-block-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
 	--color-code-block-shadow-hover: 0 10px 25px -5px rgba(0, 0, 0, 0.4), 0 4px 6px -2px rgba(0, 0, 0, 0.3);
@@ -185,30 +170,30 @@
 	--color-line-numbers-text: rgba(255, 255, 255, 0.25);
 
 	/* Blockquote */
-	--color-blockquote-border: var(--night-line);
-	--color-blockquote-text: var(--night-text-secondary);
+	--color-blockquote-border: #42464f;
+	--color-blockquote-text: #8b8fa0;
 
 	/* Header / Glassmorphism */
-	--color-header-bg: #091b2b;
-	--color-header-glass: rgba(7, 18, 31, .88);
-	--color-header-glass-border: var(--night-line);
+	--color-header-bg: #272a30;
+	--color-header-glass: rgba(23, 25, 29, 0.88);
+	--color-header-glass-border: rgba(255, 255, 255, 0.06);
 	--color-header-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 
 	/* Search */
-	--color-search-bg: #102333;
-	--color-search-footer-bg: #0d2030;
-	--color-search-result-hover: #1b3547;
-	--color-search-highlight-text: #e0eff8;
-	--color-search-highlight-bg: rgba(151, 190, 216, .22);
+	--color-search-bg: #272a30;
+	--color-search-footer-bg: #22252b;
+	--color-search-result-hover: #31353c;
+	--color-search-highlight-text: #f87171;
+	--color-search-highlight-bg: rgba(248, 113, 113, 0.15);
 
 	/* Scrollbar */
 	--color-scrollbar: rgba(200, 200, 200, 0.15);
 	--color-scrollbar-hover: rgba(200, 200, 200, 0.3);
 
 	/* Misc */
-	--color-skill-bar-bg: #1b3547;
-	--color-gradient-start: #b5cadb;
-	--color-hobby-gradient: linear-gradient(135deg, #142b3d, #1a3447);
+	--color-skill-bar-bg: #3b4048;
+	--color-gradient-start: #91afcf;
+	--color-hobby-gradient: linear-gradient(135deg, #2d3036, #30343b);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -1232,7 +1217,7 @@ hr {
 [data-theme="dark"] body[data-page-id="blog-list"],
 [data-theme="dark"] body[data-page-id="tags-index"],
 [data-theme="dark"] body[data-page-id="tag-detail"] {
-  background-color: var(--night-bg) !important;
+  background-color: #101b2b !important;
 }
 [data-theme="dark"] body[data-page-id] #main-content {
   background: transparent;
@@ -1258,10 +1243,10 @@ hr {
   height: clamp(140px, 24vh, 270px);
   pointer-events: none;
   background: linear-gradient(to bottom,
-    rgba(7, 18, 31, 0) 0%,
-    rgba(7, 18, 31, .15) 27%,
-    rgba(7, 18, 31, .65) 69%,
-    var(--night-bg) 100%);
+    rgba(16, 27, 43, 0) 0%,
+    rgba(16, 27, 43, .15) 27%,
+    rgba(16, 27, 43, .65) 69%,
+    #101b2b 100%);
 }
 [data-theme="dark"] body[data-page-id="home"] .stats-wrapper::before,
 [data-theme="dark"] body[data-page-id="about"] .about-main::before,
@@ -1273,7 +1258,7 @@ hr {
   pointer-events: none;
   inset: 0 0 auto;
   height: clamp(150px, 25vh, 270px);
-  background: linear-gradient(to bottom, var(--night-bg) 0%, rgba(7, 18, 31, 0) 100%);
+  background: linear-gradient(to bottom, #101b2b 0%, rgba(16, 27, 43, 0) 100%);
 }
 [data-theme="dark"] body[data-page-id="home"] .stats-wrapper > *,
 [data-theme="dark"] body[data-page-id="about"] .about-main > *,
@@ -1355,7 +1340,7 @@ hr {
 [data-theme="dark"] body[data-page-id="home"] .home-post-item:hover,
 [data-theme="dark"] body[data-page-id="tags-index"] .tag-post-item:hover,
 [data-theme="dark"] body[data-page-id="tag-detail"] .tag-post-item:hover {
-  background: var(--night-hover-gradient) !important;
+  background: rgba(39, 79, 111, .18) !important;
 }
 @media (max-width: 720px) {
   [data-theme="dark"] body[data-page-id="home"] .stats-container,
@@ -1386,7 +1371,7 @@ hr {
   inset: 0 0 auto;
   height: clamp(150px, 25vh, 270px);
   pointer-events: none;
-  background: linear-gradient(to bottom, var(--night-bg), rgba(7,18,31,0));
+  background: linear-gradient(to bottom, #101b2b, rgba(16,27,43,0));
 }
 [data-theme="dark"] body[data-page-id="blog-list"] .articles-inner {
   position: relative;
@@ -1423,7 +1408,7 @@ hr {
 /* Persisted sky replaces body wallpaper, preventing a second image load during
    Astro ClientRouter swaps. The background is one shared mounted layer. */
 [data-theme="dark"] body[data-page-id] {
-  background: var(--night-bg) !important;
+  background: #101b2b !important;
 }
 [data-theme="dark"] body[data-page-id] #main-content {
   position: relative;
@@ -1442,7 +1427,7 @@ hr {
    Every PageShell route has the same persistent sky beneath page content;
    photo Heroes remain unchanged. */
 [data-theme="dark"] body {
-  background-color: var(--night-bg) !important;
+  background-color: #101b2b !important;
   background-image: none !important;
 }
 [data-theme="dark"] body #main-content,
@@ -1465,7 +1450,7 @@ hr {
   background: transparent !important;
 }
 [data-theme="dark"] body[data-page-id="post"] .stats-wrapper::before {
-  background: linear-gradient(to bottom, var(--night-bg) 0%, rgba(7,18,31,0) 240px) !important;
+  background: linear-gradient(to bottom, #101b2b 0%, rgba(16,27,43,0) 240px) !important;
   z-index: 0 !important;
   pointer-events: none;
 }
@@ -1501,7 +1486,7 @@ hr {
   inset: auto 0 0;
   height: clamp(140px, 24vh, 270px);
   pointer-events: none;
-  background: linear-gradient(to bottom,rgba(7,18,31,0),rgba(7,18,31,.2) 32%,rgba(7,18,31,.72) 75%,var(--night-bg));
+  background: linear-gradient(to bottom,rgba(16,27,43,0),rgba(16,27,43,.2) 32%,rgba(16,27,43,.72) 75%,#101b2b);
 }
 @media(max-width:720px) {
   [data-theme="dark"] body[data-page-id="post"] .layout-container > .content-card {
@@ -1532,7 +1517,7 @@ hr {
 
 /* The NightSky is persistent: never re-paint the same large asset on body. */
 html[data-theme="dark"] body[data-page-id] {
-  background-color: var(--night-bg) !important;
+  background-color: #101b2b !important;
   background-image: none !important;
 }
 /* Reduce expensive blur layers on small devices without changing card colors. */

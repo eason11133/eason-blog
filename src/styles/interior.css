@@ -6,9 +6,9 @@
 
 html[data-theme="dark"] body[data-page-id]:not([data-page-id="home"]) {
   --interior-width: 880px;
-  --interior-color: var(--night-text);
-  --interior-muted: var(--night-text-secondary);
-  --interior-line: var(--night-line);
+  --interior-color: #e7effa;
+  --interior-muted: #a7b9d3;
+  --interior-line: rgba(158, 186, 221, .20);
 }
 
 html[data-theme="dark"] body[data-page-id="blog-list"] .articles-area,
@@ -60,9 +60,9 @@ html[data-theme="dark"] body[data-page-id="blog-list"] .articles-list > .scroll-
   pointer-events: none;
   opacity: 0;
   border-radius: 14px;
-  border: 1px solid var(--night-chip-border);
-  background: var(--night-hover-gradient);
-  box-shadow: var(--night-hover-shadow);
+  border: 1px solid rgba(167, 195, 232, .3);
+  background: linear-gradient(145deg, rgba(25, 49, 78, .91), rgba(14, 31, 54, .85));
+  box-shadow: 0 18px 46px rgba(0, 6, 18, .4), 0 4px 15px rgba(0, 6, 18, .14);
   transform: scale(.992);
   transition: opacity .23s ease, transform .26s ease;
 }
@@ -92,47 +92,20 @@ html[data-theme="dark"] body[data-page-id="blog-list"] .articles-list .blog-post
   box-shadow: none !important;
   transform: none !important;
 }
-/* Category pages use the same frameless rows and subtle floating hover as blog. */
-html[data-theme="dark"] body[data-page-id^="tag"] .tag-posts-list > .post-card-wrapper {
-  position: relative;
-  border: 0 !important;
-}
+/* Tag lists intentionally retain the quieter list-row design. */
 html[data-theme="dark"] body[data-page-id^="tag"] .tag-post-item {
-  position: relative;
-  isolation: isolate;
   padding: 1.45rem 0 !important;
   margin: 0 !important;
-  border: 0 !important;
   border-radius: 0 !important;
+  border-bottom: 1px solid var(--interior-line) !important;
   box-shadow: none !important;
-  transform: none;
+  transform: none !important;
   background: transparent !important;
-  transition: transform .28s cubic-bezier(.2,.7,.2,1);
 }
-html[data-theme="dark"] body[data-page-id^="tag"] .tag-post-item::before {
-  content: '';
-  position: absolute;
-  z-index: -1;
-  pointer-events: none;
-  inset: 6px -15px;
-  opacity: 0;
-  border-radius: 14px;
-  border: 1px solid var(--night-chip-border);
-  background: var(--night-hover-gradient);
-  box-shadow: var(--night-hover-shadow);
-  transform: scale(.992);
-  transition: opacity .23s ease, transform .26s ease;
-}
-html[data-theme="dark"] body[data-page-id^="tag"] .tag-post-item:hover,
-html[data-theme="dark"] body[data-page-id^="tag"] .tag-post-item:focus-within {
+html[data-theme="dark"] body[data-page-id^="tag"] .tag-post-item:hover {
   background: transparent !important;
   box-shadow: none !important;
-  transform: translateY(-4px);
-}
-html[data-theme="dark"] body[data-page-id^="tag"] .tag-post-item:hover::before,
-html[data-theme="dark"] body[data-page-id^="tag"] .tag-post-item:focus-within::before {
-  opacity: 1;
-  transform: scale(1);
+  transform: none !important;
 }
 @media (prefers-reduced-motion: reduce) {
   html[data-theme="dark"] body[data-page-id="blog-list"] .articles-list > .scroll-reveal.visible,
@@ -149,7 +122,7 @@ html[data-theme="dark"] body[data-page-id="blog-list"] .articles-list .blog-post
 }
 html[data-theme="dark"] body[data-page-id="blog-list"] .articles-list .blog-post-title,
 html[data-theme="dark"] body[data-page-id^="tag"] .tag-post-title {
-  color: var(--night-text);
+  color: #edf3fc;
   font-size: clamp(1.2rem, 2.2vw, 1.43rem) !important;
   line-height: 1.4;
 }
@@ -164,7 +137,7 @@ html[data-theme="dark"] body[data-page-id="blog-list"] .article-tags {
   margin-bottom: .75rem;
 }
 html[data-theme="dark"] body[data-page-id^="tag"] .tags-cloud {
-  border-bottom: 0 !important;
+  border-bottom: 1px solid var(--interior-line);
   margin-bottom: .75rem;
 }
 html[data-theme="dark"] body[data-page-id^="tag"] .post-card-wrapper {
@@ -173,34 +146,6 @@ html[data-theme="dark"] body[data-page-id^="tag"] .post-card-wrapper {
 }
 html[data-theme="dark"] body[data-page-id^="tag"] .tag-top {
   display: none;
-}
-
-/* Keep article controls visually related to the same tags and filters. */
-html[data-theme="dark"] body[data-page-id="post"] .post-head .pdf-export-button {
-  background: var(--night-chip-bg);
-  color: var(--night-chip-text);
-  border: 1px solid var(--night-chip-border);
-  border-radius: 9px;
-}
-html[data-theme="dark"] body[data-page-id="post"] .post-head .pdf-export-button:hover {
-  background: var(--night-chip-hover);
-  color: var(--night-accent-hover);
-}
-html[data-theme="dark"] body[data-page-id="post"] .prose a {
-  color: var(--night-accent);
-}
-html[data-theme="dark"] body[data-page-id="post"] .prose a:hover {
-  color: var(--night-accent-hover);
-}
-@media (prefers-reduced-motion: reduce) {
-  html[data-theme="dark"] body[data-page-id^="tag"] .tag-post-item,
-  html[data-theme="dark"] body[data-page-id^="tag"] .tag-post-item::before {
-    transition: none;
-  }
-  html[data-theme="dark"] body[data-page-id^="tag"] .tag-post-item:hover,
-  html[data-theme="dark"] body[data-page-id^="tag"] .tag-post-item:focus-within {
-    transform: none;
-  }
 }
 
 /* A shared content column for the other two interior entry pages. */
@@ -228,7 +173,7 @@ html[data-theme="dark"] body[data-page-id="experience"] .experience-body {
   line-height: 1.85;
 }
 html[data-theme="dark"] body[data-page-id="experience"] .experience-body a {
-  color: var(--night-accent);
+  color: #b3d2f6;
 }
 
 /* Article pages: title and metadata above the text, no hero or giant box. */
@@ -246,10 +191,10 @@ html[data-theme="dark"] body[data-page-id="post"] .post-back-link {
   align-items: center;
   margin: 0 0 1.75rem;
   text-decoration: none;
-  color: var(--night-text-secondary);
+  color: #a9c5e8;
   font-size: .9rem;
 }
-html[data-theme="dark"] body[data-page-id="post"] .post-back-link:hover { color: var(--night-accent-hover); }
+html[data-theme="dark"] body[data-page-id="post"] .post-back-link:hover { color: #e2f0ff; }
 html[data-theme="dark"] body[data-page-id="post"] .post-head .interior-heading {
   margin-bottom: 1.1rem;
 }
@@ -268,7 +213,7 @@ html[data-theme="dark"] body[data-page-id="post"] .post-head .meta-row {
 }
 html[data-theme="dark"] body[data-page-id="post"] .post-head .pdf-export-button {
   background: transparent;
-  color: var(--night-text-secondary);
+  color: #b4cdec;
   border-color: var(--interior-line);
   font-size: .85rem;
 }

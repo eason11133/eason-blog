@@ -47,15 +47,15 @@ const webSiteSchema = {
 
       /* Restore the original Curry arena hero and a quiet dark article panel. */
       :global([data-theme="dark"]) .stats-wrapper {
-        background: var(--night-bg);
+        background: #171c25;
         min-height: 50vh;
       }
 
       :global([data-theme="dark"]) .stats-container {
         position: relative;
         box-sizing: border-box;
-        background: var(--night-hover-gradient);
-        border: 1px solid var(--night-line);
+        background: #222936;
+        border: 1px solid rgba(155, 177, 214, .19);
         border-radius: 18px;
         box-shadow: 0 18px 55px rgba(0, 0, 0, .26);
         padding: 2em;
@@ -72,7 +72,7 @@ const webSiteSchema = {
         margin: 0;
         line-height: 1.3;
         font-size: 1.625rem;
-        color: var(--night-text);
+        color: #f5f6fb;
       }
 
       .status-tags {
@@ -84,7 +84,7 @@ const webSiteSchema = {
       .status-tag {
         display: inline-flex;
         align-items: center;
-        border-radius: 9px;
+        border-radius: 999px;
         padding: .27rem .75rem;
         font-size: .8rem;
         font-weight: 600;
@@ -93,26 +93,26 @@ const webSiteSchema = {
       }
 
       .status-tag.admissions {
-        color: var(--night-chip-text);
-        background: var(--night-chip-bg);
-        border-color: var(--night-chip-border);
+        color: #a8ceff;
+        background: rgba(30, 74, 133, .45);
+        border-color: rgba(85, 150, 241, .55);
       }
 
       .status-tag.website {
-        color: var(--night-chip-text);
-        background: var(--night-chip-bg);
-        border-color: var(--night-chip-border);
+        color: #dfb8ff;
+        background: rgba(91, 48, 127, .42);
+        border-color: rgba(158, 103, 213, .56);
       }
 
       .status-tag.learning {
-        color: var(--night-chip-text);
-        background: var(--night-chip-bg);
-        border-color: var(--night-chip-border);
+        color: #92e4d1;
+        background: rgba(25, 101, 88, .34);
+        border-color: rgba(78, 184, 161, .55);
       }
 
       .now-description {
         max-width: 65ch;
-        color: var(--night-text-secondary);
+        color: #c8d1e0;
         font-size: 1rem;
         line-height: 1.9;
         margin: 1.6rem 0 0;
@@ -169,7 +169,7 @@ const webSiteSchema = {
       .recent-posts-section {
         margin-top: 2.1em;
         padding-top: 1.7em;
-        border-top: 1px solid var(--night-line);
+        border-top: 1px solid rgba(159, 179, 212, .18);
       }
 
       .home-posts-list.home-stagger-ready :global(.home-post-item) {
@@ -226,8 +226,8 @@ const webSiteSchema = {
       }
 
       .home-posts-list :global(.home-post-item:hover) {
-        background: var(--night-hover-gradient);
-        box-shadow: inset 0 0 0 1px var(--night-line);
+        background: rgba(14, 25, 49, .48);
+        box-shadow: inset 0 0 0 1px rgba(157, 186, 234, .16);
         margin: 0 -1em;
         padding-left: 1em;
         padding-right: 1em;
@@ -271,7 +271,7 @@ const webSiteSchema = {
       }
 
       .home-posts-list :global(.home-post-item:hover .home-post-title a) {
-        color: var(--night-text);
+        color: var(--accent);
         background-size: 100% 2px;
       }
 
@@ -302,7 +302,6 @@ const webSiteSchema = {
       }
 
       .home-posts-list :global(.home-tag-link) {
-        border: 1px solid var(--night-chip-border);
         display: inline-flex;
         align-items: center;
         gap: 0.2em;
@@ -321,10 +320,10 @@ const webSiteSchema = {
       }
 
       .home-posts-list :global(.home-tag-link:hover) {
-        background: var(--night-chip-hover);
-        color: var(--night-accent-hover);
-        transform: translateY(-1px);
-        box-shadow: none;
+        background: var(--accent);
+        color: white;
+        transform: translateY(-2px) scale(1.05);
+        box-shadow: 0 3px 8px rgba(var(--accent-rgb), 0.25);
       }
 
       .home-posts-list :global(.home-tag-link:active) {
