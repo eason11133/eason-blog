@@ -115,9 +115,9 @@ content:
                 label: 事件內容（中間）
                 type: text
               - name: url
-                label: 點擊事件名稱後開啟的網址（選填）
+                label: 站內連結（選填）
                 type: string
-                description: 可填網站完整網址（https://...）或本站路徑（例如 /blog/）；留空就只顯示文字。
+                description: 輸入自己網站內的路徑，例如 /blog/ 或 /experience/。不要填外部網址；留空時只顯示文字。
               - name: result
                 label: 狀態或標記（右側，可空白）
                 type: string
