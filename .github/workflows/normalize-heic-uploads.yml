@@ -1,0 +1,76 @@
+name: Normalize mislabeled HEIC uploads
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - public/image/**
+      - .github/workflows/normalize-heic-uploads.yml
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  normalize:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: true
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install HEIC decoder
+        run: python -m pip install --disable-pip-version-check Pillow pillow-heif
+
+      - name: Convert mislabeled HEIC images to real JPEG
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          from PIL import Image, ImageOps
+          from pillow_heif import register_heif_opener
+
+          register_heif_opener()
+          brands = {b"heic", b"heix", b"hevc", b"hevx", b"mif1", b"msf1"}
+          converted = 0
+
+          for path in Path("public/image").rglob("*"):
+              if not path.is_file() or path.suffix.lower() not in {".jpg", ".jpeg"}:
+                  continue
+              with path.open("rb") as stream:
+                  head = stream.read(12)
+              # Pages CMS can keep the original .jpg filename even for HEIC bytes.
+              if len(head) < 12 or head[4:8] != b"ftyp" or head[8:12] not in brands:
+                  continue
+
+              replacement = path.with_name(path.name + ".normalized.jpg")
+              with Image.open(path) as source:
+                  upright = ImageOps.exif_transpose(source)
+                  upright.convert("RGB").save(
+                      replacement, format="JPEG", quality=90, optimize=True
+                  )
+              replacement.replace(path)
+              converted += 1
+              print(f"Converted {path} from HEIC to JPEG")
+
+          print(f"Normalized {converted} image(s)")
+          PY
+
+      - name: Commit converted image files
+        shell: bash
+        run: |
+          if [[ -n "$(git status --porcelain -- public/image)" ]]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add public/image
+            git commit -m "Convert uploaded HEIC bytes to real JPEG"
+            git push
+          else
+            echo "All uploaded JPG files already use JPEG encoding."
+          fi
