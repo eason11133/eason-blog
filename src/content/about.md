@@ -58,6 +58,7 @@ timelines:
         result: "NGO 合作 "
       - when: 2025 3 月
         event: 公共廁所 LINE Bot
+        url: https://eason-blog.vercel.app/experience/2026-11-18-/
         result: 已上線
       - when: 2021 ~ 2024
         event: 體育班生涯
