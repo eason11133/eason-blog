@@ -1,0 +1,190 @@
+# Eason's blog content editor. Public, no credentials in this file.
+# GitHub authentication uses a fine-grained token from the login screen.
+backend:
+  name: github
+  repo: eason11133/eason-blog
+  branch: main
+  auth_methods: [token]
+
+site_url: https://eason-blog.vercel.app
+display_url: https://eason-blog.vercel.app
+media_folder: /public/image
+public_folder: /image
+
+# Native image, syntax-highlighted code block, table, and divider tools.
+field_defaults:
+  richtext:
+    modes: [rich_text, raw]
+    editor_components: [code-block, image, table, hr]
+
+singletons:
+  - name: homepage
+    label: 首頁
+    icon: home
+    file: src/data/homepage.json
+    format: json
+    preview_path: /
+    fields:
+      - { name: hero_title, label: 首頁問候文字, widget: string }
+      - { name: hero_subtitle, label: 問候副標（選填）, widget: string, required: false }
+      - name: hero_background
+        label: 首頁主視覺照片
+        widget: image
+        hint: 保留目前照片也可以；新圖片可直接選擇或上傳，不用自己寫路徑。
+      - { name: status_title, label: 狀態區標題, widget: string }
+      - name: status_tags
+        label: 狀態標籤（可新增和排序）
+        widget: list
+        summary: '{{text}}'
+        fields:
+          - { name: text, label: 標籤文字, widget: string }
+          - name: style
+            label: 標籤顏色
+            widget: select
+            options:
+              - { label: 藍色（特選）, value: admissions }
+              - { label: 紫色（網站）, value: website }
+              - { label: 綠色（學習）, value: learning }
+      - { name: status_description, label: 目前狀態文字, widget: text }
+      - { name: pinned_title, label: 置頂文章區標題, widget: string }
+      - { name: pinned_empty, label: 沒有置頂文章時的文字, widget: string }
+      - { name: recent_title, label: 最近更新區標題, widget: string }
+      - { name: recent_empty, label: 沒有文章時的文字, widget: string }
+      - { name: blog_link_label, label: 查看文章連結文字, widget: string }
+
+  - name: about
+    label: 關於我
+    icon: person
+    file: src/content/about.md
+    format: yaml-frontmatter
+    preview_path: /about/
+    fields:
+      - { name: page_title, label: 頁面標題, widget: string }
+      - name: profile
+        label: 左側個人資訊
+        widget: object
+        fields:
+          - { name: name, label: 顯示名稱, widget: string }
+          - { name: note, label: 舊備註（目前未顯示）, widget: string, required: false }
+          - name: links
+            label: 原有社群資料（目前未顯示）
+            widget: list
+            required: false
+            summary: '{{label}}'
+            fields:
+              - { name: icon, label: 圖示代碼, widget: string, required: false }
+              - { name: label, label: 名稱, widget: string, required: false }
+              - { name: text, label: 文字, widget: string, required: false }
+              - { name: url, label: 連結, widget: string, required: false }
+          - { name: avatar_image, label: 個人照片, widget: image, required: false }
+          - { name: specialties, label: 專長（可排序）, widget: list, required: false }
+      - name: navigation
+        label: 原有區塊名稱資料（目前未顯示）
+        widget: object
+        required: false
+        fields:
+          - { name: intro, label: 自介名稱, widget: string, required: false }
+          - { name: interests, label: 興趣名稱, widget: string, required: false }
+          - { name: website, label: 網站名稱, widget: string, required: false }
+      - { name: interests_title, label: 興趣區標題, widget: string }
+      - name: interests
+        label: 興趣卡片
+        widget: list
+        summary: '{{title}}'
+        fields:
+          - name: icon
+            label: 圖示
+            widget: select
+            options:
+              - { label: 程式, value: code }
+              - { label: 棒球, value: baseball }
+              - { label: 撞球, value: billiards }
+              - { label: 動漫, value: anime }
+              - { label: 遊戲, value: game }
+              - { label: 其他, value: other }
+          - { name: title, label: 名稱, widget: string }
+          - { name: description, label: 內容, widget: text, required: false }
+      - name: website
+        label: 關於這個網站
+        widget: object
+        fields:
+          - { name: title, label: 區塊標題, widget: string }
+          - { name: description, label: 內容, widget: text }
+          - { name: link_text, label: 連結文字, widget: string, required: false }
+          - { name: link_url, label: 連結網址, widget: string, required: false }
+      - name: timelines
+        label: 時間軸
+        widget: list
+        summary: '{{title}}'
+        fields:
+          - { name: id, label: 區塊代碼（請不要修改）, widget: string, readonly: true, required: false }
+          - { name: title, label: 區塊標題, widget: string }
+          - name: items
+            label: 事件（可新增、排序）
+            widget: list
+            summary: '{{when}}：{{event}}'
+            fields:
+              - { name: when, label: 時間, widget: string }
+              - { name: event, label: 事件名稱, widget: text }
+              - { name: url, label: 點擊前往網址（選填）, widget: string, required: false }
+              - { name: result, label: 右側狀態（選填）, widget: string, required: false }
+      - { name: body, label: 自我介紹正文, widget: richtext, required: false }
+
+collections:
+  - name: posts
+    label: 文章
+    label_singular: 文章
+    icon: article
+    folder: src/content/blog
+    create: true
+    extension: md
+    format: yaml-frontmatter
+    summary: '{{title}}'
+    sortable_fields:
+      fields: [date, title]
+      default:
+        field: date
+        direction: descending
+    fields:
+      - { name: title, label: 標題, widget: string }
+      - { name: date, label: 發布日期, widget: datetime }
+      - { name: updated, label: 更新日期（選填）, widget: datetime, required: false }
+      - { name: description, label: 摘要（選填）, widget: text, required: false }
+      - { name: draft, label: 草稿（啟用即不公開）, widget: boolean, default: true }
+      - { name: pinned, label: 首頁置頂文章, widget: boolean, default: false }
+      - name: categories
+        label: 分類（發布前需選一個）
+        widget: list
+        min: 0
+        max: 1
+        required: false
+      - { name: tags, label: 標籤（發布前至少一個）, widget: list, required: false }
+      - name: body
+        label: 文章內容（可插入圖片、程式碼、表格）
+        widget: richtext
+        required: false
+        hint: 可用工具列插入圖片、程式碼和表格，也能貼上或拖曳圖片。需要時可切到 Markdown 原始碼。
+
+  - name: works
+    label: 作品
+    label_singular: 作品
+    icon: work
+    folder: src/content/works
+    create: true
+    extension: md
+    format: yaml-frontmatter
+    summary: '{{title}}'
+    sortable_fields:
+      fields: [date, title]
+      default:
+        field: date
+        direction: descending
+    fields:
+      - { name: title, label: 作品名稱, widget: string }
+      - { name: date, label: 發布日期, widget: datetime }
+      - { name: updated, label: 更新日期（選填）, widget: datetime, required: false }
+      - { name: description, label: 摘要（選填）, widget: text, required: false }
+      - { name: draft, label: 草稿（啟用即不公開）, widget: boolean, default: true }
+      - { name: pinned, label: 置頂, widget: boolean, default: false }
+      - { name: tags, label: 標籤, widget: list, required: false }
+      - { name: body, label: 作品內容, widget: richtext, required: false }

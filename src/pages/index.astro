@@ -6,12 +6,17 @@ import PostListItem from '../components/PostListItem.astro';
 import SectionHeader from '../components/SectionHeader.astro';
 import { heroConfig, locale, siteDescription, siteTitle } from '../config';
 import { getBlogPosts } from '../lib/content/blog';
+import homepage from '../data/homepage.json';
 
 const posts = await getBlogPosts();
 const siteURL = Astro.site ?? Astro.url;
 const pinnedPosts = posts.filter((post) => post.data.pinned);
 const recentPosts = posts.filter((post) => !post.data.pinned).slice(0, 1);
-const homeHero = heroConfig.home;
+const homeHero = {
+  text: homepage.hero_title,
+  subtitle: homepage.hero_subtitle,
+  backgroundImage: homepage.hero_background || heroConfig.home.backgroundImage,
+};
 const webSiteSchema = {
   '@context': 'https://schema.org',
   '@type': 'WebSite',
@@ -370,17 +375,17 @@ const webSiteSchema = {
     <ContentCard id="stats-card">
       <div class="stats-container">
         <div class="status-heading">
-          <h2>目前狀態</h2>
+          <h2>{homepage.status_title}</h2>
           <div class="status-tags" aria-label="目前狀態標籤">
-            <span class="status-tag admissions">特殊選才</span>
-            <span class="status-tag website">網站開發</span>
-            <span class="status-tag learning">程式學習</span>
+            {homepage.status_tags.map((tag) => (
+              <span class:list={['status-tag', tag.style]}>{tag.text}</span>
+            ))}
           </div>
         </div>
-        <p class="now-description">最近在整理特殊選才的準備和面試心得，也在慢慢把這個網站做好。</p>
+        <p class="now-description">{homepage.status_description}</p>
 
         <div class="pinned-posts-section">
-          <SectionHeader title="置頂文章" />
+          <SectionHeader title={homepage.pinned_title} />
           {pinnedPosts.length > 0 ? (
             <div class="home-posts-list">
               {pinnedPosts.map((post) => (
@@ -399,12 +404,12 @@ const webSiteSchema = {
               ))}
             </div>
           ) : (
-            <p class="pinned-empty">目前還沒有置頂文章。</p>
+            <p class="pinned-empty">{homepage.pinned_empty}</p>
           )}
         </div>
 
         <div class="recent-posts-section">
-          <SectionHeader title="最近更新" />
+          <SectionHeader title={homepage.recent_title} />
 
           {recentPosts.length > 0 ? (
             <>
@@ -424,12 +429,10 @@ const webSiteSchema = {
                   />
                 ))}
               </div>
-              <a href="/blog" class="blog-link" style="margin-top: 1em;">查看全部文章 ⇗</a>
+              <a href="/blog" class="blog-link" style="margin-top: 1em;">{homepage.blog_link_label}</a>
             </>
           ) : (
-            <p class="empty-state">
-              目前還沒有文章。
-            </p>
+            <p class="empty-state">{homepage.recent_empty}</p>
           )}
         </div>
       </div>
