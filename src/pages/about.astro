@@ -9,9 +9,6 @@ interface AboutPageData {
   profile: {
     name: string;
     avatar_image?: string;
-    tagline: string;
-    note: string;
-    links: Array<{ icon: string; label: string; text: string; url: string }>;
   };
   navigation: { intro: string; interests: string; website: string };
   interests_title: string;
@@ -53,43 +50,8 @@ const about = frontmatter as AboutPageData;
 
         <div class="info-content">
           <h2 class="name">{about.profile.name}</h2>
-          <p class="title">{about.profile.tagline}</p>
         </div>
       </div>
-
-      <div class="sidebar-separator" aria-hidden="true"></div>
-
-      <div class="sidebar-details">
-        {about.profile.links.map((link) => (
-          <a
-            class="sidebar-link"
-            href={link.url}
-            target={link.url.startsWith('https://') ? '_blank' : undefined}
-            rel={link.url.startsWith('https://') ? 'noopener noreferrer' : undefined}
-            data-astro-prefetch={link.url.startsWith('/') ? 'viewport' : undefined}
-          >
-            <span class="sidebar-link-icon" aria-hidden="true">
-              {link.icon === 'github' ? (
-                <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
-                  <circle cx="12" cy="12" r="9"/><path d="M9 19v-2.5a3 3 0 0 1-1-1.5c-3 .2-3-1.5-4-2"/><path d="M15 19v-2.5a3 3 0 0 0 1.5-2.8c0-1-.2-1.6-.7-2.1.2-1.1.1-1.7-.2-2.4-1 0-1.5.3-2.2.8a9 9 0 0 0-3 0c-.7-.5-1.3-.8-2.2-.8-.3.7-.4 1.3-.2 2.4-.5.5-.7 1.1-.7 2.1a3 3 0 0 0 1.5 2.8"/>
-                </svg>
-              ) : link.icon === 'article' ? (
-                <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M4 4.5A2.5 2.5 0 0 1 6.5 2H20v18H6.5A2.5 2.5 0 0 0 4 22z"/><path d="M4 4.5V19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M9 8h7M9 12h5"/>
-                </svg>
-              ) : <span>↗</span>}
-            </span>
-            <span class="sidebar-link-text">
-              <span class="sidebar-label">{link.label}</span>
-              <span class="sidebar-value">{link.text}</span>
-            </span>
-            <span class="sidebar-arrow" aria-hidden="true">↗</span>
-          </a>
-        ))}
-      </div>
-
-      <div class="sidebar-separator sidebar-separator--bottom" aria-hidden="true"></div>
-      <p class="sidebar-note">{about.profile.note}</p>
     </aside>
 
     <div class="vcard-main-content">
@@ -227,7 +189,7 @@ const about = frontmatter as AboutPageData;
   .vcard-sidebar {
     position: sticky;
     top: 88px;
-    padding: 38px 26px 24px;
+    padding: 30px 22px;
   }
 
   .sidebar-info {
@@ -236,7 +198,6 @@ const about = frontmatter as AboutPageData;
     align-items: center;
     gap: 17px;
   }
-
   .avatar-box {
     display: grid;
     place-items: center;
@@ -248,7 +209,6 @@ const about = frontmatter as AboutPageData;
     border: 1px solid rgba(145, 175, 207, .22);
     overflow: hidden;
   }
-
   .avatar-box img {
     display: block;
     width: 100%;
@@ -256,10 +216,9 @@ const about = frontmatter as AboutPageData;
     object-fit: cover;
     object-position: center;
   }
-
   .info-content { min-width: 0; text-align: center; }
   .info-content .name {
-    margin: 0 0 12px;
+    margin: 0;
     color: var(--vcard-text);
     font-size: 1.55rem;
     line-height: 1.3;
@@ -267,73 +226,7 @@ const about = frontmatter as AboutPageData;
     letter-spacing: -.025em;
   }
 
-  .info-content .title {
-    width: fit-content;
-    margin: 0 auto;
-    padding: 5px 13px;
-    border-radius: 8px;
-    background: transparent;
-    border: 1px solid rgba(145, 175, 207, .24);
-    color: #e6e8eb;
-    font-size: .78rem;
-    font-weight: 400;
-  }
-
-  .sidebar-separator {
-    width: 100%;
-    height: 1px;
-    margin: 28px 0;
-    background: var(--vcard-jet);
-  }
-  .sidebar-separator--bottom { margin-bottom: 17px; }
-
-  .sidebar-details {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-  }
-
-  .sidebar-link {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    min-width: 0;
-    color: var(--vcard-text);
-    text-decoration: none;
-  }
-
-  .sidebar-link-icon {
-    position: relative;
-    display: grid;
-    flex: none;
-    place-items: center;
-    width: 42px;
-    height: 42px;
-    border-radius: 12px;
-    color: var(--vcard-accent);
-    background: transparent;
-    border: 1px solid rgba(145, 175, 207, .28);
-    box-shadow: none;
-  }
-
-  .sidebar-link-icon::before {
-    content: '';
-    position: absolute;
-    inset: 1px;
-    border-radius: inherit;
-    background: transparent;
-    z-index: 0;
-  }
-  .sidebar-link-icon svg { position: relative; z-index: 1; }
-  .sidebar-link-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
-  .sidebar-label { color: #b8b8bd; font-size: .69rem; font-weight: 500; letter-spacing: .065em; }
-  .sidebar-value { color: #fafafa; font-size: .87rem; overflow-wrap: anywhere; }
-  .sidebar-arrow { color: var(--vcard-accent); margin-left: auto; opacity: .6; }
-  .sidebar-link:hover .sidebar-value,
-  .sidebar-link:focus-visible .sidebar-value { color: var(--vcard-accent); }
-  .sidebar-note { color: #a9abb2; margin: 0; text-align: center; font-size: .84rem; }
-
-  .vcard-main-content { position: relative; min-width: 0; }
+    .vcard-main-content { position: relative; min-width: 0; }
   .vcard-article {
     min-height: 520px;
     padding: 88px clamp(24px, 4vw, 38px) 38px;
@@ -579,22 +472,13 @@ const about = frontmatter as AboutPageData;
     .sidebar-info { flex-direction: row; gap: 20px; justify-content: flex-start; }
     .avatar-box { width: 92px; height: 92px; flex: 0 0 92px; }
     .info-content { text-align: left; }
-    .info-content .title { margin: 0; }
-    .sidebar-separator { margin: 18px 0; }
-    .sidebar-separator--bottom { display: none; }
-    .sidebar-details { flex-direction: row; flex-wrap: wrap; gap: 16px 26px; }
-    .sidebar-note { display: none; }
   }
 
   @media (max-width: 620px) {
     .vcard-page { padding: 98px 14px 66px; gap: 14px; }
     .vcard-sidebar { padding: 18px; border-radius: 17px; }
     .avatar-box { flex-basis: 68px; width: 68px; height: 68px; border-radius: 14px; }
-    .info-content .name { font-size: 1.3rem; margin-bottom: 7px; }
-    .info-content .title { font-size: .72rem; padding: 4px 8px; }
-    .sidebar-details { gap: 16px; }
-    .sidebar-link-icon { width: 36px; height: 36px; }
-    .sidebar-link { width: 100%; }
+    .info-content .name { font-size: 1.3rem; }
     .vcard-navbar {
       position: static;
       justify-content: center;
