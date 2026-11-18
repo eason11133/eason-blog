@@ -58,6 +58,9 @@ timelines:
       - when: 2025 3 月
         event: 公共廁所 LINE Bot
         result: 已上線
+      - when: 2021 ~ 2024
+        event: 體育班生涯
+        result: 結束啦
   - id: about-now
     title: 最近在忙
     items:
