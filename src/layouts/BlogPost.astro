@@ -22,6 +22,9 @@ interface Props extends BlogPostData {
 	readingTime?: number;
 	seoDescription?: string;
 	loadKatexStyles?: boolean;
+	backHref?: string;
+	backLabel?: string;
+	workMode?: boolean;
 }
 
 const {
@@ -37,6 +40,9 @@ const {
 	readingTime,
 	seoDescription,
 	loadKatexStyles = false,
+	backHref = '/blog/',
+	backLabel = '所有文章',
+	workMode = false,
 } = Astro.props as Props;
 const metaDescription = (seoDescription || description || title).trim();
 const siteURL = Astro.site ?? Astro.url;
@@ -56,7 +62,7 @@ const authorName = profileConfig.name || siteTitle;
 const authorUrl = new URL('/about/', siteURL).toString();
 const articleSchema = {
 	'@context': 'https://schema.org',
-	'@type': 'BlogPosting',
+	'@type': workMode ? 'CreativeWork' : 'BlogPosting',
 	'@id': `${canonicalURL}#article`,
 	mainEntityOfPage: canonicalURL,
 	headline: title,
@@ -637,7 +643,7 @@ const articleSchema = {
 	</Fragment>
 	<header class="post-head">
       <div class="post-head-content">
-        <a class="post-back-link" href="/blog/">← 所有文章</a>
+        <a class="post-back-link" href={backHref}>← {backLabel}</a>
         <InteriorHeading title={title} />
         <div class="hero-meta">
 				{import.meta.env.DEV && draft && (

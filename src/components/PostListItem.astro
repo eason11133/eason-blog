@@ -4,7 +4,7 @@ import DraftBadge from './DraftBadge.astro';
 import PostMeta from './PostMeta.astro';
 
 interface Props {
-	post: CollectionEntry<'blog'>;
+	post: CollectionEntry<'blog'> | CollectionEntry<'works'>;
 	titleTag?: 'h2' | 'h3';
 	articleClass?: string;
 	titleClass?: string;
@@ -18,6 +18,8 @@ interface Props {
 	tagLinkClass?: string;
 	showCategories?: boolean;
 	showTags?: boolean;
+	hrefBase?: string;
+	tagLinks?: boolean;
 }
 
 const {
@@ -35,6 +37,8 @@ const {
 	tagLinkClass = 'tag-link',
 	showCategories = true,
 	showTags = true,
+	hrefBase = '/blog',
+	tagLinks = true,
 } = Astro.props;
 
 const TitleTag = titleTag;
@@ -42,7 +46,7 @@ const TitleTag = titleTag;
 
 <article class={articleClass}>
 	<TitleTag class={titleClass}>
-		<a href={`/blog/${post.id}/`} data-astro-prefetch="viewport">{post.data.title}</a>
+		<a href={`${hrefBase}/${post.id}/`} data-astro-prefetch="viewport">{post.data.title}</a>
 		<DraftBadge draft={post.data.draft} />
 	</TitleTag>
 	{showExcerpt && excerpt && <p class={excerptClass}>{excerpt}</p>}
@@ -53,6 +57,7 @@ const TitleTag = titleTag;
 		tagLimit={tagLimit}
 		showCategories={showCategories}
 		showTags={showTags}
+		tagLinks={tagLinks}
 		containerClass={metaContainerClass}
 		itemClass={metaItemClass}
 		tagsClass={metaTagsClass}
