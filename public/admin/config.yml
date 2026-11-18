@@ -139,7 +139,6 @@ collections:
     create: true
     extension: md
     format: yaml-frontmatter
-    path: '{{year}}-{{month}}-{{day}}-{{slug}}'
     summary: '{{title}}'
     sortable_fields:
       fields: [date, title]
@@ -174,7 +173,6 @@ collections:
     create: true
     extension: md
     format: yaml-frontmatter
-    path: '{{year}}-{{month}}-{{day}}-{{slug}}'
     summary: '{{title}}'
     sortable_fields:
       fields: [date, title]
