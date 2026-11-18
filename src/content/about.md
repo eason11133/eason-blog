@@ -41,15 +41,15 @@ timelines:
   - id: about-projects
     title: 做過的事
     items:
-      - when: 2025 3 月
-        event: 公共廁所 LINE Bot
-        result: 已上線
       - when: 2026 11 月
         event: 個人網站
         result: 持續更新
       - when: 2026 2 ~ 9 月
         event: 野灣救傷中心搜尋系統
         result: "NGO 合作 "
+      - when: 2025 3 月
+        event: 公共廁所 LINE Bot
+        result: 已上線
   - id: about-now
     title: 最近在忙
     items:
