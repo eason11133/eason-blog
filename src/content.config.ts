@@ -1,6 +1,7 @@
 import { defineCollection } from 'astro:content';
 import { glob } from 'astro/loaders';
 import { blogFrontmatterSchema } from './lib/content/frontmatter-schema';
+import { workFrontmatterSchema } from './lib/content/work-frontmatter-schema';
 
 const blog = defineCollection({
 	// Load Markdown and MDX files in the `src/content/blog/` directory.
@@ -9,10 +10,10 @@ const blog = defineCollection({
 	schema: blogFrontmatterSchema,
 });
 
-// Works use the same article format and reading layout, but a separate content folder.
+// Works share the article layout, but have no mandatory category or tags.
 const works = defineCollection({
 	loader: glob({ base: './src/content/works', pattern: '**/*.{md,mdx}' }),
-	schema: blogFrontmatterSchema,
+	schema: workFrontmatterSchema,
 });
 
 export const collections = { blog, works };
