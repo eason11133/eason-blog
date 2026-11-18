@@ -408,3 +408,73 @@ html[data-theme="dark"] body[data-page-id="tag-detail"] .tags-cloud .tag-pill,
 html[data-theme="dark"] body[data-page-id="tag-detail"] .tag-panel .post-item-tag-badge {
   text-shadow: 0 1px 2px rgba(5, 19, 39, .6);
 }
+
+
+/* Homepage recent-updates frame parity:
+ * The live homepage #stats-card uses an outline-only, fully transparent card.
+ * Repeat that exact fill/line/shadow treatment on existing panels only.
+ * No selector may target [data-page-id="home"] and no new opaque layer. */
+html[data-theme="dark"] body[data-page-id="blog-list"] .articles-inner,
+html[data-theme="dark"] body[data-page-id="about"] .vcard-sidebar,
+html[data-theme="dark"] body[data-page-id="about"] .vcard-article,
+html[data-theme="dark"] body[data-page-id="about"] .timeline-panel,
+html[data-theme="dark"] body[data-page-id="about"] .service-item,
+html[data-theme="dark"] body[data-page-id="post"] .layout-container > .content-card {
+  background: transparent !important;
+  background-image: none !important;
+  border: 1px solid rgba(159, 197, 229, .14) !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* The article, works and both tag archives share the same .articles-inner. */
+html[data-theme="dark"] body[data-page-id="blog-list"] .articles-inner {
+  border-radius: 24px !important;
+  padding: clamp(1.5rem, 3.2vw, 3rem) !important;
+}
+
+/* Keep About's existing two-column layout, margins and nested card shapes. */
+html[data-theme="dark"] body[data-page-id="about"] .vcard-sidebar,
+html[data-theme="dark"] body[data-page-id="about"] .vcard-article,
+html[data-theme="dark"] body[data-page-id="about"] .timeline-panel {
+  border-radius: 20px !important;
+}
+html[data-theme="dark"] body[data-page-id="about"] .service-item {
+  border-radius: 14px !important;
+}
+
+/* The article/work reader has its own card: use the homepage outline
+   without reintroducing the previous solid blue/blurred background. */
+html[data-theme="dark"] body[data-page-id="post"] .layout-container > .content-card {
+  border-radius: 24px !important;
+  padding: clamp(1.5rem, 3.2vw, 3rem) !important;
+}
+
+/* The homepage recent item only receives a blue-toned surface on hover. */
+html[data-theme="dark"] body[data-page-id="blog-list"] .articles-list > .scroll-reveal::before {
+  background: rgba(14, 25, 49, .48) !important;
+  border-color: rgba(157, 186, 234, .16) !important;
+  box-shadow: none !important;
+}
+
+@media (max-width: 620px) {
+  html[data-theme="dark"] body[data-page-id="blog-list"] .articles-inner,
+  html[data-theme="dark"] body[data-page-id="post"] .layout-container > .content-card {
+    border-radius: 17px !important;
+    padding: 1.25rem !important;
+  }
+  html[data-theme="dark"] body[data-page-id="about"] .vcard-sidebar,
+  html[data-theme="dark"] body[data-page-id="about"] .vcard-article,
+  html[data-theme="dark"] body[data-page-id="about"] .timeline-panel {
+    border-radius: 17px !important;
+  }
+}
+@media print {
+  html[data-theme="dark"] body[data-page-id="post"] .layout-container > .content-card {
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+  }
+}
