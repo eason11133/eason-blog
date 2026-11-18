@@ -10,8 +10,8 @@ export const blogFrontmatterSchema = z
 		description: nonEmptyText.optional(),
 		draft: z.boolean().optional().default(false),
 		pinned: z.boolean().optional().default(false),
-		categories: z.array(nonEmptyText),
-		tags: z.array(nonEmptyText),
+		categories: z.array(nonEmptyText).optional().default([]),
+		tags: z.array(nonEmptyText).optional().default([]),
 	})
 	.strict()
 	.superRefine((data, context) => {
