@@ -33,7 +33,8 @@ interests:
     description: 有興趣的會看一下，沒有看很多
 website:
   title: 關於這個網站
-  description: 這裡主要放文章和一些自己做的東西。目前先整理特殊選才的準備、面試和上機考心得。
+  description: |
+    這裡主要放一些文章阿、分享一些日常瑣事，然後希望可以交朋友
   link_text: 去看文章
   link_url: /blog/
 timelines:
