@@ -9,8 +9,8 @@ const subpath = pathname.match(/[^\/]+/g);
 const isActive = href === pathname || href === '/' + (subpath?.[0] || '');
 ---
 
-<a href={href} data-astro-prefetch="viewport" class:list={[className, { active: isActive }]} {...props}>
-	<slot />
+<a href={href} data-astro-prefetch="viewport" class:list={[className, { active: isActive }]} aria-current={isActive ? 'page' : undefined} {...props}>
+	<span class="nav-link-label"><slot /></span>
 </a>
 <style>
 	a {
@@ -19,6 +19,21 @@ const isActive = href === pathname || href === '/' + (subpath?.[0] || '');
 	}
 	a.active {
 		font-weight: bolder;
-		text-decoration: underline;
+	}
+	/* The same text-width underline used by article headings, not a nav dot. */
+	.nav-link-label {
+		display: inline-block;
+		padding-bottom: 2px;
+		background-image: linear-gradient(var(--accent), var(--accent));
+		background-position: 0 100%;
+		background-repeat: no-repeat;
+		background-size: 0% 2px;
+		transition: background-size .3s cubic-bezier(.25, .46, .45, .94);
+	}
+	a:is(:hover, :focus-visible, .active) .nav-link-label {
+		background-size: 100% 2px;
+	}
+	@media (prefers-reduced-motion: reduce) {
+		.nav-link-label { transition: none; }
 	}
 </style>
