@@ -190,9 +190,13 @@ content:
       - name: body
         label: 文章內容
         type: rich-text
+        description: 直接在編輯模式寫正文；點圖片工具可選擇或上傳圖片。程式碼等特殊格式可切換 Source 模式。
         options:
           format: markdown
           switcher: true
+          path: public/image
+          categories: [image]
+          rename: safe
 
 
   - name: works

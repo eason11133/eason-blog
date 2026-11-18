@@ -30,7 +30,7 @@ const isActive = href === pathname || href === '/' + (subpath?.[0] || '');
 		background-size: 0% 2px;
 		transition: background-size .3s cubic-bezier(.25, .46, .45, .94);
 	}
-	a:is(:hover, :focus-visible, .active) .nav-link-label {
+	a:is(:hover, :focus-visible) .nav-link-label {
 		background-size: 100% 2px;
 	}
 	@media (prefers-reduced-motion: reduce) {
