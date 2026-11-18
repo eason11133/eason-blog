@@ -8,7 +8,7 @@ interface AboutPageData {
   page_title: string;
   profile: {
     name: string;
-    avatar_initial: string;
+    avatar_image?: string;
     tagline: string;
     note: string;
     links: Array<{ icon: string; label: string; text: string; url: string }>;
@@ -18,7 +18,7 @@ interface AboutPageData {
   interests: Array<{ icon: string; title: string; description: string }>;
   website: { title: string; description: string; link_text: string; link_url: string };
   timelines: Array<{
-    id: string;
+    id?: string;
     title: string;
     items: Array<{ when: string; event: string; result?: string }>;
   }>;
@@ -38,9 +38,18 @@ const about = frontmatter as AboutPageData;
   <main class="vcard-page">
     <aside class="vcard-sidebar" aria-label={`${about.profile.name} 個人資訊`}>
       <div class="sidebar-info">
-        <figure class="avatar-box" aria-label={`${about.profile.name} 字母頭像`}>
-          <span aria-hidden="true">{about.profile.avatar_initial}</span>
-        </figure>
+        {about.profile.avatar_image && (
+          <figure class="avatar-box">
+            <img
+              src={about.profile.avatar_image}
+              alt={`${about.profile.name} 的照片`}
+              width="132"
+              height="132"
+              loading="lazy"
+              decoding="async"
+            />
+          </figure>
+        )}
 
         <div class="info-content">
           <h2 class="name">{about.profile.name}</h2>
@@ -149,9 +158,9 @@ const about = frontmatter as AboutPageData;
         </section>
       </section>
 
-      {about.timelines.map((timeline) => (
-        <section class="timeline-panel" id={timeline.id} aria-labelledby={`${timeline.id}-title`}>
-          <h3 class="timeline-title" id={`${timeline.id}-title`}>
+      {about.timelines.map((timeline, index) => (
+        <section class="timeline-panel" id={timeline.id || `about-timeline-${index + 1}`} aria-labelledby={`${timeline.id || `about-timeline-${index + 1}`}-title`}>
+          <h3 class="timeline-title" id={`${timeline.id || `about-timeline-${index + 1}`}-title`}>
             <span aria-hidden="true"></span>{timeline.title}
           </h3>
           <ol class="timeline-list">
@@ -240,18 +249,12 @@ const about = frontmatter as AboutPageData;
     overflow: hidden;
   }
 
-  .avatar-box span {
-    display: grid;
-    place-items: center;
-    width: 103px;
-    height: 103px;
-    border-radius: 50%;
-    background: transparent;
-    color: #e7f1fa;
-    font-size: 3.55rem;
-    line-height: 1;
-    font-weight: 700;
-    letter-spacing: -.055em;
+  .avatar-box img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
   }
 
   .info-content { min-width: 0; text-align: center; }
@@ -575,7 +578,6 @@ const about = frontmatter as AboutPageData;
     }
     .sidebar-info { flex-direction: row; gap: 20px; justify-content: flex-start; }
     .avatar-box { width: 92px; height: 92px; flex: 0 0 92px; }
-    .avatar-box span { width: 74px; height: 74px; font-size: 2.7rem; }
     .info-content { text-align: left; }
     .info-content .title { margin: 0; }
     .sidebar-separator { margin: 18px 0; }
@@ -588,7 +590,6 @@ const about = frontmatter as AboutPageData;
     .vcard-page { padding: 98px 14px 66px; gap: 14px; }
     .vcard-sidebar { padding: 18px; border-radius: 17px; }
     .avatar-box { flex-basis: 68px; width: 68px; height: 68px; border-radius: 14px; }
-    .avatar-box span { width: 52px; height: 52px; font-size: 2rem; }
     .info-content .name { font-size: 1.3rem; margin-bottom: 7px; }
     .info-content .title { font-size: .72rem; padding: 4px 8px; }
     .sidebar-details { gap: 16px; }
