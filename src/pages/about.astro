@@ -138,12 +138,10 @@ const about = frontmatter as AboutPageData;
             {timeline.items.map((item) => (
               <li class="timeline-row">
                 <span class="timeline-when">{item.when}</span>
-                {item.url && /^(\/[^/]|https?:\/\/)/.test(item.url) ? (
+                {item.url?.startsWith('/') && !item.url.startsWith('//') ? (
                   <a
                     class="timeline-event timeline-event-link"
                     href={item.url}
-                    target={/^https?:\/\//.test(item.url) ? '_blank' : undefined}
-                    rel={/^https?:\/\//.test(item.url) ? 'noopener noreferrer' : undefined}
                     aria-label={`${item.event}，查看更多`}
                   >{item.event}</a>
                 ) : <span class="timeline-event">{item.event}</span>}
