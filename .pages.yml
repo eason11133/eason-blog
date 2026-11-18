@@ -1,5 +1,5 @@
 # Pages CMS for eason-blog (Astro / ulBo).
-# Only this configuration file is added; existing posts and site components are untouched.
+# Edit About and articles in the Pages CMS UI; edits are committed to this repo.
 media:
   input: public/image
   output: /image
@@ -7,6 +7,164 @@ media:
   rename: safe
 
 content:
+  - name: about
+    label: 關於我
+    type: file
+    path: src/content/about.md
+    format: yaml-frontmatter
+    fields:
+      - name: page_title
+        label: 頁面標題
+        type: string
+        required: true
+      - name: profile
+        label: 左側個人資訊
+        type: object
+        fields:
+          - name: name
+            label: 顯示名稱
+            type: string
+          - name: avatar_image
+            label: 個人照片
+            type: image
+            description: 上傳圖片後會取代原本的 E 字母頭像；未上傳前不顯示頭像。
+            options:
+              categories: [image]
+              rename: safe
+          - name: tagline
+            label: 名字下面的小字
+            type: string
+          - name: note
+            label: 側欄底部短句
+            type: string
+          - name: links
+            label: 側欄連結
+            type: object
+            list:
+              collapsible:
+                collapsed: true
+                summary: "{text}"
+            fields:
+              - name: icon
+                label: 圖示
+                type: select
+                options:
+                  values:
+                    - name: github
+                      label: GitHub
+                    - name: article
+                      label: 文章
+                    - name: link
+                      label: 一般連結
+              - name: label
+                label: 分類小字
+                type: string
+              - name: text
+                label: 顯示文字
+                type: string
+              - name: url
+                label: 網址
+                type: string
+      - name: navigation
+        label: 右上角導航
+        type: object
+        fields:
+          - name: intro
+            label: 自介頁籤文字
+            type: string
+          - name: interests
+            label: 興趣頁籤文字
+            type: string
+          - name: website
+            label: 網站頁籤文字
+            type: string
+      - name: interests_title
+        label: 興趣區標題
+        type: string
+      - name: interests
+        label: 興趣卡片（可新增、刪除、排序）
+        type: object
+        list:
+          collapsible:
+            collapsed: true
+            summary: "{title}"
+        fields:
+          - name: icon
+            label: 圖示
+            type: select
+            options:
+              values:
+                - name: code
+                  label: 程式
+                - name: baseball
+                  label: 棒球
+                - name: billiards
+                  label: 撞球
+                - name: anime
+                  label: 動漫
+                - name: other
+                  label: 其他
+          - name: title
+            label: 名稱
+            type: string
+          - name: description
+            label: 簡短說明
+            type: text
+      - name: website
+        label: 關於這個網站
+        type: object
+        fields:
+          - name: title
+            label: 標題
+            type: string
+          - name: description
+            label: 內容
+            type: text
+          - name: link_text
+            label: 連結文字
+            type: string
+          - name: link_url
+            label: 連結網址
+            type: string
+      - name: timelines
+        label: 時間軸區塊（可新增、刪除、排序）
+        type: object
+        list:
+          collapsible:
+            collapsed: true
+            summary: "{title}"
+        fields:
+          - name: id
+            label: 區塊代碼（不用改）
+            type: string
+            readonly: true
+          - name: title
+            label: 區塊標題
+            type: string
+          - name: items
+            label: 時間軸事件（可新增、刪除、排序）
+            type: object
+            list:
+              collapsible:
+                collapsed: true
+                summary: "{event}"
+            fields:
+              - name: when
+                label: 時間／階段（左側）
+                type: string
+              - name: event
+                label: 事件內容（中間）
+                type: text
+              - name: result
+                label: 狀態或標記（右側，可空白）
+                type: string
+      - name: body
+        label: 自我介紹文字
+        type: rich-text
+        options:
+          format: markdown
+          switcher: true
+
   - name: posts
     label: 文章管理
     type: collection

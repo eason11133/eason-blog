@@ -5,7 +5,7 @@ page_title: 關於我
 
 profile:
   name: Eason
-  avatar_initial: E
+  avatar_image: '' # 個人照片會從後台上傳，尚未上傳時不顯示頭像
   tagline: 寫程式、棒球、撞球
   note: 偶爾在這裡寫點東西。
   links:
