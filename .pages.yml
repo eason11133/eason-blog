@@ -31,19 +31,6 @@ content:
             options:
               categories: [image]
               rename: safe
-      - name: navigation
-        label: 右上角導航
-        type: object
-        fields:
-          - name: intro
-            label: 自介頁籤文字
-            type: string
-          - name: interests
-            label: 興趣頁籤文字
-            type: string
-          - name: website
-            label: 網站頁籤文字
-            type: string
       - name: interests_title
         label: 興趣區標題
         type: string
@@ -68,6 +55,8 @@ content:
                   label: 撞球
                 - name: anime
                   label: 動漫
+                - name: game
+                  label: 遊戲
                 - name: other
                   label: 其他
           - name: title
