@@ -1,5 +1,5 @@
 # Pages CMS for eason-blog (Astro / ulBo).
-# Only this configuration file is added; existing posts and site components are untouched.
+# Edit About and articles in the Pages CMS UI; edits are committed to this repo.
 media:
   input: public/image
   output: /image
