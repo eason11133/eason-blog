@@ -13,6 +13,7 @@ profile:
       text: 文章
       url: /blog/
   avatar_image: /image/img202311202145460031.jpg
+  specialty: ''
 navigation:
   intro: 關於我
   interests: 興趣
