@@ -18,7 +18,7 @@ interface AboutPageData {
   timelines: Array<{
     id?: string;
     title: string;
-    items: Array<{ when: string; event: string; result?: string }>;
+    items: Array<{ when: string; event: string; result?: string; url?: string }>;
   }>;
 }
 
@@ -138,7 +138,15 @@ const about = frontmatter as AboutPageData;
             {timeline.items.map((item) => (
               <li class="timeline-row">
                 <span class="timeline-when">{item.when}</span>
-                <span class="timeline-event">{item.event}</span>
+                {item.url && /^(\/[^/]|https?:\/\/)/.test(item.url) ? (
+                  <a
+                    class="timeline-event timeline-event-link"
+                    href={item.url}
+                    target={/^https?:\/\//.test(item.url) ? '_blank' : undefined}
+                    rel={/^https?:\/\//.test(item.url) ? 'noopener noreferrer' : undefined}
+                    aria-label={`${item.event}，查看更多`}
+                  >{item.event}</a>
+                ) : <span class="timeline-event">{item.event}</span>}
                 {item.result && <span class="timeline-result">{item.result}</span>}
               </li>
             ))}
@@ -456,6 +464,25 @@ const about = frontmatter as AboutPageData;
   }
   .timeline-when { color: #aabbd0; font-size: .82rem; }
   .timeline-event { color: #e8eaed; min-width: 0; overflow-wrap: anywhere; }
+  .timeline-event-link {
+    display: inline;
+    width: fit-content;
+    text-decoration: underline;
+    text-decoration-color: rgba(166, 201, 232, .28);
+    text-decoration-thickness: 1px;
+    text-underline-offset: 4px;
+    transition: color .16s ease, text-decoration-color .16s ease;
+  }
+  .timeline-event-link:hover,
+  .timeline-event-link:focus-visible {
+    color: #b4d6f4;
+    text-decoration-color: currentColor;
+  }
+  .timeline-event-link:focus-visible {
+    outline: 2px solid #b4d6f4;
+    outline-offset: 3px;
+    border-radius: 3px;
+  }
   .timeline-result {
     color: #b4d6f4;
     text-align: right;
