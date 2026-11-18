@@ -11,6 +11,12 @@ display_url: https://eason-blog.vercel.app
 media_folder: /public/image
 public_folder: /image
 
+# Native image, syntax-highlighted code block, table, and divider tools.
+field_defaults:
+  richtext:
+    modes: [rich_text, raw]
+    editor_components: [code-block, image, table, hr]
+
 singletons:
   - name: homepage
     label: 首頁
@@ -59,8 +65,27 @@ singletons:
         widget: object
         fields:
           - { name: name, label: 顯示名稱, widget: string }
+          - { name: note, label: 舊備註（目前未顯示）, widget: string, required: false }
+          - name: links
+            label: 原有社群資料（目前未顯示）
+            widget: list
+            required: false
+            summary: '{{label}}'
+            fields:
+              - { name: icon, label: 圖示代碼, widget: string, required: false }
+              - { name: label, label: 名稱, widget: string, required: false }
+              - { name: text, label: 文字, widget: string, required: false }
+              - { name: url, label: 連結, widget: string, required: false }
           - { name: avatar_image, label: 個人照片, widget: image, required: false }
           - { name: specialties, label: 專長（可排序）, widget: list, required: false }
+      - name: navigation
+        label: 原有區塊名稱資料（目前未顯示）
+        widget: object
+        required: false
+        fields:
+          - { name: intro, label: 自介名稱, widget: string, required: false }
+          - { name: interests, label: 興趣名稱, widget: string, required: false }
+          - { name: website, label: 網站名稱, widget: string, required: false }
       - { name: interests_title, label: 興趣區標題, widget: string }
       - name: interests
         label: 興趣卡片
@@ -139,7 +164,7 @@ collections:
         label: 文章內容（可插入圖片、程式碼、表格）
         widget: richtext
         required: false
-        hint: 可用工具列或 / 指令插入圖片、程式碼、表格，支援直接貼上圖片。Markdown 原始碼可切換編輯。
+        hint: 可用工具列插入圖片、程式碼和表格，也能貼上或拖曳圖片。需要時可切到 Markdown 原始碼。
 
   - name: works
     label: 作品
