@@ -54,6 +54,7 @@ timelines:
         result: 進行中
       - when: 2026 2 ~ 9 月
         event: 野灣救傷中心搜尋系統
+        url: https://eason-blog.vercel.app/experience/2026-11-18--1/
         result: "NGO 合作 "
       - when: 2025 3 月
         event: 公共廁所 LINE Bot
