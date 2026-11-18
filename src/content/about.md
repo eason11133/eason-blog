@@ -48,18 +48,15 @@ timelines:
     items:
       - when: 2026 11 月
         event: 個人網站
-        url: https://github.com/eason11133/eason-blog
         result: 持續更新
       - when: 2026 7 月
         event: 各類小專案 (有興趣的可以點進去看)
-        url: https://eason-systems-studio.vercel.app/products
         result: 進行中
       - when: 2026 2 ~ 9 月
         event: 野灣救傷中心搜尋系統
         result: "NGO 合作 "
       - when: 2025 3 月
         event: 公共廁所 LINE Bot
-        url: https://github.com/eason11133/toilet-bot
         result: 已上線
       - when: 2021 ~ 2024
         event: 體育班生涯
