@@ -48,9 +48,6 @@ timelines:
         event: 野灣救傷中心搜尋系統
         result: NGO 合作
       - when: 2026 年
-        event: 成大上機考工具箱
-        result: 練習筆記
-      - when: 2026 年
         event: 這個個人網站
         result: 持續更新
   - id: about-now
