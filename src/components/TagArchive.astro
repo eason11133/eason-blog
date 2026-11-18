@@ -506,7 +506,7 @@ const visiblePosts = [...posts].sort((a, b) =>
       <InteriorHeading title={`#${tag}`} centered={true} animated={true} />
       <nav class="article-tags" aria-label={`${label}標籤`}>
         <a class="tag-filter all-tag" href={archiveUrl} data-astro-prefetch="viewport">
-          全部${label} <span>{totalCount}</span>
+          全部{label} <span>{totalCount}</span>
         </a>
         {sortedTags.map(([name, count]) => (
           <a
