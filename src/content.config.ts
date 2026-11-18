@@ -9,4 +9,10 @@ const blog = defineCollection({
 	schema: blogFrontmatterSchema,
 });
 
-export const collections = { blog };
+// Works use the same article format and reading layout, but a separate content folder.
+const works = defineCollection({
+	loader: glob({ base: './src/content/works', pattern: '**/*.{md,mdx}' }),
+	schema: blogFrontmatterSchema,
+});
+
+export const collections = { blog, works };
