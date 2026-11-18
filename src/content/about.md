@@ -50,7 +50,7 @@ timelines:
         event: 個人網站
         result: 持續更新
       - when: 2026 7 月
-        event: 各類小專案
+        event: 各類小專案 (有興趣的可以點進去看)
         result: 進行中
       - when: 2026 2 ~ 9 月
         event: 野灣救傷中心搜尋系統
