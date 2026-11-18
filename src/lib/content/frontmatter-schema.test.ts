@@ -17,6 +17,16 @@ describe('blogFrontmatterSchema', () => {
 		expect(result.updatedDate).toBeUndefined();
 	});
 
+	it('treats missing categories and tags in a CMS draft as empty arrays', () => {
+		const result = blogFrontmatterSchema.parse({
+			title: '新草稿',
+			date: '2026-11-18T10:00:00+08:00',
+			draft: true,
+		});
+		expect(result.categories).toEqual([]);
+		expect(result.tags).toEqual([]);
+	});
+
 	it('allows a draft to have no category or tags', () => {
 		const result = blogFrontmatterSchema.parse({
 			title: '空草稿',
