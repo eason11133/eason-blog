@@ -17,7 +17,6 @@ const { transparent = true } = Astro.props;
 			<HeaderLink href="/blog">文章</HeaderLink>
 			<HeaderLink href="/experience">作品</HeaderLink>
 			<HeaderLink href="/about">關於我</HeaderLink>
-			<div class="nav-indicator" id="nav-indicator"></div>
 		</div>
 		<div class="header-actions">
 			<button id="search-btn" class="search-btn" aria-label="搜索">
@@ -145,13 +144,7 @@ const { transparent = true } = Astro.props;
         position: relative;
     }
 
-    /* Stronger "Focus" Effect */
-    .internal-links:hover a {
-        opacity: 0.3; /* Increased transparency for non-hovered items (was 0.5) */
-        filter: blur(1px); /* Increased blur (was 0.5px) */
-        transform: scale(0.98); /* Slight shrink for non-focused items */
-        transition: opacity 0.3s, filter 0.3s, transform 0.3s;
-    }
+    /* Match article titles: keep neighboring links stable on hover. */
     
 	nav a {
 		padding: 1em 0.5em;
@@ -171,25 +164,9 @@ const { transparent = true } = Astro.props;
     .internal-links a:nth-child(3) { animation-delay: 0s; }
     .internal-links a:nth-child(4) { animation-delay: 0s; }
 
-    /* Active dot is now handled by .nav-indicator */
-
-    /* Sliding Nav Indicator */
-    .nav-indicator {
-        position: absolute;
-        bottom: 10px;
-        height: 4px;
-        background: var(--accent);
-        border-radius: 4px;
-        pointer-events: none;
-        will-change: transform, width, border-radius;
-        z-index: 5;
-    }
-
-    /* Refined Hover State */
-    .internal-links a:hover {
-        opacity: 1 !important;
-        filter: blur(0) !important;
-        transform: scale(1.05) translateY(-2px); /* Scale up focused item */
+    /* Same hover color as the article titles. Underline lives on the text span. */
+    .internal-links a:hover,
+    .internal-links a:focus-visible {
         color: var(--accent);
     }
 
@@ -430,9 +407,6 @@ const { transparent = true } = Astro.props;
 			display: none;
 		}
 
-		.nav-indicator {
-			display: none;
-		}
 
 		.mobile-menu-btn {
 			display: inline-flex;
@@ -490,9 +464,6 @@ const { transparent = true } = Astro.props;
 		color: var(--accent);
 	}
     
-    header.transparent .nav-indicator {
-        background: white;
-    }
 
     /* Scrolled state for transparent header - Enhanced Glassmorphism */
     header.transparent.scrolled {
@@ -511,9 +482,6 @@ const { transparent = true } = Astro.props;
         color: var(--black);
     }
 
-	header.transparent.scrolled .nav-indicator {
-		background: var(--accent);
-	}
 
 	
 
