@@ -291,135 +291,151 @@ html[data-theme="dark"] body[data-page-id="post"] .toc-container {
   }
 }
 
-/* Use the existing Eason header palette for article ink, metadata, and translucent chips.
-   Preview blog listing only. All geometry and interaction rules above remain. */
-html[data-theme="dark"] body[data-page-id="blog-list"] {
-  --blog-title-ink: #e8eaed;
-  --blog-title-hover: #e8eaed;
-  --blog-excerpt-ink: #e8eaed;
-  --blog-meta-ink: #e8eaed;
-  --blog-line-ink: #91afcf;
-  --blog-filter-ink: #e8eaed;
-  --blog-filter-count: #e8eaed;
-  --blog-filter-bg: rgba(145, 175, 207, .15);
-  --blog-filter-border: rgba(145, 175, 207, .24);
-  --blog-filter-hover: rgba(145, 175, 207, .22);
-  --blog-tag-ink: #e8eaed;
-  --blog-tag-bg: rgba(145, 175, 207, .15);
-  --blog-tag-hover: rgba(145, 175, 207, .22);
+/* Keep the original borderless content column. The homepage card's outer
+ * outline belongs to its section, not to every article/works/tag archive. */
+html[data-theme="dark"] body[data-page-id="blog-list"] .articles-inner {
+  background: transparent !important;
+  background-image: none !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  padding: 0 !important;
 }
-html[data-theme="dark"] body[data-page-id="blog-list"] .articles-list .blog-post-title,
-html[data-theme="dark"] body[data-page-id="blog-list"] .articles-list .blog-post-title a {
-  color: var(--blog-title-ink) !important;
+html[data-theme="dark"] body[data-page-id="post"] .layout-container > .content-card {
+  background: transparent !important;
+  background-image: none !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  padding: 0 !important;
+}
+
+/* All four listing routes share pageId=blog-list and PostListItem.
+ * Keep their excerpt, navigation and hover-lift behavior, but use the
+ * homepage's actual title, meta and tag styles instead of a second palette. */
+html[data-theme="dark"] body[data-page-id="blog-list"] .articles-list .blog-post-item {
+  position: relative;
+  padding: 1.2em 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  margin: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+html[data-theme="dark"] body[data-page-id="blog-list"] .articles-list .blog-post-title {
+  color: var(--color-text) !important;
+  font-size: 1.2em !important;
+  font-weight: 600 !important;
+  line-height: 1.4;
+  margin: 0 0 .5em !important;
 }
 html[data-theme="dark"] body[data-page-id="blog-list"] .articles-list .blog-post-title a {
-  background-image: linear-gradient(var(--blog-line-ink), var(--blog-line-ink)) !important;
+  color: var(--color-text) !important;
+  text-decoration: none;
+  background-image: linear-gradient(var(--accent), var(--accent)) !important;
+  background-position: 0 100%;
+  background-repeat: no-repeat;
+  background-size: 0% 2px;
+  padding-bottom: 2px;
+  transition: background-size .3s cubic-bezier(.25,.46,.45,.94), color .3s ease;
 }
 html[data-theme="dark"] body[data-page-id="blog-list"] .articles-list .blog-post-item:hover .blog-post-title a,
-html[data-theme="dark"] body[data-page-id="blog-list"] .articles-list .blog-post-title a:hover {
-  color: var(--blog-title-hover) !important;
+html[data-theme="dark"] body[data-page-id="blog-list"] .articles-list .blog-post-title a:hover,
+html[data-theme="dark"] body[data-page-id="blog-list"] .articles-list .blog-post-item:focus-within .blog-post-title a {
+  color: var(--accent) !important;
+  background-size: 100% 2px;
 }
 html[data-theme="dark"] body[data-page-id="blog-list"] .articles-list .blog-post-excerpt {
-  color: var(--blog-excerpt-ink) !important;
+  color: var(--color-text-secondary) !important;
+  font-size: .94rem;
+  line-height: 1.75;
 }
 html[data-theme="dark"] body[data-page-id="blog-list"] .articles-list .blog-post-meta {
-  color: var(--blog-meta-ink) !important;
+  color: var(--color-text-tertiary) !important;
+  display: flex;
+  align-items: center;
+  gap: 1em;
+  font-size: .85em;
+  flex-wrap: wrap;
 }
+html[data-theme="dark"] body[data-page-id="blog-list"] .articles-list .blog-post-meta-item {
+  display: flex;
+  align-items: center;
+  gap: .3em;
+  padding: 0;
+  color: inherit !important;
+}
+html[data-theme="dark"] body[data-page-id="blog-list"] .articles-list .blog-post-meta-item svg {
+  width: 14px;
+  height: 14px;
+}
+html[data-theme="dark"] body[data-page-id="blog-list"] .articles-list .blog-post-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .4em;
+}
+html[data-theme="dark"] body[data-page-id="blog-list"] .articles-list .blog-tag-link {
+  display: inline-flex;
+  align-items: center;
+  gap: .2em;
+  padding: 2px 8px;
+  background: var(--color-tag-bg) !important;
+  color: var(--color-tag-text) !important;
+  border: 0 !important;
+  border-radius: 4px;
+  font-size: .85em;
+  text-shadow: none !important;
+  box-shadow: none !important;
+  transition: background-color .3s cubic-bezier(.2,0,0,1), color .3s cubic-bezier(.2,0,0,1), transform .3s cubic-bezier(.2,0,0,1), box-shadow .3s cubic-bezier(.2,0,0,1);
+}
+html[data-theme="dark"] body[data-page-id="blog-list"] .articles-list .blog-tag-link:hover,
+html[data-theme="dark"] body[data-page-id="blog-list"] .articles-list .blog-tag-link:focus-visible {
+  color: white !important;
+  background: var(--accent) !important;
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 3px 8px rgba(var(--accent-rgb), .25) !important;
+}
+html[data-theme="dark"] body[data-page-id="blog-list"] .articles-list .blog-tag-link:active {
+  transform: translateY(0) scale(.97);
+}
+html[data-theme="dark"] body[data-page-id="blog-list"] .articles-list .blog-tag-link svg {
+  width: 12px;
+  height: 12px;
+}
+/* Filter chips follow the same homepage tag palette, while remaining filters. */
 html[data-theme="dark"] body[data-page-id="blog-list"] .article-tags .tag-filter {
-  color: var(--blog-filter-ink) !important;
-  background: var(--blog-filter-bg) !important;
-  border-color: var(--blog-filter-border) !important;
+  background: var(--color-tag-bg) !important;
+  color: var(--color-tag-text) !important;
+  border-color: var(--color-border-subtle) !important;
+  text-shadow: none !important;
 }
-html[data-theme="dark"] body[data-page-id="blog-list"] .article-tags .tag-filter:hover {
-  color: #e8eaed !important;
-  background: var(--blog-filter-hover) !important;
+html[data-theme="dark"] body[data-page-id="blog-list"] .article-tags .tag-filter:hover,
+html[data-theme="dark"] body[data-page-id="blog-list"] .article-tags .tag-filter:focus-visible {
+  background: var(--accent) !important;
+  color: white !important;
 }
-html[data-theme="dark"] body[data-page-id="blog-list"] .article-tags .tag-hash {
-  color: var(--blog-title-ink) !important;
-}
-html[data-theme="dark"] body[data-page-id="blog-list"] .article-tags .tag-count,
-html[data-theme="dark"] body[data-page-id="blog-list"] .article-tags .all-tag span {
-  color: var(--blog-filter-count) !important;
-}
-html[data-theme="dark"] body[data-page-id="blog-list"] .articles-list .blog-tag-link {
-  color: var(--blog-tag-ink) !important;
-  background: var(--blog-tag-bg) !important;
-}
-html[data-theme="dark"] body[data-page-id="blog-list"] .articles-list .blog-tag-link:hover {
-  color: #e8eaed !important;
-  background: var(--blog-tag-hover) !important;
-}
-/* Add a faint border without altering the existing tag dimensions. */
-html[data-theme="dark"] body[data-page-id="blog-list"] .articles-list .blog-tag-link {
-  box-shadow: inset 0 0 0 1px rgba(145, 175, 207, .24);
+html[data-theme="dark"] body[data-page-id="blog-list"] .article-tags .tag-filter:hover *,
+html[data-theme="dark"] body[data-page-id="blog-list"] .article-tags .tag-filter:focus-visible * {
+  color: inherit !important;
 }
 
-/* On individual tag pages, use the exact same three colors already in Eason's header. */
-html[data-theme="dark"] body[data-page-id="tag-detail"] .tag-post-title,
-html[data-theme="dark"] body[data-page-id="tag-detail"] .tag-post-title a {
-  color: #e8eaed !important;
-}
-html[data-theme="dark"] body[data-page-id="tag-detail"] .tag-post-title a {
-  background-image: linear-gradient(#91afcf, #91afcf) !important;
-}
-html[data-theme="dark"] body[data-page-id="tag-detail"] .tag-post-item:hover .tag-post-title a {
-  color: #e8eaed !important;
-}
-html[data-theme="dark"] body[data-page-id="tag-detail"] .tag-post-excerpt {
-  color: #e8eaed !important;
-}
-html[data-theme="dark"] body[data-page-id="tag-detail"] .tag-post-meta {
-  color: #e8eaed !important;
-}
-html[data-theme="dark"] body[data-page-id="tag-detail"] .tag-pill,
-html[data-theme="dark"] body[data-page-id="tag-detail"] .post-item-tag-badge {
-  color: #e8eaed !important;
-  background: rgba(145, 175, 207, .15) !important;
-  border-color: rgba(145, 175, 207, .24) !important;
-}
-html[data-theme="dark"] body[data-page-id="tag-detail"] .tag-pill:hover,
-html[data-theme="dark"] body[data-page-id="tag-detail"] .post-item-tag-badge:hover,
-html[data-theme="dark"] body[data-page-id="tag-detail"] .tag-pill.active-tag {
-  background: rgba(145, 175, 207, .22) !important;
-}
-html[data-theme="dark"] body[data-page-id="tag-detail"] .post-item-tag-badge {
-  box-shadow: inset 0 0 0 1px rgba(145, 175, 207, .24);
-}
-html[data-theme="dark"] body[data-page-id="tag-detail"] .tag-hash {
-  color: #e8eaed !important;
-}
-html[data-theme="dark"] body[data-page-id="tag-detail"] .tag-badge {
-  color: #e8eaed !important;
+/* Match the homepage's subtle on-hover surface; no panel at rest. */
+html[data-theme="dark"] body[data-page-id="blog-list"] .articles-list > .scroll-reveal::before {
+  background: rgba(14, 25, 49, .48) !important;
+  border-color: rgba(157, 186, 234, .16) !important;
+  box-shadow: none !important;
 }
 
-/* Keep all small copy and badges on the same Eason text tone as the titles.
-   Tags use the underline blue at 15% opacity so the night sky remains visible. */
-html[data-theme="dark"] body[data-page-id="blog-list"] .articles-list .pinned-mark,
-html[data-theme="dark"] body[data-page-id="blog-list"] .articles-list .articles-empty,
-html[data-theme="dark"] body[data-page-id="blog-list"] .articles-list .blog-post-meta-item,
-html[data-theme="dark"] body[data-page-id="blog-list"] .article-tags .tag-name,
-html[data-theme="dark"] body[data-page-id="tag-detail"] .tag-count-summary,
-html[data-theme="dark"] body[data-page-id="tag-detail"] .tag-meta-item {
-  color: #e8eaed !important;
-}
-html[data-theme="dark"] body[data-page-id="blog-list"] .article-tags .tag-filter,
-html[data-theme="dark"] body[data-page-id="blog-list"] .articles-list .blog-tag-link,
-html[data-theme="dark"] body[data-page-id="tag-detail"] .tags-cloud .tag-pill,
-html[data-theme="dark"] body[data-page-id="tag-detail"] .tag-panel .post-item-tag-badge {
-  text-shadow: 0 1px 2px rgba(5, 19, 39, .6);
-}
-
-
-/* Homepage recent-updates frame parity:
- * The live homepage #stats-card uses an outline-only, fully transparent card.
- * Repeat that exact fill/line/shadow treatment on existing panels only.
- * No selector may target [data-page-id="home"] and no new opaque layer. */
-html[data-theme="dark"] body[data-page-id="blog-list"] .articles-inner,
+/* About cards are separate vCard panels, unaffected by archive changes. */
 html[data-theme="dark"] body[data-page-id="about"] .vcard-sidebar,
 html[data-theme="dark"] body[data-page-id="about"] .vcard-article,
 html[data-theme="dark"] body[data-page-id="about"] .timeline-panel,
-html[data-theme="dark"] body[data-page-id="about"] .service-item,
-html[data-theme="dark"] body[data-page-id="post"] .layout-container > .content-card {
+html[data-theme="dark"] body[data-page-id="about"] .service-item {
   background: transparent !important;
   background-image: none !important;
   border: 1px solid rgba(159, 197, 229, .14) !important;
@@ -427,54 +443,16 @@ html[data-theme="dark"] body[data-page-id="post"] .layout-container > .content-c
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
 }
-
-/* The article, works and both tag archives share the same .articles-inner. */
-html[data-theme="dark"] body[data-page-id="blog-list"] .articles-inner {
-  border-radius: 24px !important;
-  padding: clamp(1.5rem, 3.2vw, 3rem) !important;
-}
-
-/* Keep About's existing two-column layout, margins and nested card shapes. */
 html[data-theme="dark"] body[data-page-id="about"] .vcard-sidebar,
 html[data-theme="dark"] body[data-page-id="about"] .vcard-article,
 html[data-theme="dark"] body[data-page-id="about"] .timeline-panel {
   border-radius: 20px !important;
 }
-html[data-theme="dark"] body[data-page-id="about"] .service-item {
-  border-radius: 14px !important;
-}
-
-/* The article/work reader has its own card: use the homepage outline
-   without reintroducing the previous solid blue/blurred background. */
-html[data-theme="dark"] body[data-page-id="post"] .layout-container > .content-card {
-  border-radius: 24px !important;
-  padding: clamp(1.5rem, 3.2vw, 3rem) !important;
-}
-
-/* The homepage recent item only receives a blue-toned surface on hover. */
-html[data-theme="dark"] body[data-page-id="blog-list"] .articles-list > .scroll-reveal::before {
-  background: rgba(14, 25, 49, .48) !important;
-  border-color: rgba(157, 186, 234, .16) !important;
-  box-shadow: none !important;
-}
-
+html[data-theme="dark"] body[data-page-id="about"] .service-item { border-radius: 14px !important; }
 @media (max-width: 620px) {
-  html[data-theme="dark"] body[data-page-id="blog-list"] .articles-inner,
-  html[data-theme="dark"] body[data-page-id="post"] .layout-container > .content-card {
-    border-radius: 17px !important;
-    padding: 1.25rem !important;
-  }
   html[data-theme="dark"] body[data-page-id="about"] .vcard-sidebar,
   html[data-theme="dark"] body[data-page-id="about"] .vcard-article,
   html[data-theme="dark"] body[data-page-id="about"] .timeline-panel {
     border-radius: 17px !important;
-  }
-}
-@media print {
-  html[data-theme="dark"] body[data-page-id="post"] .layout-container > .content-card {
-    border: 0 !important;
-    border-radius: 0 !important;
-    box-shadow: none !important;
-    padding: 0 !important;
   }
 }
