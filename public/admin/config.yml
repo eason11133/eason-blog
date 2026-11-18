@@ -139,6 +139,8 @@ collections:
     create: true
     extension: md
     format: yaml-frontmatter
+    preview_path: '/blog/{{slug}}/'
+    aliases_field: false
     summary: '{{title}}'
     sortable_fields:
       fields: [date, title]
@@ -173,6 +175,8 @@ collections:
     create: true
     extension: md
     format: yaml-frontmatter
+    preview_path: '/experience/{{slug}}/'
+    aliases_field: false
     summary: '{{title}}'
     sortable_fields:
       fields: [date, title]

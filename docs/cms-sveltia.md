@@ -34,3 +34,13 @@ Sveltia CMS 官方文件：
 https://sveltiacms.app/en/docs/start
 https://sveltiacms.app/en/docs/backends/github
 https://sveltiacms.app/en/docs/fields/richtext
+
+## 遷移檢查（2026-11-18）
+
+- 正式內容管理只使用 `/admin/` 的 Sveltia CMS；`.pages.yml` 已撤除。
+- 首頁主視覺沿用原本**相同圖片檔案**，複製至 `public/image/eason-home-hero.jpg`，讓 CMS 的圖片選擇器可以預覽／替換；舊檔仍保留，不會破壞既有連結。
+- 文章／作品／關於我沿用現有 Markdown；無需匯入、改檔名或改網址。文章編輯器仍使用 YAML frontmatter + Markdown body。
+- 文章和作品的「預覽文章」連結指向網站對應網址；網站有 Vercel 部署延遲時，預覽仍會顯示上一次成功部署的版本。
+- 已額外檢查 Sveltia 欄位涵蓋所有現存 Markdown metadata，避免儲存時意外遺失欄位。
+- 操作包含：上傳圖片、貼入／拖曳圖片、插入程式碼、表格、管理分類標籤、編輯首頁和關於我的內容。
+- **尚待本人驗收：** 首次使用 GitHub Token 登入、從後台實際上傳圖片、儲存與部署後看到新文章；這些無法在沒有使用者 Token 及 Vercel 可用部署時替你完成。
