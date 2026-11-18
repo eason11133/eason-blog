@@ -13,6 +13,16 @@ profile:
       text: 文章
       url: /blog/
   avatar_image: /image/img202311202145460031.jpg
+  specialties:
+    - title: 程式
+      items:
+        - Python
+        - LINE Bot
+        - Web 開發
+    - title: 棒球
+      items:
+        - 打擊
+        - 投球
 navigation:
   intro: 關於我
   interests: 興趣

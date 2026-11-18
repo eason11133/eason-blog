@@ -10,6 +10,7 @@ interface AboutPageData {
     name: string;
     avatar_image?: string;
     specialty?: string;
+    specialties?: Array<{ title: string; items: string[] }>;
   };
   interests_title: string;
   interests: Array<{ icon: string; title: string; description: string }>;
@@ -55,7 +56,20 @@ const about = frontmatter as AboutPageData;
 
       <section class="sidebar-specialty" aria-labelledby="sidebar-specialty-heading">
         <h3 id="sidebar-specialty-heading">專長</h3>
-        {about.profile.specialty && <p>{about.profile.specialty}</p>}
+        {about.profile.specialties?.length ? (
+          <ul class="specialty-groups">
+            {about.profile.specialties.map((group) => (
+              <li>
+                <span class="specialty-group-name">{group.title}</span>
+                {group.items?.length > 0 && (
+                  <ul class="specialty-items">
+                    {group.items.map((item) => <li>{item}</li>)}
+                  </ul>
+                )}
+              </li>
+            ))}
+          </ul>
+        ) : about.profile.specialty && <p>{about.profile.specialty}</p>}
       </section>
     </aside>
 
@@ -253,6 +267,37 @@ const about = frontmatter as AboutPageData;
     white-space: pre-line;
     overflow-wrap: anywhere;
   }
+  .specialty-groups {
+    margin: 2px 0 0;
+    padding-left: 1.1rem;
+    list-style-type: disc;
+  }
+  .specialty-groups > li {
+    margin: 0 0 12px;
+    padding-left: 3px;
+  }
+  .specialty-groups > li:last-child { margin-bottom: 0; }
+  .specialty-groups > li::marker { color: var(--vcard-accent); }
+  .specialty-group-name {
+    color: var(--vcard-text);
+    font-size: .91rem;
+    line-height: 1.6;
+    font-weight: 500;
+  }
+  .specialty-items {
+    margin: 6px 0 0;
+    padding-left: 1.2rem;
+    list-style-type: circle;
+  }
+  .specialty-items > li {
+    margin: 0 0 5px;
+    padding-left: 1px;
+    color: var(--vcard-muted);
+    font-size: .88rem;
+    line-height: 1.65;
+    overflow-wrap: anywhere;
+  }
+  .specialty-items > li::marker { color: #aabbd0; }
 
   .vcard-main-content { position: relative; min-width: 0; }
   .vcard-article {
