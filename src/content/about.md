@@ -2,7 +2,6 @@
 page_title: 關於我
 profile:
   name: Eason
-  tagline: 寫程式、棒球、撞球
   note: 偶爾在這裡寫點東西。
   links:
     - icon: github
