@@ -44,6 +44,9 @@ timelines:
       - when: 2026 11 月
         event: 個人網站
         result: 持續更新
+      - when: 2026 7 月
+        event: 各類小專案
+        result: 進行中
       - when: 2026 2 ~ 9 月
         event: 野灣救傷中心搜尋系統
         result: "NGO 合作 "
