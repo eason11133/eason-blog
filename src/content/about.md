@@ -18,18 +18,18 @@ navigation:
   website: 網站
 interests_title: 平常喜歡的事
 interests:
-  - icon: code
-    title: 寫程式
-    description: 有一些自己想做的東西，就會動手試試看。
-  - icon: baseball
-    title: 棒球
-    description: 以前自己打球，現在還是很喜歡看。
   - icon: billiards
     title: 撞球
-    description: 喜歡打九號球。
+    description: 現在是打好玩的，但之後想打比賽，中8、9 球、14-1
+  - icon: code
+    title: 專案
+    description: 有一些自己想做的東西，就會手癢去做。
+  - icon: other
+    title: 糞 game
+    description: 無聊的時候會玩一些小遊戲，但不玩電腦(有3D暈)
   - icon: anime
     title: 動漫
-    description: 平常也會看動漫。
+    description: 有興趣的會看一下，沒有看很多
 website:
   title: 關於這個網站
   description: 這裡主要放文章和一些自己做的東西。目前先整理特殊選才的準備、面試和上機考心得。
