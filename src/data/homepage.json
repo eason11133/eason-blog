@@ -1,0 +1,26 @@
+{
+  "hero_title": "Hi 我是 Eason",
+  "hero_subtitle": "",
+  "hero_background": "/ChatGPT%20%E5%9C%96%E5%83%8F%202026%E5%B9%B411%E6%9C%8812%E6%97%A5%20%E4%B8%8B%E5%8D%8803_47_57.jpg",
+  "status_title": "目前狀態",
+  "status_tags": [
+    {
+      "text": "特殊選才",
+      "style": "admissions"
+    },
+    {
+      "text": "網站開發",
+      "style": "website"
+    },
+    {
+      "text": "程式學習",
+      "style": "learning"
+    }
+  ],
+  "status_description": "最近在整理特殊選才的準備和面試心得，也在慢慢把這個網站做好。",
+  "pinned_title": "置頂文章",
+  "pinned_empty": "目前還沒有置頂文章。",
+  "recent_title": "最近更新",
+  "recent_empty": "目前還沒有文章。",
+  "blog_link_label": "查看全部文章 ⇗"
+}
