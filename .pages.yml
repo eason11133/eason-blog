@@ -32,20 +32,9 @@ content:
               categories: [image]
               rename: safe
           - name: specialties
-            label: 專長分類（可新增、刪除、排序）
-            type: object
-            list:
-              collapsible:
-                collapsed: true
-                summary: "{title}"
-            fields:
-              - name: title
-                label: 分類名稱
-                type: string
-              - name: items
-                label: 分類下的項目（可新增、刪除、排序）
-                type: string
-                list: true
+            label: 專長（可新增、刪除、排序）
+            type: string
+            list: true
       - name: interests_title
         label: 興趣區標題
         type: string
