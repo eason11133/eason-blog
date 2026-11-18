@@ -46,7 +46,7 @@ timelines:
         result: 已上線
       - when: 已完成
         event: 野灣救傷中心搜尋系統
-        result: 委託開發
+        result: NGO 合作
       - when: 2026 年
         event: 成大上機考工具箱
         result: 練習筆記
