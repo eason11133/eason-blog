@@ -1,6 +1,7 @@
 ---
 import FormattedDate from './FormattedDate.astro';
 import { getTagPath } from '../lib/content/tag-path';
+import { getWorkTagPath } from '../lib/content/work-tag-path';
 
 interface Props {
 	date: Date;
@@ -10,6 +11,7 @@ interface Props {
 	showCategories?: boolean;
 	showTags?: boolean;
 	tagLinks?: boolean;
+	workTags?: boolean;
 	containerClass?: string;
 	itemClass?: string;
 	tagsClass?: string;
@@ -24,6 +26,7 @@ const {
 	showCategories = true,
 	showTags = true,
 	tagLinks = true,
+	workTags = false,
 	containerClass = 'post-meta',
 	itemClass = 'post-meta-item',
 	tagsClass = 'post-tags',
@@ -73,7 +76,7 @@ const visibleTags = typeof tagLimit === 'number' ? tags.slice(0, tagLimit) : tag
 	{showTags && visibleTags.length > 0 && (
 		<div class={tagsClass}>
 			{visibleTags.map((tag) => tagLinks ? (
-				<a href={getTagPath(tag)} class={tagLinkClass} data-astro-prefetch="viewport">
+				<a href={workTags ? getWorkTagPath(tag) : getTagPath(tag)} class={tagLinkClass} data-astro-prefetch="viewport">
 					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
 						<path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
 						<line x1="7" y1="7" x2="7.01" y2="7"></line>
@@ -81,7 +84,13 @@ const visibleTags = typeof tagLimit === 'number' ? tags.slice(0, tagLimit) : tag
 					#{tag}
 				</a>
 			) : (
-				<span class={tagLinkClass}>#{tag}</span>
+				<span class={tagLinkClass}>
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                      <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
+                      <line x1="7" y1="7" x2="7.01" y2="7"></line>
+                    </svg>
+                    #{tag}
+                  </span>
 			))}
 		</div>
 	)}

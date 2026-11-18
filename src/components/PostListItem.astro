@@ -20,6 +20,7 @@ interface Props {
 	showTags?: boolean;
 	hrefBase?: string;
 	tagLinks?: boolean;
+	workTags?: boolean;
 }
 
 const {
@@ -39,6 +40,7 @@ const {
 	showTags = true,
 	hrefBase = '/blog',
 	tagLinks = true,
+	workTags = false,
 } = Astro.props;
 
 const TitleTag = titleTag;
@@ -58,6 +60,7 @@ const TitleTag = titleTag;
 		showCategories={showCategories}
 		showTags={showTags}
 		tagLinks={tagLinks}
+		workTags={workTags}
 		containerClass={metaContainerClass}
 		itemClass={metaItemClass}
 		tagsClass={metaTagsClass}

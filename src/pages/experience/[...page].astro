@@ -11,6 +11,7 @@ import {
   getWorkPageUrls,
 } from '../../lib/content/works-page-path';
 import { extractExcerpt } from '../../lib/content/text';
+import { getWorkTagPath } from '../../lib/content/work-tag-path';
 
 export const getStaticPaths: GetStaticPaths = async ({ paginate }) => {
   const posts = (await getWorks()).sort((a, b) => Number(b.data.pinned) - Number(a.data.pinned));
@@ -576,11 +577,11 @@ if (last > 1) paginationList.push(last);
       <InteriorHeading title="作品" centered={true} animated={true} />
       {tags.length > 0 && (
         <nav class="article-tags" aria-label="作品標籤">
-          <span class="tag-filter all-tag">全部作品 <span>{page.total}</span></span>
+          <a class="tag-filter all-tag" href="/experience/" data-astro-prefetch="viewport">全部作品 <span>{page.total}</span></a>
           {tags.map(([tag, count]) => (
-            <span class="tag-filter" aria-label={`作品標籤 ${tag}，共 ${count} 個作品`}>
+            <a class="tag-filter" href={getWorkTagPath(tag)} data-astro-prefetch="viewport" aria-label={`作品標籤 ${tag}，共 ${count} 個作品`}>
               <span class="tag-hash">#</span>{tag}<span class="tag-count">{count}</span>
-            </span>
+            </a>
           ))}
         </nav>
       )}
@@ -592,7 +593,7 @@ if (last > 1) paginationList.push(last);
               <PostListItem
                 post={post}
                 hrefBase="/experience"
-                tagLinks={false}
+                workTags={true}
                 titleTag="h2"
                 articleClass="blog-post-item"
                 titleClass="blog-post-title"
