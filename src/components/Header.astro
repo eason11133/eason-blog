@@ -482,6 +482,14 @@ const { transparent = true } = Astro.props;
         color: var(--black);
     }
 
+    /* Match the article-title hover color in transparent and scrolled modes. */
+    header.transparent > nav .internal-links a:hover,
+    header.transparent > nav .internal-links a:focus-visible,
+    header.transparent.scrolled > nav .internal-links a:hover,
+    header.transparent.scrolled > nav .internal-links a:focus-visible {
+        color: var(--accent);
+    }
+
 
 	
 
