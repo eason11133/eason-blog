@@ -9,6 +9,7 @@ interface AboutPageData {
   profile: {
     name: string;
     avatar_image?: string;
+    specialty?: string;
   };
   interests_title: string;
   interests: Array<{ icon: string; title: string; description: string }>;
@@ -51,6 +52,11 @@ const about = frontmatter as AboutPageData;
           <h2 class="name">{about.profile.name}</h2>
         </div>
       </div>
+
+      <section class="sidebar-specialty" aria-labelledby="sidebar-specialty-heading">
+        <h3 id="sidebar-specialty-heading">專長</h3>
+        {about.profile.specialty && <p>{about.profile.specialty}</p>}
+      </section>
     </aside>
 
     <div class="vcard-main-content">
@@ -224,7 +230,31 @@ const about = frontmatter as AboutPageData;
     letter-spacing: -.025em;
   }
 
-    .vcard-main-content { position: relative; min-width: 0; }
+  /* Same profile panel, extended below the photo and name. */
+  .sidebar-specialty {
+    width: 100%;
+    margin-top: 27px;
+    padding-top: 22px;
+    border-top: 1px solid rgba(145, 175, 207, .24);
+    text-align: left;
+  }
+  .sidebar-specialty h3 {
+    margin: 0 0 9px;
+    color: var(--vcard-text);
+    font-size: .98rem;
+    font-weight: 600;
+    line-height: 1.6;
+  }
+  .sidebar-specialty p {
+    margin: 0;
+    color: var(--vcard-muted);
+    font-size: .91rem;
+    line-height: 1.85;
+    white-space: pre-line;
+    overflow-wrap: anywhere;
+  }
+
+  .vcard-main-content { position: relative; min-width: 0; }
   .vcard-article {
     min-height: 520px;
     padding: 38px clamp(24px, 4vw, 38px) 38px;
