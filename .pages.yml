@@ -31,6 +31,10 @@ content:
             options:
               categories: [image]
               rename: safe
+          - name: specialty
+            label: 專長內容
+            type: text
+            description: 直接輸入想放在左側照片下方的專長，可換行。
       - name: interests_title
         label: 興趣區標題
         type: string
