@@ -27,44 +27,10 @@ content:
           - name: avatar_image
             label: 個人照片
             type: image
-            description: 上傳圖片後會取代原本的 E 字母頭像；未上傳前不顯示頭像。
+            description: 上傳照片後會顯示在名字上方；沒有照片時只顯示名字。
             options:
               categories: [image]
               rename: safe
-          - name: tagline
-            label: 名字下面的小字
-            type: string
-          - name: note
-            label: 側欄底部短句
-            type: string
-          - name: links
-            label: 側欄連結
-            type: object
-            list:
-              collapsible:
-                collapsed: true
-                summary: "{text}"
-            fields:
-              - name: icon
-                label: 圖示
-                type: select
-                options:
-                  values:
-                    - name: github
-                      label: GitHub
-                    - name: article
-                      label: 文章
-                    - name: link
-                      label: 一般連結
-              - name: label
-                label: 分類小字
-                type: string
-              - name: text
-                label: 顯示文字
-                type: string
-              - name: url
-                label: 網址
-                type: string
       - name: navigation
         label: 右上角導航
         type: object
