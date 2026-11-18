@@ -1,11 +1,7 @@
 ---
-# 在這個檔案修改「關於我」的文字；冒號左側的欄位名稱請保留。
-# 列表可以自行新增、刪除、調整順序，頁面會跟著更新。
 page_title: 關於我
-
 profile:
   name: Eason
-  avatar_image: '' # 個人照片會從後台上傳，尚未上傳時不顯示頭像
   tagline: 寫程式、棒球、撞球
   note: 偶爾在這裡寫點東西。
   links:
@@ -17,14 +13,11 @@ profile:
       label: ARTICLES
       text: 文章
       url: /blog/
-
 navigation:
   intro: 關於我
   interests: 興趣
   website: 網站
-
 interests_title: 平常喜歡的事
-# icon 可填 code、baseball、billiards、anime；其他值會顯示一般符號。
 interests:
   - icon: code
     title: 寫程式
@@ -38,15 +31,11 @@ interests:
   - icon: anime
     title: 動漫
     description: 平常也會看動漫。
-
 website:
   title: 關於這個網站
   description: 這裡主要放文章和一些自己做的東西。目前先整理特殊選才的準備、面試和上機考心得。
   link_text: 去看文章
   link_url: /blog/
-
-# 每一個 timeline 是一張卡片；items 是卡片裡的時間軸。
-# when 是左側日期／階段，event 是中間事件，result 是右側標記。
 timelines:
   - id: about-projects
     title: 做過的事
@@ -63,7 +52,6 @@ timelines:
       - when: 2026 年
         event: 這個個人網站
         result: 持續更新
-
   - id: about-now
     title: 最近在忙
     items:
@@ -76,7 +64,6 @@ timelines:
       - when: 最近
         event: 調整個人網站的排版和內容
         result: 進行中
-
   - id: about-milestones
     title: 里程碑
     items:
@@ -90,7 +77,4 @@ timelines:
         event: 完成受野灣野生動物保育協會委託的搜尋系統
         result: 已交付
 ---
-
-嗨，我是 Eason。
-
-平常會寫程式、打撞球，也喜歡棒球、籃球和動漫。
+我是 Eason，就讀台北市陽明高中，國中讀體育班，興趣是各種球類運動與各種專案製作，希望尋找可以一起打撞球的夥伴。
