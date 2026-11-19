@@ -34,7 +34,7 @@ jobs:
         run: |
           node --check cloudflare/cms/worker.mjs
           node --check cloudflare/cms/admin.mjs
-          node --test cloudflare/cms/*.test.mjs
+          node --test cloudflare/cms/*.node-test.mjs
 
       - name: Build
         run: npm run build
