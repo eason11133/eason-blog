@@ -1,13 +1,14 @@
 import { z } from 'astro/zod';
 
 const nonEmptyText = z.string().trim().min(1, '不能是空字符串');
+const optionalDate = z.preprocess(value => value === '' || value === null ? undefined : value, z.coerce.date().optional());
 
 export const blogFrontmatterSchema = z
 	.object({
 		title: nonEmptyText,
 		date: z.coerce.date(),
-		updated: z.coerce.date().optional(),
-		description: nonEmptyText.optional(),
+		updated: optionalDate,
+		description: z.preprocess(value => value === '' ? undefined : value, nonEmptyText.optional()),
 		draft: z.boolean().optional().default(false),
 		pinned: z.boolean().optional().default(false),
 		categories: z.array(nonEmptyText).optional().default([]),

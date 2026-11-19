@@ -27,6 +27,16 @@ describe('blogFrontmatterSchema', () => {
 		expect(result.tags).toEqual([]);
 	});
 
+	it('accepts blank optional fields from Sveltia', () => {
+		const result = blogFrontmatterSchema.parse({
+			...validPost,
+			updated: '',
+			description: '',
+		});
+		expect(result.updatedDate).toBeUndefined();
+		expect(result.description).toBeUndefined();
+	});
+
 	it('allows a draft to have no category or tags', () => {
 		const result = blogFrontmatterSchema.parse({
 			title: '空草稿',
