@@ -1,0 +1,21 @@
+{
+  "$schema": "../../node_modules/wrangler/config-schema.json",
+  "name": "eason-blog-content-staging",
+  "main": "./worker.mjs",
+  "compatibility_date": "2026-11-19",
+  "workers_dev": true,
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "eason-blog-content",
+      "database_id": "REPLACE_WITH_CLOUDFLARE_D1_ID",
+      "migrations_dir": "migrations"
+    }
+  ],
+  "kv_namespaces": [
+    {
+      "binding": "MEDIA",
+      "id": "REPLACE_WITH_CLOUDFLARE_KV_ID"
+    }
+  ]
+}
