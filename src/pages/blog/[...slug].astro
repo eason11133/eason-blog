@@ -1,8 +1,11 @@
 ---
+export const prerender = import.meta.env.PUBLIC_EASON_LIVE !== 'true';
 import { type CollectionEntry, render } from 'astro:content';
 import BlogPost from '../../layouts/BlogPost.astro';
 import { getBlogPosts } from '../../lib/content/blog';
 import { extractSeoDescription } from '../../lib/content/text';
+import { getCmsDocument } from '../../lib/cloudflare/live-content';
+import { renderCmsMarkdown } from '../../lib/cloudflare/render-markdown';
 
 export async function getStaticPaths() {
 	const posts = await getBlogPosts();
@@ -13,8 +16,15 @@ export async function getStaticPaths() {
 }
 type Props = CollectionEntry<'blog'>;
 
-const post = Astro.props;
-const { Content, headings } = await render(post);
+const live = import.meta.env.PUBLIC_EASON_LIVE === 'true';
+const post = live
+  ? await getCmsDocument('post', Astro.params.slug ?? '')
+  : (Astro.props as CollectionEntry<'blog'>);
+if (!post) return Astro.rewrite('/404');
+const rendered = live ? await renderCmsMarkdown(post.body ?? '') : undefined;
+const staticRender = live ? undefined : await render(post as CollectionEntry<'blog'>);
+const Content = staticRender?.Content;
+const headings = rendered?.headings ?? staticRender?.headings ?? [];
 const seoDescription =
 	(post.data.description?.trim() || extractSeoDescription(post.body ?? '') || post.data.title).trim();
 const body = post.body ?? '';
@@ -35,6 +45,6 @@ const readingTime = Math.ceil(wordCount / 400);
 	seoDescription={seoDescription}
 	loadKatexStyles={hasMath}
 >
-	<Content />
+	{live ? <Fragment set:html={rendered?.html ?? ''} /> : Content ? <Content /> : null}
 </BlogPost>
 

@@ -1,4 +1,5 @@
 ---
+export const prerender = import.meta.env.PUBLIC_EASON_LIVE !== 'true';
 import TagArchive from '../../components/TagArchive.astro';
 import { getBlogPosts, getTagStats } from '../../lib/content/blog';
 
@@ -16,7 +17,14 @@ export async function getStaticPaths() {
   }));
 }
 
-const { tag, posts, sortedTags, totalCount } = Astro.props;
+const live = import.meta.env.PUBLIC_EASON_LIVE === 'true';
+const currentTag = Astro.params.tag ?? '';
+const allPosts = live ? await getBlogPosts() : [];
+const statRows = live ? await getTagStats() : [];
+const { tag, posts, sortedTags, totalCount } = live
+  ? { tag: currentTag, posts: allPosts.filter(post => post.data.tags.includes(currentTag)), sortedTags: statRows, totalCount: allPosts.length }
+  : Astro.props;
+if (live && !statRows.some(([name]) => name === currentTag)) return Astro.rewrite('/404');
 ---
 
 <TagArchive {tag} {posts} {sortedTags} {totalCount} kind="blog" />
