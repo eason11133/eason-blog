@@ -41,7 +41,7 @@ if (skyOnly) heroClass += ' hero-sky-only';
                 <div class="hero-portrait" style={`background-image: url('${backgroundImageSrc}')`}></div>
             )}
         </>
-    )}
+    ) : null}
     {!skyOnly && <div class="hero-overlay"></div>}
     <div class="hero-content">
         <slot name="top" />
