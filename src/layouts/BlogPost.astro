@@ -1,6 +1,7 @@
 ---
 import type { CollectionEntry } from 'astro:content';
 import DraftBadge from '../components/DraftBadge.astro';
+import Comments from '../components/Comments.astro';
 import FormattedDate from '../components/FormattedDate.astro';
 import InteriorHeading from '../components/InteriorHeading.astro';
 import HeroHeader from '../components/HeroHeader.astro';
@@ -708,6 +709,8 @@ const articleSchema = {
 		</div>
 	</div>
 		
+	{import.meta.env.PUBLIC_EASON_LIVE === 'true' && <Comments kind={workMode ? 'work' : 'post'} slug={Astro.url.pathname.split('/').filter(Boolean).at(-1) || ''} />}
+
 	<!-- Lightbox HTML -->
 	<div id="lightbox" class="lightbox-overlay">
 		<span class="lightbox-close">&times;</span>
