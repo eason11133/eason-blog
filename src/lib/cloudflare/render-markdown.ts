@@ -12,6 +12,6 @@ const processor = createMarkdownProcessor({
 });
 
 export async function renderCmsMarkdown(markdown: string) {
-  const output = await processor.render(markdown);
+  const output = await (await processor).render(markdown);
   return { html: output.code, headings: output.metadata.headings ?? [] };
 }
