@@ -217,12 +217,33 @@ html[data-theme="dark"] body[data-page-id="post"] .hero-header.hero-sky-only .in
   margin: 0 0 1rem;
   text-align: center;
 }
+html[data-theme="dark"] body[data-page-id="post"] .hero-header.hero-sky-only .post-topline {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  column-gap: 1.4rem;
+  row-gap: .4rem;
+  margin: 0 0 1.5rem;
+}
 html[data-theme="dark"] body[data-page-id="post"] .hero-header.hero-sky-only .post-back-link {
   display: inline-flex;
-  margin: 0 0 1.5rem;
+  align-items: center;
+  margin: 0;
   text-decoration: none;
   color: #a9c5e8;
   font-size: .9rem;
+}
+html[data-theme="dark"] body[data-page-id="post"] .hero-header.hero-sky-only .post-date {
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+  color: var(--interior-muted);
+  font-size: .9rem;
+  white-space: nowrap;
+}
+html[data-theme="dark"] body[data-page-id="post"] .hero-header.hero-sky-only .post-date svg {
+  flex: none;
 }
 html[data-theme="dark"] body[data-page-id="post"] .hero-header.hero-sky-only .post-back-link:hover {
   color: #e2f0ff;

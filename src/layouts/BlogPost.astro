@@ -644,7 +644,13 @@ const articleSchema = {
 	</Fragment>
 	<!-- Restore the original article-hero structure while using the single shared starfield. -->
 	<HeroHeader text={title} compact={true} skyOnly={true}>
-		<a slot="top" class="post-back-link" href={backHref}>← {backLabel}</a>
+		<div slot="top" class="post-topline">
+			<a class="post-back-link" href={backHref}>← {backLabel}</a>
+			<span class="post-date">
+				<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+				<FormattedDate date={pubDate} />
+			</span>
+		</div>
 		<InteriorHeading slot="title" title={title} centered={true} animated={true} />
         <div class="hero-meta">
 				{import.meta.env.DEV && draft && (
@@ -652,11 +658,8 @@ const articleSchema = {
 						<DraftBadge {draft} overlay={true} />
 					</div>
 				)}
+                {((wordCount ?? 0) > 0 || (readingTime ?? 0) > 0) && (
                 <div class="meta-row">
-                    <div class="meta-item">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-calendar"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-                        <FormattedDate date={pubDate} />
-                    </div>
                     {(wordCount ?? 0) > 0 && (
                         <div class="meta-item">
                             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-bar-chart-2"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
@@ -668,6 +671,7 @@ const articleSchema = {
                             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-clock"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
                             <span>{readingTime} 分鐘</span>
                         </div>
+                )}
                     )}
                 </div>
 				{(wordCount ?? 0) > 0 && (
