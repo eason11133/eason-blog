@@ -18,7 +18,7 @@ function asDate(value) {
   if(Number.isNaN(d.getTime()))throw new Error('Bad date in Markdown: '+value);
   return d.toISOString();
 }
-const lines=['-- D1 import generated from existing Astro Markdown. Uses INSERT OR IGNORE to preserve later edits.','BEGIN TRANSACTION;'];
+const lines=['-- D1 import generated from existing Astro Markdown. Uses INSERT OR IGNORE to preserve later edits.'];
 for(const [kind,dir] of [['post','src/content/blog'],['work','src/content/works']]){
  for(const name of fs.readdirSync(path.join(root,dir)).filter(x=>x.endsWith('.md')).sort()){
   const {metadata:m,body}=parseMarkdown(path.join(root,dir,name));
@@ -35,5 +35,4 @@ const home=JSON.parse(fs.readFileSync(path.join(root,'src/data/homepage.json'),'
 const about=parseMarkdown(path.join(root,'src/content/about.md'));
 lines.push('INSERT OR IGNORE INTO settings(key,value_json,updated) VALUES('+['homepage',JSON.stringify(home),new Date().toISOString()].map(escapeSQL).join(',')+');');
 lines.push('INSERT OR IGNORE INTO settings(key,value_json,updated) VALUES('+['about',JSON.stringify({...about.metadata,body_markdown:about.body}),new Date().toISOString()].map(escapeSQL).join(',')+');');
-lines.push('COMMIT;');
 process.stdout.write(lines.join('\n')+'\n');
