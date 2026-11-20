@@ -176,6 +176,20 @@ html[data-theme="dark"] body[data-page-id="experience"] .experience-body a {
   color: #b3d2f6;
 }
 
+/* Short post pages need a bottom-aligned footer. The sky is viewport-fixed,
+ * so a footer immediately after sparse content otherwise slices the night
+ * above the mountain ridge. Scope this to posts/works; preserve home layout. */
+@media screen {
+  body[data-page-id="post"] #main-content {
+    display: flex;
+    flex-direction: column;
+  }
+  body[data-page-id="post"] #main-content > footer {
+    margin-top: auto;
+    flex-shrink: 0;
+  }
+}
+
 /* Article pages: title and metadata above the text, no hero or giant box. */
 html[data-theme="dark"] body[data-page-id="post"] .post-head {
   box-sizing: border-box;
