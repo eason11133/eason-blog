@@ -1,5 +1,6 @@
 import { getCollection, type CollectionEntry } from 'astro:content';
 import { filterVisiblePosts } from './visibility';
+import { getCmsDocuments } from '../cloudflare/live-content';
 
 export type BlogPost = CollectionEntry<'blog'>;
 
@@ -8,7 +9,9 @@ export function sortPostsByDateDesc(posts: BlogPost[]): BlogPost[] {
 }
 
 export async function getBlogPosts(): Promise<BlogPost[]> {
-	const posts = await getCollection('blog');
+	const posts = import.meta.env.PUBLIC_EASON_LIVE === 'true'
+		? await getCmsDocuments('post')
+		: await getCollection('blog');
 	return sortPostsByDateDesc(filterVisiblePosts(posts, import.meta.env.PROD));
 }
 

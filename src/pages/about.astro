@@ -3,6 +3,8 @@ import { Content as AboutContent, frontmatter } from '../content/about.md';
 import InteriorHeading from '../components/InteriorHeading.astro';
 import PageShell from '../layouts/PageShell.astro';
 import { siteTitle } from '../config';
+import { getCmsSettings } from '../lib/cloudflare/live-content';
+import { renderCmsMarkdown } from '../lib/cloudflare/render-markdown';
 
 interface AboutPageData {
   page_title: string;
@@ -23,7 +25,13 @@ interface AboutPageData {
 }
 
 // 所有可編輯文字都在 src/content/about.md；這個檔案只負責排版。
-const about = frontmatter as AboutPageData;
+const live = import.meta.env.PUBLIC_EASON_LIVE === 'true';
+const about = live
+  ? await getCmsSettings<AboutPageData & { body_markdown?: string }>('about')
+  : (frontmatter as AboutPageData);
+const aboutBodyHtml = live
+  ? (await renderCmsMarkdown('body_markdown' in about ? String(about.body_markdown ?? '') : '')).html
+  : '';
 ---
 
 <PageShell
@@ -73,7 +81,7 @@ const about = frontmatter as AboutPageData;
         </header>
 
         <div class="about-text">
-          <AboutContent />
+          {live ? <Fragment set:html={aboutBodyHtml} /> : <AboutContent />}
         </div>
 
         <section class="service" id="about-interests" aria-labelledby="interests-title">

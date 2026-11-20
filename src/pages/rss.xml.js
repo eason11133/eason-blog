@@ -1,3 +1,4 @@
+export const prerender = import.meta.env.PUBLIC_EASON_LIVE !== 'true';
 import rss from '@astrojs/rss';
 import { siteDescription, siteTitle } from '../config';
 import { getBlogPosts } from '../lib/content/blog';
