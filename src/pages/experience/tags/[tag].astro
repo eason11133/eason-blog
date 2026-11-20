@@ -16,7 +16,20 @@ export async function getStaticPaths() {
   }));
 }
 
-const { tag, posts, sortedTags, totalCount } = Astro.props;
+const live = import.meta.env.PUBLIC_EASON_LIVE === 'true';
+const liveTag = Astro.params.tag ?? '';
+const livePosts = live ? await getWorks() : [];
+const liveTags = live ? await getWorkTagStats() : [];
+const pageData = live
+  ? {
+      tag: liveTag,
+      posts: livePosts.filter((entry) => entry.data.tags.includes(liveTag)),
+      sortedTags: liveTags,
+      totalCount: livePosts.length,
+    }
+  : Astro.props;
+const { tag, posts, sortedTags, totalCount } = pageData;
+if (live && !liveTags.some(([name]) => name === liveTag)) Astro.response.status = 404;
 ---
 
 <TagArchive {tag} {posts} {sortedTags} {totalCount} kind="works" />
