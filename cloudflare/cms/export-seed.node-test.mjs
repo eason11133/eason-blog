@@ -12,6 +12,6 @@ test('Astro data export preserves the real homepage and legacy Markdown filename
  assert.match(out,/公共廁所 LINE Bot/);
  assert.match(out,/剛建個網，請多多指教/);
  assert.match(out,/INSERT OR IGNORE INTO settings\(key,value_json,updated\)/);
- assert.equal((out.match(/BEGIN TRANSACTION/g)||[]).length,1);
- assert.match(out,/COMMIT;/);
+ assert.doesNotMatch(out,/^BEGIN(?:\s+TRANSACTION)?\s*;/m);
+ assert.doesNotMatch(out,/^COMMIT\s*;/m);
 });
