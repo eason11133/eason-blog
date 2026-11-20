@@ -1,0 +1,29 @@
+name: Cloudflare live site build
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "src/**"
+      - "cloudflare/live-site/**"
+      - "astro.config.mjs"
+      - ".github/workflows/cloudflare-live-build.yml"
+  workflow_dispatch:
+
+jobs:
+  build-ssr:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+      - name: Install existing locked site dependencies
+        run: npm ci
+      - name: Install pinned Astro 6 Cloudflare adapter for isolated build
+        run: npm install --no-save --package-lock=false @astrojs/cloudflare@13.1.0
+      - name: Check Cloudflare dynamic build
+        run: node cloudflare/live-site/build.mjs
