@@ -6,7 +6,7 @@ import PostListItem from '../components/PostListItem.astro';
 import SectionHeader from '../components/SectionHeader.astro';
 import { heroConfig, locale, siteDescription, siteTitle } from '../config';
 import { getBlogPosts } from '../lib/content/blog';
-import homepage from '../data/homePage.json';
+import homepage from '../data/homepage.json';
 import { getCmsSettings } from '../lib/cloudflare/live-content';
 
 const homePage = import.meta.env.PUBLIC_EASON_LIVE === 'true'
