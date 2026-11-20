@@ -1,0 +1,12 @@
+---
+import BlogListing from '../../components/BlogListing.astro';
+import { getBlogPosts } from '../../lib/content/blog';
+import { getBlogPageUrls } from '../../lib/content/blog-page-path';
+import { buildContentPage } from '../../lib/cloudflare/pagination';
+
+export const prerender = import.meta.env.PUBLIC_EASON_LIVE !== 'true';
+const posts = (await getBlogPosts()).sort((a, b) => Number(b.data.pinned) - Number(a.data.pinned));
+const page = buildContentPage(posts, 1, getBlogPageUrls)!;
+---
+
+<BlogListing {page} />

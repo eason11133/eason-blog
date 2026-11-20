@@ -1,0 +1,23 @@
+---
+import type { GetStaticPaths } from 'astro';
+import WorksListing from '../../../components/WorksListing.astro';
+import { getWorks } from '../../../lib/content/works';
+import { getWorkPageUrls } from '../../../lib/content/works-page-path';
+import { buildContentPage } from '../../../lib/cloudflare/pagination';
+
+export const prerender = import.meta.env.PUBLIC_EASON_LIVE !== 'true';
+export const getStaticPaths: GetStaticPaths = async () => {
+  const posts = await getWorks();
+  const lastPage = Math.max(1, Math.ceil(posts.length / 15));
+  return Array.from({ length: Math.max(0, lastPage - 1) }, (_, i) => ({
+    params: { number: String(i + 2) },
+  }));
+};
+
+const current = Number(Astro.params.number);
+const posts = (await getWorks()).sort((a, b) => Number(b.data.pinned) - Number(a.data.pinned));
+const page = buildContentPage(posts, current, getWorkPageUrls);
+if (!page || current === 1) return Astro.rewrite('/404');
+---
+
+<WorksListing {page} />

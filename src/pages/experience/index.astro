@@ -1,0 +1,12 @@
+---
+import WorksListing from '../../components/WorksListing.astro';
+import { getWorks } from '../../lib/content/works';
+import { getWorkPageUrls } from '../../lib/content/works-page-path';
+import { buildContentPage } from '../../lib/cloudflare/pagination';
+
+export const prerender = import.meta.env.PUBLIC_EASON_LIVE !== 'true';
+const posts = (await getWorks()).sort((a, b) => Number(b.data.pinned) - Number(a.data.pinned));
+const page = buildContentPage(posts, 1, getWorkPageUrls)!;
+---
+
+<WorksListing {page} />

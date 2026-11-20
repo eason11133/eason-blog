@@ -1,60 +1,15 @@
 ---
-import type { GetStaticPaths, Page } from 'astro';
-import InteriorHeading from '../../components/InteriorHeading.astro';
-import PageShell from '../../layouts/PageShell.astro';
-import PostListItem from '../../components/PostListItem.astro';
-import { siteTitle } from '../../config';
-import { getWorks, getWorkTagStats, type WorkEntry } from '../../lib/content/works';
+import type { Page } from 'astro';
+import InteriorHeading from './InteriorHeading.astro';
+import PageShell from '../layouts/PageShell.astro';
+import PostListItem from './PostListItem.astro';
+import { siteTitle } from '../config';
+import { getWorkTagStats, type WorkEntry } from '../lib/content/works';
 import {
-  getWorkPageParam,
   getWorkPagePath,
-  getWorkPageUrls,
-} from '../../lib/content/works-page-path';
-import { extractExcerpt } from '../../lib/content/text';
-import { getWorkTagPath } from '../../lib/content/work-tag-path';
-
-export const getStaticPaths: GetStaticPaths = async ({ paginate }) => {
-  const posts = (await getWorks()).sort((a, b) => Number(b.data.pinned) - Number(a.data.pinned));
-
-  if (posts.length === 0) {
-    return [
-      {
-        params: { page: undefined },
-        props: {
-          page: {
-            data: [],
-            start: 0,
-            end: 0,
-            size: 15,
-            total: 0,
-            currentPage: 1,
-            lastPage: 1,
-            url: getWorkPageUrls(1, 1),
-          },
-        },
-      },
-    ];
-  }
-
-  return paginate(posts, { pageSize: 15 }).map((entry) => {
-    const currentPage = entry.props.page.currentPage;
-    const lastPage = entry.props.page.lastPage;
-    return {
-      ...entry,
-      params: {
-        ...entry.params,
-        page: getWorkPageParam(currentPage),
-      },
-      props: {
-        ...entry.props,
-        page: {
-          ...entry.props.page,
-          url: getWorkPageUrls(currentPage, lastPage),
-        },
-      },
-    };
-  });
-};
+} from '../lib/content/works-page-path';
+import { extractExcerpt } from '../lib/content/text';
+import { getWorkTagPath } from '../lib/content/work-tag-path';
 
 const { page } = Astro.props as { page: Page<WorkEntry> };
 const siteURL = Astro.site ?? Astro.url;

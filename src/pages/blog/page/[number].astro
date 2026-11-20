@@ -1,0 +1,23 @@
+---
+import type { GetStaticPaths } from 'astro';
+import BlogListing from '../../../components/BlogListing.astro';
+import { getBlogPosts } from '../../../lib/content/blog';
+import { getBlogPageUrls } from '../../../lib/content/blog-page-path';
+import { buildContentPage } from '../../../lib/cloudflare/pagination';
+
+export const prerender = import.meta.env.PUBLIC_EASON_LIVE !== 'true';
+export const getStaticPaths: GetStaticPaths = async () => {
+  const posts = await getBlogPosts();
+  const lastPage = Math.max(1, Math.ceil(posts.length / 15));
+  return Array.from({ length: Math.max(0, lastPage - 1) }, (_, i) => ({
+    params: { number: String(i + 2) },
+  }));
+};
+
+const current = Number(Astro.params.number);
+const posts = (await getBlogPosts()).sort((a, b) => Number(b.data.pinned) - Number(a.data.pinned));
+const page = buildContentPage(posts, current, getBlogPageUrls);
+if (!page || current === 1) return Astro.rewrite('/404');
+---
+
+<BlogListing {page} />
