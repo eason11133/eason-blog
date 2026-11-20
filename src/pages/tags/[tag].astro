@@ -24,7 +24,7 @@ const statRows = live ? await getTagStats() : [];
 const { tag, posts, sortedTags, totalCount } = live
   ? { tag: currentTag, posts: allPosts.filter(post => post.data.tags.includes(currentTag)), sortedTags: statRows, totalCount: allPosts.length }
   : Astro.props;
-if (live && !statRows.some(([name]) => name === currentTag)) return Astro.rewrite('/404');
+if (live && !statRows.some(([name]) => name === currentTag)) Astro.response.status = 404;
 ---
 
 <TagArchive {tag} {posts} {sortedTags} {totalCount} kind="blog" />
