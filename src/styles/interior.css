@@ -190,42 +190,51 @@ html[data-theme="dark"] body[data-page-id="experience"] .experience-body a {
   }
 }
 
-/* Article pages: title and metadata above the text, no hero or giant box. */
-html[data-theme="dark"] body[data-page-id="post"] .post-head {
+/* Article inner pages: restore the original compact HeroHeader layout.
+   Only the wallpaper and article box are removed; leave text/readability intact. */
+html[data-theme="dark"] body[data-page-id="post"] .hero-header.hero-sky-only {
   box-sizing: border-box;
-  max-width: 1160px;
-  padding: clamp(126px, 17vh, 180px) clamp(20px, 4vw, 48px) 0;
-  margin: 0 auto 2rem;
+  height: auto;
+  min-height: 0;
+  margin: 0;
+  padding: clamp(116px, 16vh, 164px) clamp(20px, 4vw, 48px) 2rem;
+  overflow: visible;
+  background: transparent;
 }
-html[data-theme="dark"] body[data-page-id="post"] .post-head-content {
-  max-width: 810px;
+html[data-theme="dark"] body[data-page-id="post"] .hero-header.hero-sky-only .hero-content {
+  width: min(100%, 900px);
+  max-width: 100%;
+  padding: 0;
+  text-align: center;
 }
-html[data-theme="dark"] body[data-page-id="post"] .post-back-link {
+html[data-theme="dark"] body[data-page-id="post"] .hero-header.hero-sky-only .interior-heading {
+  margin: 0 0 1rem;
+}
+html[data-theme="dark"] body[data-page-id="post"] .hero-header.hero-sky-only .post-back-link {
   display: inline-flex;
-  align-items: center;
-  margin: 0 0 1.75rem;
+  margin: 0 0 1.5rem;
   text-decoration: none;
   color: #a9c5e8;
   font-size: .9rem;
 }
-html[data-theme="dark"] body[data-page-id="post"] .post-back-link:hover { color: #e2f0ff; }
-html[data-theme="dark"] body[data-page-id="post"] .post-head .interior-heading {
-  margin-bottom: 1.1rem;
+html[data-theme="dark"] body[data-page-id="post"] .hero-header.hero-sky-only .post-back-link:hover {
+  color: #e2f0ff;
 }
-html[data-theme="dark"] body[data-page-id="post"] .post-head .hero-meta {
-  align-items: flex-start;
+html[data-theme="dark"] body[data-page-id="post"] .hero-header.hero-sky-only .hero-meta {
+  align-items: center;
+  margin: 0;
+  padding: 0;
+  gap: .55rem;
   color: var(--interior-muted);
   opacity: 1;
   text-shadow: none;
-  margin: 0;
-  padding: 0;
-  gap: .5rem;
 }
-html[data-theme="dark"] body[data-page-id="post"] .post-head .meta-row {
-  justify-content: flex-start;
-  gap: .9rem;
+html[data-theme="dark"] body[data-page-id="post"] .hero-header.hero-sky-only .meta-row {
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: .85rem;
 }
-html[data-theme="dark"] body[data-page-id="post"] .post-head .pdf-export-button {
+html[data-theme="dark"] body[data-page-id="post"] .hero-header.hero-sky-only .pdf-export-button {
   background: transparent;
   color: #b4cdec;
   border-color: var(--interior-line);
@@ -255,8 +264,9 @@ html[data-theme="dark"] body[data-page-id="post"] .layout-container > .content-c
   box-shadow: none !important;
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
-  padding: 0 !important;
-  min-height: 0;
+  /* Keep the original article text inset; removing the card must not remove its spacing. */
+  padding: 2.25rem clamp(20px, 4vw, 48px) !important;
+  min-height: 240px;
 }
 html[data-theme="dark"] body[data-page-id="post"] .layout-container .prose {
   max-width: 100%;
@@ -275,9 +285,6 @@ html[data-theme="dark"] body[data-page-id="post"] .toc-container {
     grid-template-columns: minmax(0, 1fr);
     max-width: 860px !important;
   }
-  html[data-theme="dark"] body[data-page-id="post"] .post-head {
-    max-width: 860px;
-  }
 }
 @media (max-width: 720px) {
   html[data-theme="dark"] body[data-page-id="blog-list"] .articles-area,
@@ -287,15 +294,18 @@ html[data-theme="dark"] body[data-page-id="post"] .toc-container {
     padding-top: 112px !important;
     padding-bottom: 72px !important;
   }
-  html[data-theme="dark"] body[data-page-id="post"] .post-head {
-    padding-top: 112px !important;
+  html[data-theme="dark"] body[data-page-id="post"] .hero-header.hero-sky-only {
+    padding-top: 112px;
+  }
+  html[data-theme="dark"] body[data-page-id="post"] .layout-container > .content-card {
+    padding: 1.5rem !important;
   }
   html[data-theme="dark"] body[data-page-id="post"] .layout-container {
     padding-bottom: 72px !important;
   }
 }
 @media print {
-  html[data-theme="dark"] body[data-page-id="post"] .post-head { display: none !important; }
+  html[data-theme="dark"] body[data-page-id="post"] .hero-header.hero-sky-only { display: none !important; }
   html[data-theme="dark"] body[data-page-id="post"] .layout-container,
   html[data-theme="dark"] body[data-page-id="post"] .layout-container > .content-card {
     display: block !important;

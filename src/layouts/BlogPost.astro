@@ -3,6 +3,7 @@ import type { CollectionEntry } from 'astro:content';
 import DraftBadge from '../components/DraftBadge.astro';
 import FormattedDate from '../components/FormattedDate.astro';
 import InteriorHeading from '../components/InteriorHeading.astro';
+import HeroHeader from '../components/HeroHeader.astro';
 import TableOfContents from '../components/TableOfContents.astro';
 import PageShell from './PageShell.astro';
 import { heroConfig, locale, profileConfig, siteTitle } from '../config';
@@ -641,10 +642,10 @@ const articleSchema = {
 			}
 		</style>
 	</Fragment>
-	<header class="post-head">
-      <div class="post-head-content">
-        <a class="post-back-link" href={backHref}>← {backLabel}</a>
-        <InteriorHeading title={title} />
+	<!-- Restore the original article-hero structure while using the single shared starfield. -->
+	<HeroHeader text={title} compact={true} skyOnly={true}>
+		<a slot="top" class="post-back-link" href={backHref}>← {backLabel}</a>
+		<InteriorHeading slot="title" title={title} centered={true} animated={true} />
         <div class="hero-meta">
 				{import.meta.env.DEV && draft && (
 					<div class="meta-row">
@@ -678,9 +679,8 @@ const articleSchema = {
 				</div>
 				)}
         </div>
-      </div>
-    </header>
-		
+	</HeroHeader>
+
 	<div class="stats-wrapper">
 		<div class="layout-container">
 			<main class="content-card" transition:animate="none">
@@ -691,7 +691,7 @@ const articleSchema = {
 							<p>發布於 <FormattedDate date={pubDate} /></p>
 						</header>
 						<slot />
-						{updatedDate && (
+						{updatedDate && (wordCount ?? 0) > 0 && (
 							<div class="last-updated-on">
 								最後更新於 <FormattedDate date={updatedDate} />
 							</div>

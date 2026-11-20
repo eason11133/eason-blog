@@ -10,6 +10,7 @@ interface Props {
     compact?: boolean;
     interactive?: boolean; // 是否启用悬停交互效果（仅主页）
     cutoutImage?: string;
+    skyOnly?: boolean; // Use the site's persistent starfield, without a separate hero image.
 }
 
 const { 
@@ -18,7 +19,8 @@ const {
     backgroundImage = heroConfig.postDefaultBackground,
     compact = false,
     interactive = false,
-    cutoutImage
+    cutoutImage,
+    skyOnly = false
 } = Astro.props;
 const backgroundImageSrc =
     typeof backgroundImage === 'string' ? backgroundImage : backgroundImage.src;
@@ -26,12 +28,13 @@ const backgroundImageSrc =
 let heroClass = compact ? 'hero-header hero-compact' : 'hero-header';
 if (interactive) heroClass += ' hero-interactive';
 if (cutoutImage) heroClass += ' hero-cutout-mode';
+if (skyOnly) heroClass += ' hero-sky-only';
 ---
 
 <div class={heroClass} transition:animate="none">
     {cutoutImage ? (
         <img class="hero-cutout" src={cutoutImage} alt="Stephen Curry 背影" />
-    ) : (
+    ) : !skyOnly ? (
         <>
             <div class="hero-bg" style={`background-image: url('${backgroundImageSrc}')`}></div>
             {interactive && (
@@ -39,9 +42,10 @@ if (cutoutImage) heroClass += ' hero-cutout-mode';
             )}
         </>
     )}
-    <div class="hero-overlay"></div>
+    {!skyOnly && <div class="hero-overlay"></div>}
     <div class="hero-content">
-        <Typewriter text={text} tag="h1" class="hero-title" />
+        <slot name="top" />
+        <slot name="title"><Typewriter text={text} tag="h1" class="hero-title" /></slot>
         {subtitle && <p class="hero-subtitle">{subtitle}</p>}
         <slot />
     </div>
