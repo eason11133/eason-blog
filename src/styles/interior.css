@@ -199,16 +199,23 @@ html[data-theme="dark"] body[data-page-id="post"] .hero-header.hero-sky-only {
   margin: 0;
   padding: clamp(116px, 16vh, 164px) clamp(20px, 4vw, 48px) 2rem;
   overflow: visible;
-  background: transparent;
+  background: transparent !important;
+}
+/* This Hero has no separate photo. The global photo-to-sky fade would turn
+   solid at its bottom, creating a horizontal seam in the persistent sky. */
+html[data-theme="dark"] body[data-page-id="post"] .hero-header.hero-sky-only::after {
+  content: none !important;
+  background: none !important;
 }
 html[data-theme="dark"] body[data-page-id="post"] .hero-header.hero-sky-only .hero-content {
   width: min(100%, 900px);
   max-width: 100%;
   padding: 0;
-  text-align: center;
+  text-align: left;
 }
 html[data-theme="dark"] body[data-page-id="post"] .hero-header.hero-sky-only .interior-heading {
   margin: 0 0 1rem;
+  text-align: center;
 }
 html[data-theme="dark"] body[data-page-id="post"] .hero-header.hero-sky-only .post-back-link {
   display: inline-flex;
@@ -221,7 +228,7 @@ html[data-theme="dark"] body[data-page-id="post"] .hero-header.hero-sky-only .po
   color: #e2f0ff;
 }
 html[data-theme="dark"] body[data-page-id="post"] .hero-header.hero-sky-only .hero-meta {
-  align-items: center;
+  align-items: flex-start;
   margin: 0;
   padding: 0;
   gap: .55rem;
@@ -230,7 +237,7 @@ html[data-theme="dark"] body[data-page-id="post"] .hero-header.hero-sky-only .he
   text-shadow: none;
 }
 html[data-theme="dark"] body[data-page-id="post"] .hero-header.hero-sky-only .meta-row {
-  justify-content: center;
+  justify-content: flex-start;
   flex-wrap: wrap;
   gap: .85rem;
 }
