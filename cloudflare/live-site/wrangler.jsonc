@@ -9,7 +9,7 @@
   ],
   "workers_dev": true,
   "assets": {
-    "directory": "../../dist-cloudflare",
+    "directory": "../../dist-cloudflare/client",
     "binding": "ASSETS"
   },
   "observability": {
