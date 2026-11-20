@@ -24,6 +24,6 @@ jobs:
       - name: Install existing locked site dependencies
         run: npm ci
       - name: Install pinned Astro 6 Cloudflare adapter for isolated build
-        run: npm install --no-save --package-lock=false @astrojs/cloudflare@13.1.0
+        run: npm install --no-save --package-lock=false @astrojs/cloudflare@13.7.0
       - name: Check Cloudflare dynamic build
         run: node cloudflare/live-site/build.mjs

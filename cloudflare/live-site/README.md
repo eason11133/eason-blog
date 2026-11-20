@@ -14,7 +14,7 @@
 
 ```bat
 git pull
-npm install --no-save @astrojs/cloudflare@13.1.0
+npm install --no-save @astrojs/cloudflare@13.7.0
 node cloudflare/live-site/build.mjs
 npx --yes wrangler@latest deploy --config cloudflare/live-site/wrangler.jsonc
 ```
