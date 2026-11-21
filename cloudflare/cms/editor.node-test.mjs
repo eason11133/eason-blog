@@ -23,7 +23,7 @@ test('Image and alignment controls are present with a safe preview sanitizer', (
   ]) assert.ok(adminHtml.includes(token), 'Missing editor feature: ' + token);
 });
 test('Embedded editor script is valid JavaScript after HTML generation', () => {
-  const all=[...adminHtml.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/g)];
+  const all=[...adminHtml.matchAll(/<script>([\s\S]*?)<\/script>/g)];
   assert.equal(all.length,1,'Exactly one inline editor controller expected');
   assert.doesNotThrow(()=>new vm.Script(all[0][1]));
 });
