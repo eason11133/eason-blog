@@ -20,6 +20,17 @@ jobs:
         run: |
           python3 - <<'PY'
           import urllib.request
+          import json
+          with urllib.request.urlopen('https://data.jsdelivr.com/v1/package/npm/markdown-it@14.3.2',timeout=20) as resp:
+            root=json.load(resp)
+          def show(entries,prefix=''):
+            for item in entries:
+              path=prefix+'/'+item.get('name','')
+              if item.get('type')=='directory':
+                show(item.get('files',[]),path)
+              elif 'dist' in path and ('umd' in path or path.endswith('.js') or path.endswith('.mjs')):
+                print('package-file',path,flush=True)
+          show(root.get('files',[]))
           urls = {
             'CodeMirror JS': 'https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js',
             'CodeMirror Markdown mode': 'https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/markdown/markdown.min.js',
