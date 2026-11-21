@@ -10,13 +10,14 @@
 
 > 目前不覆蓋正式站，也不覆蓋 CMS Worker。
 
-部署設定現在放在專案根目錄的 `wrangler.live.jsonc`，避免 Wrangler 把套件入口相對於 `cloudflare/live-site/` 誤認成檔案路徑。請在專案根目錄執行：
+Astro 6 編譯後會產生 `dist-cloudflare/server/entry.mjs` 和對應的 Wrangler 設定。部署時使用**已編譯的入口**，不要直接把 Adapter 原始入口交給 Wrangler。請在專案根目錄執行：
 
 ```bat
 git pull
 npm install --no-save --package-lock=false @astrojs/cloudflare@13.7.0
 node cloudflare/live-site/build.mjs
-node_modules\\.bin\\wrangler.cmd deploy --config wrangler.live.jsonc
+node cloudflare/live-site/prepare-deploy.mjs
+node_modules\.bin\wrangler.cmd deploy --config dist-cloudflare/server/wrangler.json
 ```
 
 後續需將 adapter 寫入專案依賴與 lockfile，並建立 Cloudflare 自動部署。目前仍需人工執行一次部署和驗證。
