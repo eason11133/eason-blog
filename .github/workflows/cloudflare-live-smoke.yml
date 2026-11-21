@@ -1,0 +1,66 @@
+name: Cloudflare live runtime smoke test
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/cloudflare-live-smoke.yml"
+  workflow_dispatch:
+
+jobs:
+  public-runtime:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    steps:
+      - name: Check deployed Worker and CMS public endpoints
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import urllib.request
+          import urllib.error
+          import json
+          import sys
+
+          base='https://eason-blog-web-live.eason456h.workers.dev'
+          cms='https://eason-blog.eason456h.workers.dev'
+          checks=[
+            ('frontend-home',base+'/','html'),
+            ('frontend-blog',base+'/blog/','html'),
+            ('frontend-experience',base+'/experience/','html'),
+            ('frontend-about',base+'/about/','html'),
+            ('frontend-search-index',base+'/search-index.json','json'),
+            ('cms-health',cms+'/health','json'),
+            ('cms-posts',cms+'/api/posts','json'),
+            ('cms-works',cms+'/api/works','json'),
+            ('cms-homepage',cms+'/api/homepage','json'),
+            ('cms-about',cms+'/api/about','json'),
+          ]
+          failed=[]
+          for label,url,kind in checks:
+            try:
+              req=urllib.request.Request(url,headers={'User-Agent':'Eason-Blog-GitHub-Smoke/1.0','Accept':'application/json' if kind=='json' else 'text/html'})
+              with urllib.request.urlopen(req,timeout=16) as res:
+                code=res.status
+                content_type=res.headers.get('content-type','')
+                body=res.read(150_000)
+              valid=200<=code<300
+              if kind=='html':
+                valid=valid and b'<html' in body.lower()
+                info='bytes='+str(len(body))
+              else:
+                data=json.loads(body)
+                if label in ('cms-posts','cms-works'): info='items='+str(len(data.get('items',[])))
+                elif label=='frontend-search-index': info='records='+str(len(data))
+                else: info='json='+','.join(list(data)[:5]) if isinstance(data,dict) else 'json-array'
+              print(f'{label}: HTTP {code}, valid={valid}, {info}',flush=True)
+              if not valid: failed.append(label)
+            except Exception as exc:
+              print(f'{label}: ERROR {type(exc).__name__}: {str(exc)[:180]}',flush=True)
+              failed.append(label)
+          if failed:
+            print('FAILED:',', '.join(failed),flush=True)
+            sys.exit(1)
+          print('PASS: all public endpoints responded correctly',flush=True)
+          PY
