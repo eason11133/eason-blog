@@ -349,6 +349,7 @@ function getEditor(){
  root.addEventListener('dragleave',()=>{delete root.dataset.drop;});
  root.addEventListener('drop',event=>{
   delete root.dataset.drop;
+  if(event.defaultPrevented)return;
   const file=Array.from(event.dataTransfer?.files||[]).find(f=>f.type.startsWith('image/'));
   if(file){event.preventDefault();uploadImage(file).catch(err=>say(err.message,true));}
  });
