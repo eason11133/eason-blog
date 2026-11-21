@@ -262,7 +262,7 @@ const htmlEsc=s=>String(s).replaceAll('&','&amp;').replaceAll('"','&quot;').repl
 function alignText(alignment){
  const chosen=selectedMarkdown()||'這裡輸入文字';
  const style=alignment==='center'?'center':alignment==='right'?'right':'left';
- replaceSelectedMarkdown('<div style="text-align:'+style+';">\n\n'+chosen+'\n\n</div>');
+ replaceSelectedMarkdown('<div style="text-align:'+style+';">\\n\\n'+chosen+'\\n\\n</div>');
 }
 function imageHtml(url,alt){
  const sizes=['100%','75%','50%','25%','320px','480px','640px'];
@@ -273,11 +273,11 @@ function imageHtml(url,alt){
 }
 function configureImage(){
  const selected=selectedMarkdown().trim();
- const markdownImage=/^!\[([^\]]*)\]\(([^)\s]+)(?:\s+["'][^"']*["'])?\)$/.exec(selected);
- const htmlImage=/^<img\s[^>]*src=["']([^"']+)["'][^>]*>$/i.exec(selected);
+ const markdownImage=/^!\\[([^\\]]*)\\]\\(([^)\\s]+)(?:\\s+["'][^"']*["'])?\\)$/.exec(selected);
+ const htmlImage=/^<img\\s[^>]*src=["']([^"']+)["'][^>]*>$/i.exec(selected);
  if(markdownImage){replaceSelectedMarkdown(imageHtml(markdownImage[2],markdownImage[1]));return;}
  if(htmlImage){
-  const alt=/\balt=["']([^"']*)["']/i.exec(selected);
+  const alt=/\\balt=["']([^"']*)["']/i.exec(selected);
   replaceSelectedMarkdown(imageHtml(htmlImage[1],alt?alt[1]:'圖片'));
   return;
  }
@@ -291,7 +291,7 @@ async function uploadImage(file){
  const result=await response.json();
  if(!response.ok)throw new Error(result.error||'圖片上傳失敗');
  if(typeof result.url!=='string'||!result.url.startsWith('https://'))throw new Error('上傳沒有回傳正確圖片網址');
- replaceSelectedMarkdown('\n'+imageHtml(result.url,file.name.replace(/\.[^.]*$/,''))+'\n');
+ replaceSelectedMarkdown('\\n'+imageHtml(result.url,file.name.replace(/\\.[^.]*$/,''))+'\\n');
  say('圖片已上傳並插入文章');
  mdStatus('圖片已插入，文章尚未儲存',true);
 }
@@ -299,11 +299,11 @@ function applyFormat(kind){
  const value=selectedMarkdown();
  if(kind==='bold')return editSelection('**','**','粗體文字');
  if(kind==='italic')return editSelection('*','*','斜體文字');
- if(kind==='heading')return editSelection('\n## ','\n', '小標題');
+ if(kind==='heading')return editSelection('\\n## ','\\n', '小標題');
  if(kind==='link')return editSelection('[','](https://example.com)','連結文字');
- if(kind==='quote')return editSelection('\n> ','\n','引用文字');
- if(kind==='list')return editSelection('\n- ','\n','清單項目');
- if(kind==='code')return editSelection('\n'+String.fromCharCode(96).repeat(3)+'\n','\n'+String.fromCharCode(96).repeat(3)+'\n',value||'程式碼');
+ if(kind==='quote')return editSelection('\\n> ','\\n','引用文字');
+ if(kind==='list')return editSelection('\\n- ','\\n','清單項目');
+ if(kind==='code')return editSelection('\\n'+String.fromCharCode(96).repeat(3)+'\\n','\\n'+String.fromCharCode(96).repeat(3)+'\\n',value||'程式碼');
  if(['center','left','right'].includes(kind))return alignText(kind);
 }
 function getEditor(){
