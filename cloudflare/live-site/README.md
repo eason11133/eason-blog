@@ -10,13 +10,13 @@
 
 > 目前不覆蓋正式站，也不覆蓋 CMS Worker。
 
-先安裝 Astro 6 的 Cloudflare adapter（由根目錄執行）：
+部署設定現在放在專案根目錄的 `wrangler.live.jsonc`，避免 Wrangler 把套件入口相對於 `cloudflare/live-site/` 誤認成檔案路徑。請在專案根目錄執行：
 
 ```bat
 git pull
-npm install --no-save @astrojs/cloudflare@13.7.0
+npm install --no-save --package-lock=false @astrojs/cloudflare@13.7.0
 node cloudflare/live-site/build.mjs
-npx --yes wrangler@latest deploy --config cloudflare/live-site/wrangler.jsonc
+node_modules\\.bin\\wrangler.cmd deploy --config wrangler.live.jsonc
 ```
 
 後續需將 adapter 寫入專案依賴與 lockfile，並建立 Cloudflare 自動部署。目前仍需人工執行一次部署和驗證。

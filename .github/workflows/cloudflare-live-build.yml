@@ -6,6 +6,7 @@ on:
     paths:
       - "src/**"
       - "cloudflare/live-site/**"
+      - "wrangler.live.jsonc"
       - "astro.config.mjs"
       - ".github/workflows/cloudflare-live-build.yml"
   workflow_dispatch:
@@ -27,3 +28,5 @@ jobs:
         run: npm install --no-save --package-lock=false @astrojs/cloudflare@13.7.0
       - name: Check Cloudflare dynamic build
         run: node cloudflare/live-site/build.mjs
+      - name: Validate production Worker entrypoint and bundle without deploying
+        run: ./node_modules/.bin/wrangler deploy --config wrangler.live.jsonc --dry-run --outdir ./.wrangler/live-dry-run
