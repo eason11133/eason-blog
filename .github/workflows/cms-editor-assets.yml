@@ -35,7 +35,7 @@ jobs:
             'CodeMirror JS': 'https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js',
             'CodeMirror Markdown mode': 'https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/markdown/markdown.min.js',
             'CodeMirror CSS': 'https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css',
-            'markdown-it browser': 'https://unpkg.com/markdown-it@14.3.2/dist/browser/markdown-it.umd.min.js',
+            'markdown-it browser': 'https://unpkg.com/markdown-it@14.3.2/dist/markdown-it.min.js',
             'DOMPurify': 'https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.4.17/purify.min.js',
           }
           for label,url in urls.items():
