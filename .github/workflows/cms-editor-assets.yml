@@ -1,0 +1,38 @@
+name: CMS editor assets check
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "cloudflare/cms/admin.mjs"
+      - "cloudflare/cms/worker.mjs"
+      - ".github/workflows/cms-editor-assets.yml"
+  workflow_dispatch:
+
+jobs:
+  assets:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Verify editor libraries are downloadable
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import urllib.request
+          urls = {
+            'CodeMirror JS': 'https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js',
+            'CodeMirror Markdown mode': 'https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/markdown/markdown.min.js',
+            'CodeMirror CSS': 'https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css',
+            'markdown-it browser': 'https://unpkg.com/markdown-it@14.3.2/dist/browser/markdown-it.umd.min.js',
+            'DOMPurify': 'https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.4.17/purify.min.js',
+          }
+          for label,url in urls.items():
+            req=urllib.request.Request(url,headers={'User-Agent':'Eason-Editor-Dependency-Check/1.0'})
+            with urllib.request.urlopen(req,timeout=22) as response:
+              data=response.read(4096)
+              print(label, 'HTTP',response.status,'sample-bytes',len(data),flush=True)
+              if response.status!=200 or len(data)<100:
+                raise RuntimeError('Editor asset not available: '+label)
+          print('PASS editor libraries available',flush=True)
+          PY
