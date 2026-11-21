@@ -64,3 +64,56 @@ jobs:
             sys.exit(1)
           print('PASS: all public endpoints responded correctly',flush=True)
           PY
+      - name: Verify D1 document routes and missing-page 404
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import urllib.request
+          import urllib.error
+          import urllib.parse
+          import html
+          import json
+          import sys
+
+          frontend='https://eason-blog-web-live.eason456h.workers.dev'
+          cms='https://eason-blog.eason456h.workers.dev'
+          failures=[]
+          def request(url):
+            try:
+              with urllib.request.urlopen(urllib.request.Request(url,headers={'User-Agent':'Eason-Blog-GitHub-Smoke/1.0'}),timeout=16) as r:
+                return r.status,r.read(200_000).decode('utf-8','replace')
+            except urllib.error.HTTPError as e:
+              return e.code,e.read(1000).decode('utf-8','replace')
+
+          for collection,path in (('posts','blog'),('works','experience')):
+            code,data=request(cms+'/api/'+collection)
+            if code!=200:
+              failures.append(collection+' API'); continue
+            docs=json.loads(data).get('items',[])
+            for doc in docs:
+              slug=urllib.parse.quote(doc['slug'],safe='')
+              code,page=request(frontend+'/'+path+'/'+slug+'/')
+              valid=(code==200 and html.escape(doc['title'],quote=False) in page or code==200 and doc['title'] in html.unescape(page))
+              print(f'{collection}/{slug}: HTTP {code}, title_matches={valid}',flush=True)
+              if not valid: failures.append(collection+'/'+doc['slug'])
+
+          code,search=request(frontend+'/search-index.json')
+          valid_search=(code==200 and isinstance(json.loads(search),list))
+          print(f'search-index: HTTP {code}, array={valid_search}',flush=True)
+          if not valid_search: failures.append('search-index')
+
+          for missing in ('/blog/no-such-eason-doc-98765/','/experience/no-such-eason-work-98765/'):
+            code,_=request(frontend+missing)
+            print(f'{missing}: HTTP {code}, expected=404',flush=True)
+            if code!=404: failures.append('missing '+missing)
+
+          code,comments=request(frontend+'/api/comments?kind=work&slug=2026-11-18--1')
+          valid_comments=(code==200 and 'comments' in json.loads(comments))
+          print(f'comments read: HTTP {code}, valid={valid_comments}',flush=True)
+          if not valid_comments: failures.append('comments')
+
+          if failures:
+            print('FAILED:',', '.join(failures),flush=True)
+            sys.exit(1)
+          print('PASS: D1 article and work routes, 404 and comment reads',flush=True)
+          PY
