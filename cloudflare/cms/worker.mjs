@@ -89,7 +89,7 @@ async function handle(req,env) {
   if (method==='GET' && (path==='/admin' || path==='/admin/')) return new Response(adminHtml,{
     headers:{'Content-Type':'text/html; charset=utf-8',...noStore,
       'X-Frame-Options':'DENY', 'Referrer-Policy':'no-referrer',
-      'Content-Security-Policy':"default-src 'none'; script-src 'self' 'unsafe-inline' https://uicdn.toast.com; style-src 'self' 'unsafe-inline' https://uicdn.toast.com; font-src 'self' data:; img-src 'self' data: blob:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'"},
+      'Content-Security-Policy':"default-src 'none'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://unpkg.com; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; font-src 'self' data:; img-src 'self' https: data: blob:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'"},
   });
   if (!env.DB) return fail('Database not configured',503);
   if (method!=='GET' && method!=='HEAD' && !sameOriginWrite(req,url)) return fail('Invalid request origin',403);
