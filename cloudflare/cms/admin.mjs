@@ -171,7 +171,7 @@ nav{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:16px}nav button[aria-curr
 <div class="span-2 editor-actions"><button id="save-doc" type="submit">儲存到 D1</button><small>正式發布會立即更新資料庫，不經 GitHub 或 Vercel</small></div>
 </form></section>
 <section id="settings-panel" class="card hidden"><h2 id="settings-heading"></h2><form id="settings-form"><div id="settings-fields"></div><div class="editor-actions"><button type="submit">儲存設定到 D1</button></div></form></section>
-<section id="comments-panel" class="card hidden"><h2>留言審核</h2><p>訪客送出的留言預設不公開，你按核准後才會顯示。</p><div id="comments-list"></div></section>
+<section id="comments-panel" class="card hidden"><h2>留言管理</h2><p>GitHub／Google 登入的訪客留言會直接公開。你可以隱藏或恢復留言；舊版待審留言仍可個別核准。</p><div id="comments-list"></div></section>
 </section>
 </main>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
@@ -413,11 +413,12 @@ async function loadComments(){
  const data=await api('/api/admin/comments');const target=el('comments-list');target.replaceChildren();
  for(const c of (data.comments||[])){
   const box=document.createElement('div');box.className='comment';
-  const title=document.createElement('strong');title.textContent=(c.status==='pending'?'[待審] ':'['+c.status+'] ')+c.nickname+' · '+c.kind+'/'+c.slug;
+  const title=document.createElement('strong');title.textContent='['+({pending:'待審',approved:'公開',hidden:'已隱藏'}[c.status]||c.status)+'] '+c.nickname+(c.auth_provider?' ('+c.auth_provider+')':'')+' · '+c.kind+'/'+c.slug;
   const msg=document.createElement('p');msg.textContent=c.body;
   const actions=document.createElement('div');actions.className='actions';
   for(const status of ['approved','hidden']){
-   const b=document.createElement('button');b.type='button';b.className='secondary';b.textContent=status==='approved'?'核准':'隱藏';
+   const b=document.createElement('button');b.type='button';b.className='secondary';b.textContent=status==='approved'?(c.status==='pending'?'核准':'恢復公開'):'隱藏';
+   b.disabled=c.status===status;
    b.onclick=async()=>{try{await api('/api/admin/comments','PUT',{id:c.id,status});say('留言狀態已更新');loadComments();}catch(e){say(e.message,true);}};
    actions.appendChild(b);
   }
