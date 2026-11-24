@@ -643,7 +643,9 @@ const articleSchema = {
 	</Fragment>
 	<!-- Restore the original article-hero structure while using the single shared starfield. -->
 	<HeroHeader text={title} compact={true} skyOnly={true}>
-		<div slot="top" class="post-topline">
+
+		<InteriorHeading slot="title" title={title} centered={true} animated={true} />
+		<div class="post-topline">
 			<a class="post-back-link" href={backHref}>← {backLabel}</a>
 			<div class="post-facts" aria-label="文章資訊">
 				<span class="post-fact"><span class="post-fact-label">建立</span><span class="post-fact-value"><FormattedDate date={pubDate} /></span></span>
@@ -653,7 +655,6 @@ const articleSchema = {
 				<span class="post-fact"><span class="post-fact-label">瀏覽</span><span class="post-fact-value"><span data-article-views data-kind={workMode ? 'work' : 'post'} data-slug={decodeURIComponent(Astro.url.pathname.split('/').filter(Boolean).at(-1) || '')}>—</span></span></span>
 			</div>
 		</div>
-		<InteriorHeading slot="title" title={title} centered={true} animated={true} />
         {import.meta.env.DEV && draft && (
             <div class="hero-meta">
                 <div class="meta-row">
