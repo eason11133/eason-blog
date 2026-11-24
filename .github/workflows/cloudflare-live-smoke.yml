@@ -118,6 +118,17 @@ jobs:
           print('PASS: D1 article and work routes, 404 and comment reads',flush=True)
           PY
 
+      - name: Verify NCU interview article renders with the supplied diagram
+        shell: bash
+        run: |
+          curl -fsS --retry 2 --retry-delay 2 -A 'Mozilla/5.0' \
+            -o /tmp/ncu-interview-page.html \
+            'https://eason-blog-web-live.eason456h.workers.dev/blog/ncu-im-116/'
+          grep -q '面試逐字稿' /tmp/ncu-interview-page.html
+          grep -q 'ncu-im-interview-seating.webp' /tmp/ncu-interview-page.html
+          grep -q '備取 6' /tmp/ncu-interview-page.html
+          echo 'PASS: NCU interview rendered with image, transcript, and result'
+
       - name: Diagnose visitor auth API
         if: always()
         shell: bash
