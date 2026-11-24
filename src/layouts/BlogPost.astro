@@ -191,6 +191,33 @@ const articleSchema = {
 				display: none;
 			}
 
+
+			/* Only the compact metadata line changes; the article theme and title remain untouched. */
+			.post-facts {
+				display: flex;
+				flex: 1 1 540px;
+				flex-wrap: wrap;
+				align-items: center;
+				column-gap: 1.1rem;
+				row-gap: .4rem;
+				min-width: 0;
+				font-size: .85rem;
+				line-height: 1.55;
+				color: #a9bbd3;
+			}
+			.post-fact {
+				display: inline-flex;
+				align-items: baseline;
+				gap: .35em;
+				white-space: nowrap;
+			}
+			.post-fact-label { color: #93a9c5; }
+			.post-fact-value { color: #e1ebf9; font-weight: 550; }
+			@media (max-width: 720px) {
+				.post-facts { flex: 1 1 100%; column-gap: .9rem; row-gap: .35rem; font-size: .8rem; }
+				.post-fact { white-space: normal; }
+			}
+
 			/* 布局容器 */
 			.layout-container {
 				display: grid;
@@ -647,10 +674,13 @@ const articleSchema = {
 	<HeroHeader text={title} compact={true} skyOnly={true}>
 		<div slot="top" class="post-topline">
 			<a class="post-back-link" href={backHref}>← {backLabel}</a>
-			<span class="post-date">
-				<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-				<FormattedDate date={pubDate} />
-			</span>
+			<div class="post-facts" aria-label="文章資訊">
+				<span class="post-fact"><span class="post-fact-label">建立</span><span class="post-fact-value"><FormattedDate date={pubDate} /></span></span>
+				<span class="post-fact"><span class="post-fact-label">最新更新</span><span class="post-fact-value">{updatedDate ? <FormattedDate date={updatedDate} /> : '尚未更新'}</span></span>
+				<span class="post-fact"><span class="post-fact-label">字數</span><span class="post-fact-value">{(wordCount ?? 0).toLocaleString('zh-TW')}</span></span>
+				<span class="post-fact"><span class="post-fact-label">閱讀</span><span class="post-fact-value">{(wordCount ?? 0) > 0 ? `約 ${Math.max(readingTime ?? 1,1)} 分鐘` : '0 分鐘'}</span></span>
+				<span class="post-fact"><span class="post-fact-label">瀏覽</span><span class="post-fact-value"><span data-article-views data-kind={workMode ? 'work' : 'post'} data-slug={decodeURIComponent(Astro.url.pathname.split('/').filter(Boolean).at(-1) || '')}>—</span></span></span>
+			</div>
 		</div>
 		<InteriorHeading slot="title" title={title} centered={true} animated={true} />
         <div class="hero-meta">
@@ -659,22 +689,6 @@ const articleSchema = {
 						<DraftBadge {draft} overlay={true} />
 					</div>
 				)}
-                {((wordCount ?? 0) > 0 || (readingTime ?? 0) > 0) && (
-                    <div class="meta-row">
-                        {(wordCount ?? 0) > 0 && (
-                            <div class="meta-item">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-bar-chart-2"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
-                                <span>{wordCount} 字</span>
-                            </div>
-                        )}
-                        {(readingTime ?? 0) > 0 && (
-                            <div class="meta-item">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-clock"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
-                                <span>{readingTime} 分鐘</span>
-                            </div>
-                        )}
-                    </div>
-                )}
 				{(wordCount ?? 0) > 0 && (
 				<div class="meta-row">
 					<button class="pdf-export-button" type="button" data-pdf-export data-pdf-title={title} aria-label={`將《${title}》匯出為 PDF`}>
@@ -696,11 +710,7 @@ const articleSchema = {
 							<p>發布於 <FormattedDate date={pubDate} /></p>
 						</header>
 						<slot />
-						{updatedDate && (wordCount ?? 0) > 0 && (
-							<div class="last-updated-on">
-								最後更新於 <FormattedDate date={updatedDate} />
-							</div>
-						)}
+
 					</div>
 				</article>
 			</main>
@@ -719,6 +729,7 @@ const articleSchema = {
 
 	<Fragment slot="scripts">
 		<script>
+            import { setupArticleViewCounter } from '../scripts/article-view-counter';
             import { setupToc } from '../scripts/toc';
             import { setupCodeBlocks } from '../scripts/code-block';
             import { prepareMermaidForPrint, setupMermaid } from '../scripts/mermaid';
@@ -873,6 +884,7 @@ const articleSchema = {
                 setupCodeBlocks?.();
                 const articleNavigation = setupToc?.() ?? null;
                 setupLightbox?.();
+                setupArticleViewCounter();
                 setupSearchLanding?.(articleNavigation);
 				markPrintExcerpt();
 				setupPdfExport();

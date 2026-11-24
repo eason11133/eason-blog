@@ -1,5 +1,6 @@
 import { adminHtml } from './admin.mjs';
 import { commentUser, handleCommentAuth } from './comment-auth.mjs';
+import { handleViews } from './views.mjs';
 import { normalizeDocument, publicDocument, validSlug, safeText, safeJsonParse } from './utils.mjs';
 
 const encoder = new TextEncoder();
@@ -111,6 +112,8 @@ async function handle(req,env) {
     return json({ok:true},200,{'Set-Cookie':await issueCookie(env)});
   }
   if (method==='POST' && path==='/api/admin/logout') return json({ok:true},200,{'Set-Cookie':'eason_cms=; HttpOnly; Secure; SameSite=Strict; Path=/; Max-Age=0'});
+
+  if (path==='/api/views') return handleViews(req,env,url);
 
   if (method==='GET' && path==='/api/comments') {
     const kind=url.searchParams.get('kind') || 'post', slug=url.searchParams.get('slug');
