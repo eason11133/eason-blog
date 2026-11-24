@@ -1,0 +1,107 @@
+name: Verify single-row tag filters once
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/verify-tag-overflow-once.yml'
+jobs:
+  browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 9
+    steps:
+      - name: Test descending counts, responsive overflow, More menu, and filter links
+        shell: bash
+        run: |
+          python3 -m pip install --quiet selenium Pillow
+          python3 - <<'PY'
+          import time,json,io,base64
+          from selenium import webdriver
+          from selenium.webdriver.chrome.options import Options
+          from PIL import Image
+          opts=Options()
+          opts.add_argument('--headless=new')
+          opts.add_argument('--no-sandbox')
+          opts.add_argument('--disable-dev-shm-usage')
+          d=webdriver.Chrome(options=opts)
+          root='https://eason-blog-web-live.eason456h.workers.dev'
+          def inspect():
+            return d.execute_script("""
+              const nav=document.querySelector('[data-tag-overflow]');
+              if(!nav)return {error:'missing nav'};
+              const visible=nav.querySelector('[data-tag-visible]');
+              const menu=nav.querySelector('[data-tag-more-menu]');
+              const more=nav.querySelector('[data-tag-more]');
+              const button=nav.querySelector('[data-tag-more-button]');
+              const r=e=>{let x=e.getBoundingClientRect();return {top:Math.round(x.top),bottom:Math.round(x.bottom),left:Math.round(x.left),right:Math.round(x.right),width:Math.round(x.width)}};
+              const tags=[...visible.querySelectorAll('a.tag-filter:not(.all-tag)')];
+              const overflow=[...menu.querySelectorAll('a.tag-filter')];
+              const all=[...tags,...overflow];
+              return {nav:r(nav),visible:r(visible),button:button? r(button):null,
+                moreVisible:!more.hidden,menuHidden:menu.hidden,visibleTags:tags.map(a=>({label:a.textContent.trim(),
+                count:Number(a.querySelector('.tag-count')?.textContent.trim()),rect:r(a),href:a.getAttribute('href')})),
+                overflowTags:overflow.map(a=>({label:a.textContent.trim(),count:Number(a.querySelector('.tag-count')?.textContent.trim()),href:a.getAttribute('href')})),
+                allCount:all.length,overflowCount:overflow.length,
+                docOverflow:document.documentElement.scrollWidth>document.documentElement.clientWidth+2};
+            """)
+          def test(url,width,label):
+            d.set_window_size(width,940)
+            d.get(root+url)
+            time.sleep(1.2)
+            data=inspect()
+            print(label,json.dumps(data,ensure_ascii=False),flush=True)
+            assert 'error' not in data, label
+            assert data['allCount'] >= (6 if url.startswith('/experience') else 2),label
+            assert not data['docOverflow'],label
+            seq=data['visibleTags']+data['overflowTags']
+            assert all(seq[i]['count']>=seq[i+1]['count'] for i in range(len(seq)-1)),label
+            assert len(data['visibleTags'])>0 and data['visibleTags'][-1]['rect']['right']<=data['visible']['right']+2,label
+            assert data['overflowCount']>0 if width<=1024 else True,label
+            if data['overflowCount']:
+              assert data['moreVisible'] and data['menuHidden'],label
+              more=d.find_element('css selector','[data-tag-more-button]')
+              more.click()
+              expanded=d.execute_script("let n=document.querySelector('[data-tag-more-menu]');return !n.hidden")
+              assert expanded,label
+              options=d.find_elements('css selector','[data-tag-more-menu] a')
+              assert len(options)==data['overflowCount']
+              assert all(option.get_attribute('href') for option in options)
+              d.execute_script("document.body.click()")
+              time.sleep(.1)
+            else:
+              assert not data['moreVisible'],label
+            if label=='WORKS_DESKTOP':
+              d.execute_script("document.querySelector('[data-tag-overflow]').scrollIntoView({block:'center'})")
+              path='/tmp/works-tags.png'
+              d.save_screenshot(path)
+              im=Image.open(path).convert('RGB')
+              im.thumbnail((1040,680))
+              buf=io.BytesIO()
+              im.save(buf,'JPEG',quality=54,optimize=True)
+              print('SCREEN_BEGIN',flush=True)
+              print(base64.b64encode(buf.getvalue()).decode('ascii'),flush=True)
+              print('SCREEN_END',flush=True)
+          try:
+            ready=False
+            for index in range(25):
+              d.set_window_size(1024,900)
+              d.get(root+'/experience/')
+              time.sleep(.65)
+              data=inspect()
+              if data.get('overflowCount',0)>0 and data.get('allCount',0)>=6:
+                ready=True;break
+              print('WAIT_DEPLOYMENT',index+1,str(data.get('error',data.get('allCount'))),flush=True)
+              time.sleep(4)
+            assert ready, 'No single-row tag overflow yet, deployment not ready'
+            test('/experience/',1440,'WORKS_DESKTOP')
+            test('/experience/',420,'WORKS_MOBILE')
+            test('/blog/',420,'BLOG_MOBILE')
+            # A tag detail uses exactly the same dropdown.
+            d.set_window_size(1024,900)
+            d.get(root+'/experience/')
+            time.sleep(.8)
+            href=d.execute_script("return document.querySelector('[data-tag-visible] .tag-filter:not(.all-tag)')?.getAttribute('href')")
+            assert href and '/tags/' in href
+            test(href,420,'WORK_TAG_DETAIL_MOBILE')
+            print('PASS: one-row responsive tags, sorted counts, and fully functional More dropdown')
+          finally:d.quit()
+          PY
