@@ -42,7 +42,7 @@ const hostname = (url: string) => {
           <h2>申請友站</h2>
           <p>有自己的網站或部落格，歡迎來交換友站！送出後由我審核，不用登入，也不強制回加本站。</p>
           <details class="friend-info"><summary>本站資訊</summary><p>網站名稱：{siteTitle}<br />網址：<a href={Astro.url.origin}>{Astro.url.origin}</a></p></details>
-          <form id="friend-request-form">
+          <form id="friend-request-form" method="post" action="/api/friend-requests">
             <label>網站名稱<input name="name" required maxlength="100" placeholder="你的網站名稱" /></label>
             <label>網站網址<input name="url" type="url" required maxlength="1500" placeholder="https://..." /></label>
             <label>簡短介紹<textarea name="description" rows="3" required maxlength="300" placeholder="介紹一下你的網站"></textarea></label>
