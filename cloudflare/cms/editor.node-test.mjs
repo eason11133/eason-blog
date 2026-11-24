@@ -39,3 +39,8 @@ test('CMS retains login protection and no-store admin page', async () => {
   const body=await response.text();
   assert.ok(body.includes('id="markdown-preview"'));
 });
+
+test('About settings uses editable fields and repeatable rows rather than raw JSON', () => {
+  for (const token of ['renderAboutForm', 'readAboutForm()', '新增專長', '新增興趣', '新增時間軸區塊', '新增經歷', 'about-avatar-file', 'body_text']) assert.ok(adminHtml.includes(token), token);
+  assert.ok(!adminHtml.includes('about-json'));
+});

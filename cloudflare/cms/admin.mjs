@@ -86,6 +86,13 @@ nav{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:16px}nav button[aria-curr
 .editor-actions{display:flex;gap:10px;align-items:center;margin-top:20px}
 .comment{border-bottom:1px solid #36445a;padding:14px 0}.comment:last-child{border:0}
 .comment p{white-space:pre-wrap;color:#e0e7f1}.actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.about-form-section{padding:18px 0;border-bottom:1px solid #39485e}
+.about-form-section h3{margin:0 0 14px;font-size:1.04rem}
+.about-repeat-row{padding:12px 14px;margin:8px 0;border:1px solid #39485e;border-radius:9px}
+.about-repeat-row .home-field:last-child{margin-bottom:0}
+.about-repeat-actions{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.about-repeat-actions button,.about-add{padding:6px 10px;font-size:.86rem}
+.about-avatar-preview{width:96px;height:96px;object-fit:cover;border-radius:12px;display:block;margin:10px 0}
 .home-field{margin-bottom:12px}.tags-grid{display:grid;grid-template-columns:1fr 160px;gap:10px;margin:8px 0}
 @media(max-width:720px){.two,.fields{grid-template-columns:1fr}main{padding:15px}.card{padding:16px}.span-2{grid-column:auto}.md-toolbar{padding:9px}.md-toolbar button{padding:7px}.md-toolbar select{max-width:130px}}
 </style>
@@ -471,16 +478,134 @@ function showPanel(next){
  if(tab==='friends')loadFriends().catch(e=>say(e.message,true));
  if(tab==='footer')loadFooter().catch(e=>say(e.message,true));
 }
+let readAboutForm=null;
+let settingsLoadId=0;
+function renderAboutForm(target,data){
+ const asObject=v=>v&&typeof v==='object'&&!Array.isArray(v)?v:{};
+ const asList=v=>Array.isArray(v)?v:[];
+ const asText=v=>typeof v==='string'?v:'';
+ let controlId=0;
+ function field(parent,label,value,options={}){
+  const wrap=document.createElement('div');wrap.className='home-field';
+  const title=document.createElement('label');title.textContent=label;
+  const control=document.createElement(options.choices?'select':options.rows?'textarea':'input');
+  control.id='about-field-'+(++controlId);title.htmlFor=control.id;
+  if(options.choices){
+   const choices=options.choices.slice();
+   if(value&&!choices.some(pair=>pair[0]===value))choices.push([value,value]);
+   for(const pair of choices){const option=document.createElement('option');option.value=pair[0];option.textContent=pair[1];control.appendChild(option);}
+  }else if(options.rows){control.rows=options.rows;}
+  else{control.type='text';}
+  control.value=asText(value);
+  if(options.required)control.required=true;
+  if(options.placeholder)control.placeholder=options.placeholder;
+  wrap.append(title,control);parent.appendChild(wrap);
+  return control;
+ }
+ function section(label){
+  const box=document.createElement('section');box.className='about-form-section';
+  const heading=document.createElement('h3');heading.textContent=label;
+  box.appendChild(heading);target.appendChild(box);return box;
+ }
+ function button(label,click,disabled=false){
+  const b=document.createElement('button');b.type='button';b.className='secondary';b.textContent=label;b.disabled=disabled;b.onclick=click;return b;
+ }
+ function repeat(parent,items,addLabel,makeRow,empty){
+  const list=document.createElement('div');parent.appendChild(list);
+  let rows=[];
+  function draw(values){
+   list.replaceChildren();rows=[];
+   values.forEach((value,i)=>{
+    const row=document.createElement('div');row.className='about-repeat-row';
+    rows.push(makeRow(row,value));
+    const actions=document.createElement('div');actions.className='about-repeat-actions';
+    function move(to){const all=read();[all[i],all[to]]=[all[to],all[i]];draw(all);}
+    actions.append(button('上移',()=>move(i-1),i===0),button('下移',()=>move(i+1),i===values.length-1),button('刪除',()=>{const all=read();all.splice(i,1);draw(all);}));
+    row.appendChild(actions);list.appendChild(row);
+   });
+  }
+  function read(){return rows.map(get=>get());}
+  const add=button(addLabel,()=>draw([...read(),empty()]));add.classList.add('about-add');parent.appendChild(add);
+  draw(items);return read;
+ }
+ const profile=asObject(data.profile),website=asObject(data.website);
+ const personal=section('個人資料');
+ const pageTitle=field(personal,'頁面標題',data.page_title||'關於我',{required:true});
+ const name=field(personal,'姓名',profile.name,{required:true});
+ const avatar=field(personal,'頭像網址或圖片路徑',profile.avatar_image);
+ const preview=document.createElement('img');preview.className='about-avatar-preview';preview.alt='頭像預覽';
+ function refreshAvatar(){
+  const value=avatar.value.trim();
+  preview.hidden=!value;
+  if(value)preview.src=value.startsWith('/')?'https://eason-blog-web-live.eason456h.workers.dev'+value:value;
+ }
+ avatar.addEventListener('input',refreshAvatar);personal.appendChild(preview);refreshAvatar();
+ const upload=document.createElement('input');upload.type='file';upload.accept='image/png,image/jpeg,image/webp,image/gif';
+ const uploadLabel=document.createElement('label');uploadLabel.textContent='或直接上傳頭像';upload.id='about-avatar-file';uploadLabel.htmlFor=upload.id;personal.append(uploadLabel,upload);
+ upload.onchange=async()=>{
+  const file=upload.files[0];if(!file)return;
+  upload.disabled=true;
+  try{
+   if(!['image/png','image/jpeg','image/webp','image/gif'].includes(file.type)||file.size>4500000)throw new Error('請選擇 4.5MB 以內的 PNG、JPG、WebP 或 GIF');
+   const response=await fetch('/api/admin/media',{method:'POST',credentials:'same-origin',headers:{'Content-Type':file.type},body:file});
+   const result=await response.json();if(!response.ok||typeof result.url!=='string'||!result.url.startsWith('https://'))throw new Error(result.error||'圖片上傳失敗');
+   avatar.value=result.url;refreshAvatar();say('頭像已上傳，請儲存關於我');
+  }catch(err){say(err.message,true);}finally{upload.disabled=false;upload.value='';}
+ };
+ const specialties=repeat(section('專長'),Array.isArray(profile.specialties)?profile.specialties:profile.specialty?[profile.specialty]:[],'＋ 新增專長',(row,v)=>{const control=field(row,'專長',v,{required:true});return ()=>control.value;},()=>'');
+ const originalBody=typeof data.body_text==='string'?data.body_text:asText(data.body_markdown);
+ const intro=field(section('自我介紹'),'介紹文字（直接輸入文字，可換行）',originalBody,{rows:5});
+ const interestsSection=section('興趣');
+ const interestsTitle=field(interestsSection,'區塊標題',data.interests_title||'平常喜歡的事',{required:true});
+ const icons=[['code','程式／專案'],['baseball','棒球'],['billiards','撞球'],['anime','動漫'],['game','遊戲'],['other','其他']];
+ const interests=repeat(interestsSection,asList(data.interests),'＋ 新增興趣',(row,value)=>{
+  const v=asObject(value);
+  const icon=field(row,'圖示',v.icon||'other',{choices:icons});
+  const title=field(row,'名稱',v.title,{required:true});
+  const description=field(row,'介紹',v.description,{rows:2});
+  return ()=>({...v,icon:icon.value,title:title.value,description:description.value});
+ },()=>({icon:'other',title:'',description:''}));
+ const websiteSection=section('關於這個網站');
+ const websiteTitle=field(websiteSection,'區塊標題',website.title||'關於這個網站',{required:true});
+ const websiteDescription=field(websiteSection,'網站介紹',website.description,{rows:3});
+ const linkText=field(websiteSection,'連結文字',website.link_text);
+ const linkUrl=field(websiteSection,'連結網址（選填）',website.link_url,{placeholder:'/blog/ 或 https://...'});
+ const timelines=repeat(section('時間軸／經歷'),asList(data.timelines),'＋ 新增時間軸區塊',(row,value)=>{
+  const v=asObject(value);
+  const title=field(row,'時間軸標題',v.title,{required:true});
+  const items=repeat(row,asList(v.items),'＋ 新增經歷',(itemRow,item)=>{
+   const i=asObject(item);
+   const when=field(itemRow,'時間',i.when,{required:true});
+   const event=field(itemRow,'事件名稱',i.event,{required:true});
+   const result=field(itemRow,'結果／狀態（選填）',i.result);
+   const url=field(itemRow,'連結（選填）',i.url,{placeholder:'/experience/... 或 https://...'});
+   return ()=>({...i,when:when.value,event:event.value,result:result.value,url:url.value});
+  },()=>({when:'',event:'',result:'',url:''}));
+  return ()=>({...v,title:title.value,items:items()});
+ },()=>({title:'',items:[]}));
+ return ()=>{
+  const result={...data,page_title:pageTitle.value,profile:{...profile,name:name.value,avatar_image:avatar.value.trim(),specialties:specialties().map(x=>x.trim()).filter(Boolean),specialty:''},interests_title:interestsTitle.value,interests:interests(),website:{...website,title:websiteTitle.value,description:websiteDescription.value,link_text:linkText.value,link_url:linkUrl.value.trim()},timelines:timelines()};
+  // Preserve old formatted content unless the introduction is actually edited.
+  if(typeof data.body_text==='string'||intro.value!==originalBody)result.body_text=intro.value;
+  return result;
+ };
+}
 async function loadSettings(){
- const data=await api('/api/admin/settings/'+tab);
+ const currentTab=tab,loadId=++settingsLoadId;
+ const save=el('settings-form').querySelector('button[type="submit"]');
+ save.disabled=true;readAboutForm=null;
+ const target=el('settings-fields');target.replaceChildren();
+ const data=await api('/api/admin/settings/'+currentTab);
+ if(tab!==currentTab||loadId!==settingsLoadId)return;
  homeData=data;
  el('settings-heading').textContent=tab==='homepage'?'首頁管理':'關於我內容';
- const target=el('settings-fields');target.replaceChildren();
  if(tab==='about'){
-  const p=document.createElement('p');p.textContent='第一階段先以 JSON 保留「關於我」完整資料，後續會換成表單欄位。';target.appendChild(p);
-  const a=document.createElement('textarea');a.id='about-json';a.rows=22;a.value=JSON.stringify(data,null,2);target.appendChild(a);
+  if(!data.profile||!data.page_title)throw new Error('無法讀取現有關於我內容，請重新整理，避免覆蓋資料');
+  readAboutForm=renderAboutForm(target,data);
+  save.disabled=false;
   return;
  }
+ save.disabled=false;
  fields.forEach((key,i)=>{
   const wrap=document.createElement('div');wrap.className='home-field';
   const label=document.createElement('label');label.textContent=labels[i];label.htmlFor='setting-'+key;
@@ -571,7 +696,7 @@ el('settings-form').onsubmit=async e=>{
  e.preventDefault();
  try{
   let data;
-  if(tab==='about')data=JSON.parse(el('about-json').value);
+  if(tab==='about'){if(!readAboutForm)throw new Error('請先載入關於我內容');data=readAboutForm();}
   else {
    data={...homeData};
    for(const key of fields)data[key]=el('setting-'+key).value;

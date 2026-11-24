@@ -24,12 +24,13 @@ interface AboutPageData {
   }>;
 }
 
-// 所有可編輯文字都在 src/content/about.md；這個檔案只負責排版。
+// Live content comes from the CMS form; Markdown remains the static/legacy fallback.
 const live = import.meta.env.PUBLIC_EASON_LIVE === 'true';
 const about = live
-  ? await getCmsSettings<AboutPageData & { body_markdown?: string }>('about')
+  ? await getCmsSettings<AboutPageData & { body_markdown?: string; body_text?: string }>('about')
   : (frontmatter as AboutPageData);
-const aboutBodyHtml = live
+const aboutBodyText = live && 'body_text' in about && typeof about.body_text === 'string' ? about.body_text : undefined;
+const aboutBodyHtml = live && aboutBodyText === undefined
   ? (await renderCmsMarkdown('body_markdown' in about ? String(about.body_markdown ?? '') : '')).html
   : '';
 ---
@@ -81,7 +82,7 @@ const aboutBodyHtml = live
         </header>
 
         <div class="about-text">
-          {live ? <Fragment set:html={aboutBodyHtml} /> : <AboutContent />}
+          {aboutBodyText !== undefined ? <p class="about-plain-text">{aboutBodyText}</p> : live ? <Fragment set:html={aboutBodyHtml} /> : <AboutContent />}
         </div>
 
         <section class="service" id="about-interests" aria-labelledby="interests-title">
@@ -327,6 +328,8 @@ const aboutBodyHtml = live
     font-weight: 400;
     line-height: 1.85;
   }
+
+  .about-plain-text { white-space: pre-wrap; overflow-wrap: anywhere; }
 
   .service,
   .site-note { scroll-margin-top: 95px; }
