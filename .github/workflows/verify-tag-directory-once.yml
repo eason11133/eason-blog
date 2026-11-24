@@ -125,11 +125,20 @@ jobs:
                   meta:r('.hero-header .post-topline'),back:r('.hero-header .post-back-link'),
                   article:r('.layout-container .content-card'),prose:r('.layout-container .prose'),
                   hero:r('.hero-header .hero-content'),viewport:innerWidth,
-                  footerTop:r('footer')?.top,
+                  footerTop:r('footer')?.top,comments:r('.site-comments'),
                   overflow:document.documentElement.scrollWidth>document.documentElement.clientWidth+2};
               """)
               print(label,json.dumps(detail,ensure_ascii=False),flush=True)
               assert not detail['overflow']
+              if width==1920:
+                assert 465<=detail['meta']['left']<=520, 'Wide metadata line has not moved left'
+                assert abs(detail['article']['left']-detail['meta']['left'])<=6, 'Wide body must align with metadata'
+                assert detail['article']['bottom']-detail['prose']['bottom']<55, 'Short article forced minimum height'
+                assert detail['comments'] and 0<=detail['comments']['top']-detail['article']['bottom']<75, 'Excess blank space before comments'
+              elif width==1120:
+                assert 185<=detail['meta']['left']<=205 and 50<=detail['article']['left']<=72, 'Half-window layout changed'
+              else:
+                assert detail['meta']['left']==20 and detail['article']['left']==20, 'Mobile layout changed'
               shot(label)
             print('PASS: full-screen centered, half/mobile unchanged, one-row tags, tag directory works',flush=True)
           finally:d.quit()
