@@ -614,9 +614,31 @@ html[data-theme="dark"] body[data-page-id="blog-list"] .articles-list .blog-post
   padding-top: .75rem;
   row-gap: .45rem;
 }
+/* Pinned is a visual badge, not an extra row in the card. Keep the
+   first article title aligned with the title of every unpinned card. */
+html[data-theme="dark"] body[data-page-id="blog-list"] .articles-list > .scroll-reveal {
+  position: relative;
+}
 html[data-theme="dark"] body[data-page-id="blog-list"] .articles-list .pinned-mark {
-  padding-top: 0;
-  margin-bottom: .35rem;
+  position: absolute;
+  top: 19px;
+  right: 21px;
+  z-index: 3;
+  display: inline-flex;
+  width: max-content;
+  padding: 0;
+  margin: 0;
+  line-height: 1.4;
+  pointer-events: none;
+}
+html[data-theme="dark"] body[data-page-id="blog-list"] .articles-list > .scroll-reveal:has(> .pinned-mark) .blog-post-title {
+  max-width: calc(100% - 86px);
+}
+@media screen and (max-width: 820px) {
+  html[data-theme="dark"] body[data-page-id="blog-list"] .articles-list .pinned-mark {
+    top: 18px;
+    right: 18px;
+  }
 }
 @media screen and (max-width: 820px) {
   html[data-theme="dark"] body[data-page-id="blog-list"] .articles-list {
