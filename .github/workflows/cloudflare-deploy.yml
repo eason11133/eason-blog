@@ -4,6 +4,7 @@ on:
   push:
     branches: [main]
     paths:
+      - 'cloudflare/site-config.mjs'
       - 'cloudflare/cms/**'
       - 'cloudflare/live-site/**'
       - 'src/**'
