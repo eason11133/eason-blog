@@ -63,10 +63,34 @@ jobs:
                 firstParagraph:inspect('.prose > p'),
                 prose:inspect('.prose'),
                 toc:inspect('.sidebar-container'),
+                layoutContainer:inspect('.layout-container'),
+                footer:inspect('#main-content > footer'),
                 imageFilter:getComputedStyle(document.querySelector('.prose img')).filter
               };
             """)
             print('BROWSER_GEOMETRY',metrics,flush=True)
+            assert metrics['hero']['bottom']>=metrics['heroMeta']['bottom']-2, 'Article header does not contain its title/meta'
+            assert metrics['firstParagraph']['top']>=metrics['heroMeta']['bottom']+8, 'Article body overlaps title/meta'
+            assert metrics['statsWrapper']['bottom']>=metrics['prose']['bottom']-2, 'Article wrapper ends before body'
+            assert metrics['footer']['top']>=metrics['prose']['bottom']-2, 'Footer overlaps long article'
+            assert metrics['imageFilter']=='none', 'Image must be displayed at normal brightness'
+            browser.set_window_size(420,900)
+            mobile=browser.execute_script("""
+              const rect=(s)=>{let e=document.querySelector(s);let r=e.getBoundingClientRect();return [Math.round(r.top),Math.round(r.bottom)]};
+              return {
+                header:rect('.hero-header.hero-sky-only'),
+                meta:rect('.hero-meta'),
+                article:rect('.content-card'),
+                first:rect('.prose > p'),
+                prose:rect('.prose'),
+                footer:rect('#main-content > footer')
+              };
+            """)
+            print('MOBILE_GEOMETRY',mobile,flush=True)
+            assert mobile['header'][1]>=mobile['meta'][1]-2, 'Mobile header too short'
+            assert mobile['first'][0]>=mobile['meta'][1]+8, 'Mobile body overlaps header'
+            assert mobile['footer'][0]>=mobile['prose'][1]-2, 'Mobile footer overlaps body'
+            print('PASS: real browser geometry is non-overlapping on desktop and mobile',flush=True)
           finally:
             browser.quit()
           PY
