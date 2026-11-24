@@ -1,0 +1,51 @@
+name: Article visual smoke check
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/article-visual-qa.yml"
+  workflow_dispatch:
+
+jobs:
+  capture:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - name: Capture article screenshot in headless Chrome
+        shell: bash
+        run: |
+          set -e
+          chrome=$(command -v google-chrome || command -v google-chrome-stable || command -v chromium || true)
+          if [[ -z "$chrome" ]]; then echo 'Chrome not installed'; exit 1; fi
+          echo "Browser: $chrome"
+          "$chrome" --headless=new --no-sandbox --disable-gpu --disable-dev-shm-usage --hide-scrollbars \
+            --window-size=1440,940 --virtual-time-budget=2500 \
+            --screenshot=/tmp/eason-ncu-desktop.png \
+            'https://eason-blog-web-live.eason456h.workers.dev/blog/ncu-im-116/' 2>/tmp/chrome-log
+          test -s /tmp/eason-ncu-desktop.png
+          "$chrome" --headless=new --no-sandbox --disable-gpu --disable-dev-shm-usage --hide-scrollbars \
+            --window-size=420,900 --virtual-time-budget=2500 \
+            --screenshot=/tmp/eason-ncu-mobile.png \
+            'https://eason-blog-web-live.eason456h.workers.dev/blog/ncu-im-116/' 2>>/tmp/chrome-log
+          test -s /tmp/eason-ncu-mobile.png
+      - name: Emit compressed screenshots for visual QA
+        shell: bash
+        run: |
+          python3 -m pip install --quiet Pillow
+          python3 - <<'PY'
+          from PIL import Image
+          import base64,io
+          for label,fn,maximum in [
+            ('DESKTOP','/tmp/eason-ncu-desktop.png',(1152,752)),
+            ('MOBILE','/tmp/eason-ncu-mobile.png',(420,900)),
+          ]:
+            im=Image.open(fn).convert('RGB')
+            im.thumbnail(maximum)
+            buf=io.BytesIO()
+            im.save(buf,format='JPEG',quality=54,optimize=True)
+            print('VISUAL_'+label+'_BEGIN')
+            print(base64.b64encode(buf.getvalue()).decode('ascii'))
+            print('VISUAL_'+label+'_END')
+            print('CAPTURE '+label+' size='+str(im.size)+' bytes='+str(len(buf.getvalue())))
+          PY
