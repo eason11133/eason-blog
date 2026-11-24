@@ -59,10 +59,10 @@ jobs:
               d.get(base+'/experience/')
               time.sleep(.65)
               info=inspect()
-              if info.get('actionUrl')=='/tags/' and info.get('action')=='所有標籤 →':
-                d.get(base+'/tags/')
+              if info.get('actionUrl')=='/experience/tags/' and info.get('action')=='所有標籤 →':
+                d.get(base+'/experience/tags/')
                 time.sleep(.4)
-                if d.find_elements('css selector','.tags-group') and len(d.find_elements('css selector','.tags-group'))==2:
+                if d.find_elements('css selector','.tags-grid .tags-entry'):
                   deployed=True;break
               print('WAIT_FOR_DEPLOY',i+1,str(info.get('actionUrl')),flush=True)
               time.sleep(4)
@@ -74,7 +74,7 @@ jobs:
               val=inspect()
               print(label,json.dumps(val,ensure_ascii=False),flush=True)
               assert not val['overflow'],label
-              assert val['actionUrl']=='/tags/' and val['action']=='所有標籤 →',label
+              assert val['actionUrl']=='/experience/tags/' and val['action']=='所有標籤 →',label
               counts=[x['count'] for x in (val['visible']+val['hidden']) if x['label'].startswith('#')]
               assert counts==sorted(counts,reverse=True),label
               assert val['visible'] and not val['visible'][0]['label'].startswith('#'),label
@@ -86,28 +86,23 @@ jobs:
               if width==420:
                 assert len(val['hidden'])>0,'Mobile should hide lower-priority tags'
               shot(label)
-            d.set_window_size(1440,1000)
-            d.get(base+'/tags/')
-            time.sleep(.75)
-            tags=d.execute_script("""
-              return {title:document.querySelector('.all-tags-inner .interior-heading h1')?.textContent.trim(),
-                sections:[...document.querySelectorAll('.tags-group')].map(x=>({
-                  heading:x.querySelector('h2')?.textContent.trim(),
-                  items:[...x.querySelectorAll('.tags-entry')].map(x=>({
+            for route,kind in [('/experience/tags/','works'),('/tags/','blog')]:
+              d.set_window_size(1440,1000)
+              d.get(base+route)
+              time.sleep(.75)
+              tags=d.execute_script("""
+                return {title:document.querySelector('.interior-heading')?.textContent.trim(),
+                  items:[...document.querySelectorAll('.tags-grid .tags-entry')].map(x=>({
                     label:x.querySelector('.tags-label')?.textContent.trim(),
                     count:Number(x.querySelector('.number')?.textContent),
-                    href:x.getAttribute('href')}))})),
-                overflow:document.documentElement.scrollWidth>document.documentElement.clientWidth+2};
-            """)
-            print('DIRECTORY',json.dumps(tags,ensure_ascii=False),flush=True)
-            assert '所有標籤' in tags['title']
-            assert [x['heading'] for x in tags['sections']]==['作品','文章']
-            assert all(x['items'] for x in tags['sections'])
-            for section in tags['sections']:
-              assert all(section['items'][i]['count']>=section['items'][i+1]['count'] for i in range(len(section['items'])-1))
-              assert all(x['href'].startswith('/') for x in section['items'])
-            assert not tags['overflow']
-            shot('DIRECTORY')
+                    href:x.getAttribute('href')})),
+                  overflow:document.documentElement.scrollWidth>document.documentElement.clientWidth+2};
+              """)
+              print('DIRECTORY_'+kind,json.dumps(tags,ensure_ascii=False),flush=True)
+              assert tags['items'] and not tags['overflow']
+              assert all(tags['items'][i]['count']>=tags['items'][i+1]['count'] for i in range(len(tags['items'])-1))
+              assert all(x['href'].startswith('/experience/tags/' if kind=='works' else '/tags/') for x in tags['items'])
+              shot('DIRECTORY_'+kind)
             for width,label in [(1920,'ARTICLE_WIDE'),(1120,'ARTICLE_HALF'),(420,'ARTICLE_MOBILE')]:
               d.set_window_size(width,1020)
               d.get(base+'/experience/')
