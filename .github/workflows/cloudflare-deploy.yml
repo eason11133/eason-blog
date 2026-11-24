@@ -88,23 +88,21 @@ jobs:
       - name: Verify public comment login and anonymous write protection
         shell: bash
         run: |
-          python3 - <<'PY'
-          import urllib.request
-          import urllib.error
-          import json
           site='https://eason-blog-web-live.eason456h.workers.dev'
-          with urllib.request.urlopen(urllib.request.Request(site+'/api/auth/me',headers={'User-Agent':'Mozilla/5.0'}),timeout=20) as r:
-            data=json.load(r)
-            assert r.status==200 and data.get('user') is None
-            assert isinstance(data.get('providers'),dict)
-            print('OAuth session API: 200, unauthenticated',flush=True)
-          body=json.dumps({'kind':'post','slug':'demo','body':'not sent'}).encode()
-          req=urllib.request.Request(site+'/api/comments',data=body,method='POST',headers={'Origin':site,'Content-Type':'application/json','User-Agent':'Mozilla/5.0'})
-          try:
-            with urllib.request.urlopen(req,timeout=20) as r:
-              code=r.status
-          except urllib.error.HTTPError as error:
-            code=error.code
-          assert code==401, 'Expected anonymous comment POST to be denied (401), got '+str(code)
-          print('Anonymous comment write: 401, correctly blocked',flush=True)
+          curl -fsS --retry 3 --retry-delay 2 -A 'Mozilla/5.0' -o /tmp/eason-comment-me.json "$site/api/auth/me"
+          python3 - <<'PY'
+          import json
+          with open('/tmp/eason-comment-me.json',encoding='utf-8') as f:
+            data=json.load(f)
+          assert data.get('user') is None
+          assert isinstance(data.get('providers'),dict)
+          print('OAuth session API: 200, unauthenticated',flush=True)
           PY
+          status=$(curl -sS --max-time 20 -A 'Mozilla/5.0' -o /tmp/eason-guest-post.json -w '%{http_code}' \
+            -H "Origin: $site" -H 'Content-Type: application/json' \
+            -d '{"kind":"post","slug":"demo","body":"not sent"}' "$site/api/comments")
+          echo "Anonymous comment write: HTTP $status"
+          if [[ "$status" != 401 ]]; then
+            cat /tmp/eason-guest-post.json
+            exit 1
+          fi
