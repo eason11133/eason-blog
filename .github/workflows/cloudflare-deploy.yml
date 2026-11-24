@@ -70,7 +70,7 @@ jobs:
       - name: Validate live Worker bundle without deploying
         run: ./node_modules/.bin/wrangler deploy --config dist-cloudflare/server/wrangler.json --dry-run --outdir ./.wrangler/live-dry-run
       - name: Apply D1 migrations (preserves current content)
-        run: ./node_modules/.bin/wrangler d1 migrations apply eason-blog-content --config cloudflare/cms/wrangler.jsonc --remote --yes
+        run: ./node_modules/.bin/wrangler d1 migrations apply eason-blog-content --config cloudflare/cms/wrangler.jsonc --remote
       - name: Deploy CMS Worker (eason-blog)
         run: ./node_modules/.bin/wrangler deploy --config cloudflare/cms/wrangler.jsonc
       - name: Deploy live frontend Worker (eason-blog-web-live)
