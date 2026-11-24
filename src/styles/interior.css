@@ -798,3 +798,22 @@ html[data-theme="dark"] body[data-page-id="blog-list"] .article-tags[data-tag-ov
   html[data-theme="dark"] body[data-page-id="blog-list"] .article-tags .tag-visible { gap: .4rem; }
   html[data-theme="dark"] body[data-page-id="blog-list"] .article-tags[data-tag-overflow] { gap: .4rem; }
 }
+
+
+/* Wide-screen post alignment, without changing half-width or phone layout. */
+@media screen and (min-width: 1600px) {
+  html[data-theme="dark"] body[data-page-id="post"] .layout-container {
+    /* The old 150px offset centered the narrow text inside a wider grid,
+       but made full-width windows feel too far to the right. */
+    left: 50px;
+    padding-bottom: 28px !important;
+  }
+  html[data-theme="dark"] body[data-page-id="post"] .hero-header.hero-sky-only .post-topline {
+    position: relative;
+    left: -100px;
+  }
+  html[data-theme="dark"] body[data-page-id="post"] .layout-container > .content-card {
+    /* Let short posts end after their actual text, rather than force 240px. */
+    min-height: 0;
+  }
+}
