@@ -6,6 +6,7 @@ on:
     paths:
       - "src/**"
       - "cloudflare/live-site/**"
+      - "cloudflare/site-config.mjs"
       - "astro.config.mjs"
       - ".github/workflows/cloudflare-live-build.yml"
   workflow_dispatch:
