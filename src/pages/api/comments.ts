@@ -21,11 +21,12 @@ export const POST: APIRoute = async ({ request, url }) => {
   if (!(request.headers.get('Content-Type')||'').startsWith('application/json')) return json({error:'Unsupported content type'},415);
   const size = Number(request.headers.get('Content-Length')||0);
   if(size>7000) return json({error:'留言太長'},413);
+  if (!request.headers.get('Cookie')?.includes('eason_comment_session=')) return json({error:'請先登入再留言'},401);
   const body=await request.text();
   if(body.length>7000) return json({error:'留言太長'},413);
   const response=await fetch(CMS_ORIGIN+'/api/comments',{
     method:'POST',
-    headers:{Origin:CMS_ORIGIN,'Content-Type':'application/json'},
+    headers:{Origin:CMS_ORIGIN,'Content-Type':'application/json',Cookie:request.headers.get('Cookie')||''},
     body
   });
   return new Response(response.body,{status:response.status,headers:{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store'}});
