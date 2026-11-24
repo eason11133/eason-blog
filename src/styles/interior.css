@@ -561,4 +561,10 @@ html[data-theme="dark"] body[data-page-id="post"] .prose img[src$="ncu-im-interv
   html[data-theme="dark"] body[data-page-id="post"] .layout-container {
     left: clamp(0px, calc((100vw - 1160px) / 2), 150px);
   }
+  /* Align the back link and metadata with the centered reading column,
+     rather than the wider title container. */
+  html[data-theme="dark"] body[data-page-id="post"] .hero-header.hero-sky-only .post-topline {
+    width: min(100%, 732px);
+    margin-inline: auto;
+  }
 }
