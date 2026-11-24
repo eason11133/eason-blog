@@ -15,6 +15,7 @@ const { page } = Astro.props as { page: Page<WorkEntry> };
 const siteURL = Astro.site ?? Astro.url;
 const hasPosts = page.total > 0;
 const tags = await getWorkTagStats();
+tags.sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], 'zh-Hant'));
 const pageTitle =
   !hasPosts || page.currentPage === 1
     ? `作品 | ${siteTitle}`
@@ -531,13 +532,21 @@ if (last > 1) paginationList.push(last);
     <div class="articles-inner">
       <InteriorHeading title="作品" centered={true} animated={true} />
       {tags.length > 0 && (
-        <nav class="article-tags" aria-label="作品標籤">
+        <nav class="article-tags" aria-label="作品標籤" data-tag-overflow>
+          <div class="tag-visible" data-tag-visible>
           <a class="tag-filter all-tag" href="/experience/" data-astro-prefetch="viewport">全部作品 <span>{page.total}</span></a>
           {tags.map(([tag, count]) => (
             <a class="tag-filter" href={getWorkTagPath(tag)} data-astro-prefetch="viewport" aria-label={`作品標籤 ${tag}，共 ${count} 個作品`}>
               <span class="tag-hash">#</span>{tag}<span class="tag-count">{count}</span>
             </a>
           ))}
+          </div>
+          <div class="tag-overflow" data-tag-more hidden>
+            <button class="tag-filter tag-more-button" type="button" data-tag-more-button aria-expanded="false" aria-haspopup="true" aria-label="查看更多標籤">
+              更多 <span class="tag-more-count" data-tag-more-count></span><span aria-hidden="true">⌄</span>
+            </button>
+            <div class="tag-overflow-menu" data-tag-more-menu hidden></div>
+          </div>
         </nav>
       )}
       <div class="articles-list blog-posts-list">

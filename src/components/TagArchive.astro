@@ -18,6 +18,7 @@ interface Props {
 }
 
 const { tag, posts, sortedTags, totalCount, kind } = Astro.props;
+const displayTags = [...sortedTags].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], 'zh-Hant'));
 const isWork = kind === 'works';
 const label = isWork ? '作品' : '文章';
 const archiveUrl = isWork ? '/experience/' : '/blog/';
@@ -506,11 +507,12 @@ const pageCount = Math.ceil(visiblePosts.length / CONTENT_PAGE_SIZE);
   <section class="articles-area" aria-label={`${label}標籤列表`}>
     <div class="articles-inner">
       <InteriorHeading title={`#${tag}`} centered={true} animated={true} />
-      <nav class="article-tags" aria-label={`${label}標籤`}>
+      <nav class="article-tags" aria-label={`${label}標籤`} data-tag-overflow>
+        <div class="tag-visible" data-tag-visible>
         <a class="tag-filter all-tag" href={archiveUrl} data-astro-prefetch="viewport">
           全部{label} <span>{totalCount}</span>
         </a>
-        {sortedTags.map(([name, count]) => (
+        {displayTags.map(([name, count]) => (
           <a
             class="tag-filter"
             href={pathForTag(name)}
@@ -520,6 +522,13 @@ const pageCount = Math.ceil(visiblePosts.length / CONTENT_PAGE_SIZE);
             <span class="tag-hash">#</span>{name}<span class="tag-count">{count}</span>
           </a>
         ))}
+        </div>
+          <div class="tag-overflow" data-tag-more hidden>
+            <button class="tag-filter tag-more-button" type="button" data-tag-more-button aria-expanded="false" aria-haspopup="true" aria-label="查看更多標籤">
+              更多 <span class="tag-more-count" data-tag-more-count></span><span aria-hidden="true">⌄</span>
+            </button>
+            <div class="tag-overflow-menu" data-tag-more-menu hidden></div>
+          </div>
       </nav>
       <div class="articles-list blog-posts-list" data-tag-pagination data-page-count={pageCount}>
         {visiblePosts.map((post, index) => (

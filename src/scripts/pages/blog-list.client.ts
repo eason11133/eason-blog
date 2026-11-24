@@ -1,4 +1,74 @@
 
+/**
+ * Move only the tags which do not fit beside "More" into a dropdown.
+ * Runs on client-navigation and window resize; original links remain valid.
+ */
+function setupTagOverflow() {
+  for (const bar of document.querySelectorAll<HTMLElement>('[data-tag-overflow]')) {
+    const visible = bar.querySelector<HTMLElement>('[data-tag-visible]');
+    const more = bar.querySelector<HTMLElement>('[data-tag-more]');
+    const menu = bar.querySelector<HTMLElement>('[data-tag-more-menu]');
+    const toggle = bar.querySelector<HTMLButtonElement>('[data-tag-more-button]');
+    const counter = bar.querySelector<HTMLElement>('[data-tag-more-count]');
+    if (!visible || !more || !menu || !toggle || !counter) continue;
+    const all = visible.querySelector<HTMLAnchorElement>('.all-tag');
+    if (!all) continue;
+    const tags = [...visible.querySelectorAll<HTMLAnchorElement>('.tag-filter:not(.all-tag)')];
+    if (!tags.length) continue;
+    let animationFrame = 0;
+    const close = () => {
+      menu.hidden = true;
+      toggle.setAttribute('aria-expanded', 'false');
+    };
+    const layout = () => {
+      close();
+      // Restore DOM order before each measurement, including after resizes.
+      for (const tag of tags) visible.appendChild(tag);
+      more.hidden = false;
+      // Reserve the More button in advance so it can never create a second row.
+      const available = visible.clientWidth;
+      const gap = Number.parseFloat(getComputedStyle(visible).columnGap) || 0;
+      let used = all.getBoundingClientRect().width;
+      for (const tag of tags) {
+        const tagWidth = tag.getBoundingClientRect().width;
+        if (used + gap + tagWidth <= available + .5) {
+          used += gap + tagWidth;
+        } else {
+          menu.appendChild(tag);
+        }
+      }
+      const hiddenCount = menu.children.length;
+      counter.textContent = hiddenCount ? String(hiddenCount) : '';
+      more.hidden = hiddenCount === 0;
+    };
+    const schedule = () => {
+      cancelAnimationFrame(animationFrame);
+      animationFrame = requestAnimationFrame(layout);
+    };
+    toggle.addEventListener('click', () => {
+      menu.hidden = !menu.hidden;
+      toggle.setAttribute('aria-expanded', String(!menu.hidden));
+    });
+    document.addEventListener('pointerdown', event => {
+      if (!bar.contains(event.target as Node)) close();
+    });
+    bar.addEventListener('keydown', event => {
+      if (event.key === 'Escape') {
+        close();
+        toggle.focus();
+      }
+    });
+    if ('ResizeObserver' in window) {
+      const ro = new ResizeObserver(schedule);
+      ro.observe(bar);
+    } else {
+      window.addEventListener('resize', schedule, { passive: true });
+    }
+    schedule();
+  }
+}
+
+
 function setupScrollReveal() {
 	const targets = Array.from(document.querySelectorAll<HTMLElement>('.scroll-reveal'));
 	if (targets.length === 0) return;
@@ -87,6 +157,7 @@ function setupTagPagination() {
 }
 
 export function initBlogListPage() {
+  setupTagOverflow();
   setupTagPagination();
   setupScrollReveal();
 }

@@ -728,3 +728,88 @@ html[data-theme="dark"] body[data-page-id="blog-list"] .page-btn.disabled {
     justify-content: center;
   }
 }
+
+
+/* Tag filters always occupy one row; overflow links go into the More menu.
+   Keep the existing chip colors and the night sky visible underneath. */
+html[data-theme="dark"] body[data-page-id="blog-list"] .article-tags[data-tag-overflow] {
+  display: flex !important;
+  flex-wrap: nowrap !important;
+  align-items: center;
+  width: 100%;
+  min-width: 0;
+  gap: .55rem;
+  position: relative;
+  overflow: visible;
+}
+html[data-theme="dark"] body[data-page-id="blog-list"] .article-tags .tag-visible {
+  display: flex;
+  flex: 1 1 0;
+  min-width: 0;
+  align-items: center;
+  gap: .6rem;
+  overflow: hidden;
+  white-space: nowrap;
+}
+html[data-theme="dark"] body[data-page-id="blog-list"] .article-tags .tag-visible > .tag-filter {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+html[data-theme="dark"] body[data-page-id="blog-list"] .article-tags .tag-overflow {
+  position: relative;
+  flex: 0 0 auto;
+  z-index: 10;
+}
+html[data-theme="dark"] body[data-page-id="blog-list"] .article-tags .tag-more-button {
+  display: inline-flex;
+  align-items: center;
+  gap: .35rem;
+  cursor: pointer;
+  font: inherit;
+  font-size: .88rem;
+  white-space: nowrap;
+}
+html[data-theme="dark"] body[data-page-id="blog-list"] .article-tags .tag-more-count {
+  font-size: .78rem;
+  color: var(--color-text-tertiary);
+}
+html[data-theme="dark"] body[data-page-id="blog-list"] .article-tags .tag-overflow-menu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 10px);
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 5px;
+  min-width: 175px;
+  width: max-content;
+  max-width: min(290px, calc(100vw - 32px));
+  max-height: min(58dvh, 380px);
+  overflow-y: auto;
+  padding: 9px;
+  border: 1px solid rgba(165, 194, 230, .25);
+  border-radius: 11px;
+  background: rgba(21, 31, 48, .96);
+  box-shadow: 0 12px 34px rgba(0, 7, 22, .27);
+}
+html[data-theme="dark"] body[data-page-id="blog-list"] .article-tags .tag-overflow-menu > .tag-filter {
+  display: flex;
+  width: 100%;
+  box-sizing: border-box;
+  flex: 0 0 auto;
+  justify-content: flex-start;
+  white-space: nowrap;
+  text-align: left;
+}
+html[data-theme="dark"] body[data-page-id="blog-list"] .article-tags .tag-overflow-menu .tag-count {
+  margin-left: auto;
+  padding-left: .6rem;
+}
+html[data-theme="dark"] body[data-page-id="blog-list"] .article-tags [hidden] {
+  display: none !important;
+}
+@media(max-width: 620px) {
+  html[data-theme="dark"] body[data-page-id="blog-list"] .article-tags .tag-visible { gap: .4rem; }
+  html[data-theme="dark"] body[data-page-id="blog-list"] .article-tags[data-tag-overflow] { gap: .4rem; }
+}
