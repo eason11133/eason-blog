@@ -678,3 +678,18 @@ html[data-theme="dark"] body[data-page-id="post"] .prose table tbody tr:hover {
     background: linear-gradient(to right, transparent, rgba(132, 174, 223, .13));
   }
 }
+
+
+/* Desktop article & work pages: separate the title from the metadata, then
+   close the oversized gap between metadata and article body. Mobile untouched. */
+@media screen and (min-width: 901px) {
+  html[data-theme="dark"] body[data-page-id="post"] .hero-header.hero-sky-only {
+    padding-bottom: 0;
+  }
+  html[data-theme="dark"] body[data-page-id="post"] .hero-header.hero-sky-only .interior-heading {
+    margin-bottom: 2rem;
+  }
+  html[data-theme="dark"] body[data-page-id="post"] .hero-header.hero-sky-only .post-topline {
+    margin-bottom: 0;
+  }
+}

@@ -146,6 +146,19 @@ const { transparent = true } = Astro.props;
         position: relative;
     }
 
+
+    /* True viewport centering: the logo is wider than the search button.
+       Space-between put the nav slightly to the right of the screen center. */
+    @media (min-width: 901px) {
+      header > nav {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) max-content minmax(0, 1fr);
+      }
+      header > nav > h2 { justify-self: start; }
+      header > nav > .internal-links { justify-self: center; }
+      header > nav > .header-actions { justify-self: end; }
+    }
+
     /* Match article titles: keep neighboring links stable on hover. */
     
 	nav a {
