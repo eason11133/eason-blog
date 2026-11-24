@@ -186,6 +186,14 @@ if (skyOnly) heroClass += ' hero-sky-only';
         padding: 0;
     }
 
+    /* Wide displays: align greeting with the centered portrait instead
+       of the outer monitor edge. Preserve the existing windowed position. */
+    @media screen and (min-width: 1600px) and (min-aspect-ratio: 7/5) {
+        .hero-header.hero-interactive .hero-content {
+            left: calc(50% - min(480px, 35vw, 57.5vh) + 70px);
+        }
+    }
+
     .hero-header.hero-compact {
         height: 60vh;
         height: 60dvh;
