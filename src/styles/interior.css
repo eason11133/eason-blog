@@ -203,7 +203,7 @@ html[data-theme="dark"] body[data-page-id="post"] .hero-header.hero-sky-only {
   height: auto;
   min-height: 0;
   margin: 0;
-  padding: clamp(108px, 15vh, 156px) clamp(20px, 4vw, 48px) 1.5rem;
+  padding: clamp(96px, 14vh, 144px) clamp(20px, 4vw, 48px) 1.5rem;
   overflow: visible;
   background: transparent !important;
 }
