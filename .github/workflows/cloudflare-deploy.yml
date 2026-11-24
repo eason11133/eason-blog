@@ -57,7 +57,10 @@ jobs:
       - name: Install locked dependencies
         run: npm ci
       - name: Verify CMS code and editor
-        run: node --test cloudflare/cms/*.node-test.mjs
+        run: |
+          node --check cloudflare/cms/comment-auth.mjs
+          node --check cloudflare/cms/worker.mjs
+          node --test cloudflare/cms/*.node-test.mjs
       - name: Install pinned Cloudflare adapter
         run: npm install --no-save --package-lock=false @astrojs/cloudflare@13.7.0
       - name: Build live frontend
