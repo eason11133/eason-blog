@@ -2,6 +2,10 @@
 // CMS owns secrets, code exchange, and session HMAC verification.
 import type { APIRoute } from 'astro';
 export const prerender = import.meta.env.PUBLIC_EASON_LIVE !== 'true';
+// The non-Cloudflare static build needs concrete paths for this catch-all route.
+export function getStaticPaths() {
+  return ['me','logout','github','google','github/callback','google/callback'].map(path=>({params:{path}}));
+}
 const CMS = 'https://eason-blog.eason456h.workers.dev';
 const unavailable = () => new Response(JSON.stringify({error:'訪客登入目前只開放在 Cloudflare 動態網站'}),{status:503,headers:{'Content-Type':'application/json; charset=utf-8'}});
 async function forward(request:Request, params:Record<string,string|undefined>, method:'GET'|'POST') {
