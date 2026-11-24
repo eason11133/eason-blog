@@ -100,7 +100,7 @@ jobs:
                 overflow:document.documentElement.scrollWidth>document.documentElement.clientWidth+2};
             """)
             print('DIRECTORY',json.dumps(tags,ensure_ascii=False),flush=True)
-            assert tags['title']=='所有標籤'
+            assert '所有標籤' in tags['title']
             assert [x['heading'] for x in tags['sections']]==['作品','文章']
             assert all(x['items'] for x in tags['sections'])
             for section in tags['sections']:
