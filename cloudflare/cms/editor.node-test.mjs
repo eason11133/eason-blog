@@ -56,5 +56,20 @@ test('CMS date input and save use Taipei time independently of browser timezone'
   assert.equal(result.midnight,'2026-11-25T00:00');
   assert.equal(result.saved,'2026-11-24T16:00:00.000Z');
   assert.equal(result.unchanged,'2026-11-24T16:00:53.123Z');
-  assert.ok(adminHtml.includes('date:dateForSave(el('));
+  assert.ok(adminHtml.includes('date:dateForSave(normalizeDateFields('));
+});
+
+test('CMS date fields accept direct typing, compact dates and 24-hour time', () => {
+ const start=adminHtml.indexOf('const taipeiDateFormatter=');
+ const end=adminHtml.indexOf('let originalDocDate=',start);
+ const source=adminHtml.slice(start,end);
+ const run=expression=>vm.runInNewContext(source+String.fromCharCode(10)+expression);
+ assert.equal(run('normalizeDateFields("2026/11/5","9:05")'),'2026-11-05T09:05');
+ assert.equal(run('normalizeDateFields("20261125","0134")'),'2026-11-25T01:34');
+ assert.equal(run('dateForSave(normalizeDateFields("2026/11/25","00:00"),"")'),'2026-11-24T16:00:00.000Z');
+ assert.throws(()=>run('dateForSave(normalizeDateFields("2026/02/30","12:00"),"")'),/日期格式/);
+ assert.throws(()=>run('dateForSave(normalizeDateFields("2026/11/25","25:00"),"")'),/日期格式/);
+ assert.ok(adminHtml.includes('id="doc-date-today"'));
+ assert.ok(adminHtml.includes('id="doc-date-now"'));
+ assert.ok(!adminHtml.includes('type="datetime-local"'));
 });

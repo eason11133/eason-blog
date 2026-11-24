@@ -93,6 +93,11 @@ nav{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:16px}nav button[aria-curr
 .about-repeat-actions{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
 .about-repeat-actions button,.about-add{padding:6px 10px;font-size:.86rem}
 .about-avatar-preview{width:96px;height:96px;object-fit:cover;border-radius:12px;display:block;margin:10px 0}
+.doc-date-controls{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.doc-date-controls #doc-date{flex:1 1 125px;min-width:0;width:auto;font-variant-numeric:tabular-nums}
+.doc-date-controls #doc-time{flex:0 1 82px;min-width:72px;width:auto;font-variant-numeric:tabular-nums}
+.doc-date-controls button{padding:10px 12px;white-space:nowrap;font-size:.86rem}
+.doc-date-help{display:block;margin-top:6px;line-height:1.4}
 .home-field{margin-bottom:12px}.tags-grid{display:grid;grid-template-columns:1fr 160px;gap:10px;margin:8px 0}
 @media(max-width:720px){.two,.fields{grid-template-columns:1fr}main{padding:15px}.card{padding:16px}.span-2{grid-column:auto}.md-toolbar{padding:9px}.md-toolbar button{padding:7px}.md-toolbar select{max-width:130px}}
 </style>
@@ -120,7 +125,13 @@ nav{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:16px}nav button[aria-curr
 <form id="document-form" class="fields" style="margin-top:18px">
 <div class="field"><label for="doc-title">標題</label><input id="doc-title" required maxlength="200"></div>
 <div class="field"><label for="doc-slug">網址代碼／slug（建立後請勿隨意改）</label><input id="doc-slug" required maxlength="120"></div>
-<div class="field"><label for="doc-date">日期（台灣時間 UTC+8）</label><input id="doc-date" type="datetime-local" required></div>
+<div class="field"><label for="doc-date">建立日期（台灣時間）</label>
+<div class="doc-date-controls">
+<input id="doc-date" type="text" placeholder="2026/11/25" aria-label="建立日期，年/月/日" autocomplete="off" required>
+<input id="doc-time" type="text" placeholder="01:30" aria-label="建立時間，24 小時制" autocomplete="off" required>
+<button id="doc-date-today" class="secondary" type="button">今天</button>
+<button id="doc-date-now" class="secondary" type="button">現在</button>
+</div><small class="doc-date-help">直接輸入年月日與 24 小時制時間，例如 2026/11/25、01:30。最新更新時間會自動記錄。</small></div>
 <div class="field"><label for="doc-description">簡介</label><input id="doc-description" maxlength="1200"></div>
 <div class="field"><label for="doc-categories">分類（文章限一個）</label><input id="doc-categories" placeholder="心得"></div>
 <div class="field"><label for="doc-tags">標籤，用逗號分隔</label><input id="doc-tags" placeholder="特選,上機考"></div>
@@ -407,14 +418,28 @@ function dateForSave(value,original){
  if(!Number.isFinite(date.getTime())||dateInput(date.toISOString())!==value)throw new Error('日期格式不正確');
  return date.toISOString();
 }
+function normalizeDateFields(day,clock){
+ const d=String(day).trim().match(/^(\\d{4})[-/.](\\d{1,2})[-/.](\\d{1,2})$/)||String(day).trim().match(/^(\\d{4})(\\d{2})(\\d{2})$/);
+ const t=String(clock).trim().match(/^(\\d{1,2}):(\\d{1,2})$/)||String(clock).trim().match(/^(\\d{2})(\\d{2})$/);
+ if(!d||!t)throw new Error('請輸入正確日期和時間，例如 2026/11/25、01:30');
+ const pad=x=>x.padStart(2,'0');
+ return d[1]+'-'+pad(d[2])+'-'+pad(d[3])+'T'+pad(t[1])+':'+pad(t[2]);
+}
 let originalDocDate='';
+function fillDateFields(value){
+ const parts=dateInput(value).split('T');
+ el('doc-date').value=(parts[0]||'').replaceAll('-','/');
+ el('doc-time').value=parts[1]||'';
+}
+el('doc-date-now').onclick=()=>fillDateFields();
+el('doc-date-today').onclick=()=>{el('doc-date').value=dateInput().split('T')[0].replaceAll('-','/');};
 
 function showDoc(d){
  const data=d||{};
  el('doc-title').value=data.title||'';
  el('doc-slug').value=data.slug||'';
  originalDocDate=data.date||'';
- el('doc-date').value=dateInput(data.date);
+ fillDateFields(data.date);
  el('doc-description').value=data.description||'';
  el('doc-categories').value=(data.categories||[]).join(',');
  el('doc-tags').value=(data.tags||[]).join(',');
@@ -693,7 +718,7 @@ el('document-form').onsubmit=async e=>{
  try{
   const payload={
    kind:tab,slug:el('doc-slug').value.trim(),title:el('doc-title').value.trim(),
-   date:dateForSave(el('doc-date').value,originalDocDate),
+   date:dateForSave(normalizeDateFields(el('doc-date').value,el('doc-time').value),originalDocDate),
    description:el('doc-description').value,
    categories:parseList(el('doc-categories').value),
    tags:parseList(el('doc-tags').value),
