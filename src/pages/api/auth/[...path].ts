@@ -1,10 +1,11 @@
 // Same-origin visitor OAuth proxy. Cookies are set on the public site, never CMS origin.
 // CMS owns secrets, code exchange, and session HMAC verification.
 import type { APIRoute } from 'astro';
+import { BLOG_CMS_ORIGIN } from '../../../../cloudflare/site-config.mjs';
 export const prerender = import.meta.env.PUBLIC_EASON_LIVE !== 'true';
 // OAuth is available only in the Cloudflare SSR deployment; generate no files in the legacy static build.
 export function getStaticPaths() { return []; }
-const CMS = 'https://eason-blog.eason456h.workers.dev';
+const CMS = BLOG_CMS_ORIGIN;
 const unavailable = () => new Response(JSON.stringify({error:'訪客登入目前只開放在 Cloudflare 動態網站'}),{status:503,headers:{'Content-Type':'application/json; charset=utf-8'}});
 async function forward(request:Request, params:Record<string,string|undefined>, method:'GET'|'POST') {
   if (import.meta.env.PUBLIC_EASON_LIVE !== 'true') return unavailable();
