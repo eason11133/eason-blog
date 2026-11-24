@@ -2,13 +2,14 @@ import { createMarkdownProcessor } from '@astrojs/markdown-remark';
 import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
+import rehypeResponsiveTables from '../../plugins/rehype-responsive-tables.mjs';
 
 // Reuse the Astro Markdown ecosystem at request time; no client-side Markdown
 // fetches, so articles remain indexable and new slugs work without a rebuild.
 const processor = createMarkdownProcessor({
   syntaxHighlight: false,
   remarkPlugins: [remarkGfm, remarkMath],
-  rehypePlugins: [rehypeKatex],
+  rehypePlugins: [rehypeKatex, rehypeResponsiveTables],
 });
 
 export async function renderCmsMarkdown(markdown: string) {
