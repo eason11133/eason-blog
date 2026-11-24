@@ -117,3 +117,19 @@ jobs:
             sys.exit(1)
           print('PASS: D1 article and work routes, 404 and comment reads',flush=True)
           PY
+
+      - name: Diagnose visitor auth API
+        if: always()
+        shell: bash
+        run: |
+          for url in \
+            "https://eason-blog.eason456h.workers.dev/api/auth/me" \
+            "https://eason-blog-web-live.eason456h.workers.dev/api/auth/me" \
+            "https://eason-blog-web-live.eason456h.workers.dev/api/comments?kind=post&slug=demo"; do
+            echo "URL: $url"
+            code=$(curl -sS --max-time 20 -D /tmp/auth-response-headers -o /tmp/auth-response-body -A 'Mozilla/5.0' -w '%{http_code}' "$url" || true)
+            echo "status=$code"
+            grep -iE '^(server|content-type|cf-ray|location|www-authenticate):' /tmp/auth-response-headers || true
+            head -c 500 /tmp/auth-response-body || true
+            echo
+          done
