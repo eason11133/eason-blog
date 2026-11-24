@@ -18,9 +18,15 @@ async function forward(request:Request, params:Record<string,string|undefined>, 
   }
   const response=await fetch(upstream.toString(),{method,headers,redirect:'manual',cache:'no-store'});
   const responseHeaders=new Headers({'Cache-Control':'no-store'});
-  for(const name of ['Content-Type','Location','Set-Cookie']) {
+  for(const name of ['Content-Type','Location']) {
     const value=response.headers.get(name);
     if(value)responseHeaders.set(name,value);
+  }
+  // Preserve separate state/session Set-Cookie headers across the Worker proxy.
+  for(const value of response.headers.getSetCookie?.() || [])responseHeaders.append('Set-Cookie',value);
+  if(!responseHeaders.has('Set-Cookie')) {
+    const value=response.headers.get('Set-Cookie');
+    if(value)responseHeaders.set('Set-Cookie',value);
   }
   // Only the public origin is allowed for redirects in this flow.
   const location=responseHeaders.get('Location');
