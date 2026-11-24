@@ -555,7 +555,7 @@ input {
 	background-color: var(--color-surface-input);
 	border-bottom: 2px solid var(--color-border-strong);
 	color: var(--color-text-strong);
-	font-family: 'Outfit', sans-serif;
+	font-family: inherit;
 }
 
 .prose table th {
