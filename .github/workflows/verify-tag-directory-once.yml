@@ -135,6 +135,7 @@ jobs:
                 assert abs(detail['article']['left']-detail['meta']['left'])<=6, 'Wide body must align with metadata'
                 assert detail['article']['bottom']-detail['prose']['bottom']<55, 'Short article forced minimum height'
                 assert detail['comments'] and 0<=detail['comments']['top']-detail['article']['bottom']<75, 'Excess blank space before comments'
+                assert abs(detail['comments']['left']-detail['article']['left'])<=6, 'Comments and article reading column no longer aligned'
               elif width==1120:
                 assert 185<=detail['meta']['left']<=205 and 50<=detail['article']['left']<=72, 'Half-window layout changed'
               else:
