@@ -23,6 +23,7 @@ const hostname = (url: string) => {
   <main class="friends-page">
     <div class="friends-inner">
       <InteriorHeading title="友站" centered={true} animated={true} />
+      {live && <div class="friend-apply-link"><a href="#friend-apply">申請友站 →</a></div>}
       {sites.length > 0 ? (
         <div class="friends-grid" aria-label="友站列表">
           {sites.map(site => (
@@ -36,6 +37,22 @@ const hostname = (url: string) => {
       ) : (
         <p class="friends-empty">目前還沒有友站。</p>
       )}
+      {live && (
+        <section id="friend-apply" class="friend-apply">
+          <h2>申請友站</h2>
+          <p>有自己的網站或部落格，歡迎來交換友站！送出後由我審核，不用登入，也不強制回加本站。</p>
+          <details class="friend-info"><summary>本站資訊</summary><p>網站名稱：{siteTitle}<br />網址：<a href={Astro.url.origin}>{Astro.url.origin}</a></p></details>
+          <form id="friend-request-form">
+            <label>網站名稱<input name="name" required maxlength="100" placeholder="你的網站名稱" /></label>
+            <label>網站網址<input name="url" type="url" required maxlength="1500" placeholder="https://..." /></label>
+            <label>簡短介紹<textarea name="description" rows="3" required maxlength="300" placeholder="介紹一下你的網站"></textarea></label>
+            <label>聯絡方式（不公開）<input name="contact" required maxlength="300" placeholder="Email、IG 或其他聯絡方式" /></label>
+            <div class="friend-honeypot" aria-hidden="true"><label>請勿填寫<input name="website_check" tabindex="-1" autocomplete="off" /></label></div>
+            <button type="submit">送出申請</button>
+            <p class="friend-form-status" role="status" aria-live="polite"></p>
+          </form>
+        </section>
+      )}
     </div>
   </main>
 </PageShell>
@@ -45,9 +62,9 @@ const hostname = (url: string) => {
     position: relative;
     z-index: 1;
     width: 100%;
-    min-height: calc(100dvh - 64px);
+    min-height: 0;
     box-sizing: border-box;
-    padding: clamp(108px, 15vh, 150px) clamp(20px, 4vw, 48px) 90px;
+    padding: clamp(108px, 15vh, 150px) clamp(20px, 4vw, 48px) 32px;
     background: transparent;
   }
   .friends-inner { width: min(100%, 1000px); margin: 0 auto; }
@@ -90,5 +107,28 @@ const hostname = (url: string) => {
     .friend-item { min-height: 120px; padding: 15px 8px; }
     .friends-empty { margin-top: 36px; }
   }
+  .friend-apply-link { text-align:right; margin: 18px 0 0; }
+  .friend-apply-link a,.friend-info a { color:#a9c5e8; text-decoration:none; }
+  .friend-apply-link a:hover,.friend-info a:hover { text-decoration:underline; }
+  .friend-apply { max-width: 660px; margin: 44px auto 0; padding: 24px 0 0; border-top: 1px solid rgba(158,186,221,.2); scroll-margin-top: 92px; }
+  .friend-apply h2 { font-size:1.4rem; margin:0 0 .8rem; }
+  .friend-apply p { color:#b7c8df; line-height:1.7; }
+  .friend-info { margin: 0 0 18px; color:#a9bbd3; }
+  .friend-info summary { cursor:pointer; }
+  .friend-info p { overflow-wrap:anywhere; margin:10px 0 0; }
+  #friend-request-form { display:grid; gap:14px; }
+  #friend-request-form label { display:grid; gap:6px; color:#c6d4e7; font-size:.9rem; }
+  #friend-request-form input,#friend-request-form textarea { box-sizing:border-box; width:100%; min-width:0; background:rgba(12,27,45,.44); border:1px solid rgba(158,186,221,.26); border-radius:9px; color:#e7effa; padding:.7rem .85rem; font:inherit; }
+  #friend-request-form textarea { resize:vertical; }
+  #friend-request-form button { justify-self:start; cursor:pointer; font:inherit; color:#e7effa; background:var(--color-tag-bg); border:1px solid var(--color-border-subtle); padding:.55rem 1rem; border-radius:9px; }
+  #friend-request-form button:hover { background:var(--accent); color:white; }
+  #friend-request-form button:disabled { opacity:.6; cursor:wait; }
+  #friend-request-form :is(input,textarea,button):focus-visible { outline:2px solid #a9c5e8; outline-offset:2px; }
+  .friend-honeypot { position:absolute; left:-10000px; width:1px; height:1px; overflow:hidden; }
+  .friend-form-status { margin:0; }
+  .friend-form-status:empty { display:none; }
+  :global(body[data-page-id="friends"] #main-content) { display:flex; flex-direction:column; }
+  :global(body[data-page-id="friends"] #main-content > .friends-page) { flex:0 0 auto; }
+  :global(body[data-page-id="friends"] #main-content > footer) { margin-top:auto; flex-shrink:0; }
   @media (prefers-reduced-motion: reduce) { .friend-item { transition: none; } }
 </style>

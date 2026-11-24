@@ -200,6 +200,7 @@ nav{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:16px}nav button[aria-curr
 <section id="settings-panel" class="card hidden"><h2 id="settings-heading"></h2><form id="settings-form"><div id="settings-fields"></div><div class="editor-actions"><button type="submit">儲存設定到 D1</button></div></form></section>
 <section id="friends-panel" class="card hidden">
 <h2>友站管理</h2>
+<h3>待審核申請</h3><p>核准後才會公開，聯絡方式不會出現在前台。</p><div id="friend-requests-list"></div><h3>已公開友站</h3>
 <p>新增友站名稱、網址和介紹，儲存後立即更新網站「友站」頁面。</p>
 <form id="friends-form">
 <div id="friends-list"></div>
@@ -495,9 +496,39 @@ function renderFriendRows(items){
   row.appendChild(actions);target.appendChild(row);
  });
 }
+let savedFriendSnapshot='';
 async function loadFriends(){
  const data=await api('/api/friends');
  renderFriendRows(Array.isArray(data.sites)?data.sites:[]);
+ savedFriendSnapshot=JSON.stringify(currentFriendRows());
+ await loadFriendRequests();
+}
+async function loadFriendRequests(){
+ const data=await api('/api/admin/friend-requests');
+ const target=el('friend-requests-list');target.replaceChildren();
+ if(!(data.requests||[]).length){const p=document.createElement('p');p.textContent='目前沒有待審核申請。';target.appendChild(p);return;}
+ for(const item of data.requests){
+  const row=document.createElement('div');row.className='friend-entry';
+  const title=document.createElement('strong');title.textContent=item.name;
+  const link=document.createElement('a');link.textContent=item.url;link.style.color='#9ecaff';
+  try{const u=new URL(item.url);if(['https:','http:'].includes(u.protocol)&&!u.username&&!u.password){link.href=u.href;link.target='_blank';link.rel='noopener noreferrer';}}catch{}
+  const desc=document.createElement('p');desc.textContent=item.description;
+  const contact=document.createElement('p');contact.textContent='聯絡方式：'+item.contact;
+  const date=document.createElement('small');date.textContent='申請時間：'+new Date(item.created).toLocaleString('zh-TW',{timeZone:'Asia/Taipei',hour12:false});
+  const actions=document.createElement('div');actions.className='friend-actions';
+  for(const status of ['approved','rejected']){
+   const b=document.createElement('button');b.type='button';b.className=status==='rejected'?'secondary':'';b.textContent=status==='approved'?'核准並公開':'拒絕';
+   b.onclick=async()=>{
+    if(JSON.stringify(currentFriendRows())!==savedFriendSnapshot){say('請先儲存下方友站清單的修改，再審核申請',true);return;}
+    if(!confirm(status==='approved'?'確定公開這個友站？':'確定拒絕這筆申請？'))return;
+    const buttons=Array.from(actions.querySelectorAll('button'));buttons.forEach(x=>x.disabled=true);
+    try{await api('/api/admin/friend-requests','PUT',{id:item.id,status});say(status==='approved'?'已核准並公開友站':'已拒絕申請');await loadFriends();}
+    catch(err){say(err.message,true);buttons.forEach(x=>x.disabled=false);}
+   };
+   actions.appendChild(b);
+  }
+  row.append(title,document.createElement('br'),link,desc,contact,date,actions);target.appendChild(row);
+ }
 }
 const footerKeys=['github','email','instagram','discord'];
 async function loadFooter(){

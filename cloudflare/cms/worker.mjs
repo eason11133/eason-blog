@@ -176,6 +176,32 @@ async function handle(req,env) {
 
   if (method==='GET' && path==='/api/footer-links') return json(await getFooterLinks(env.DB));
   if (method==='GET' && path==='/api/friends') return json({sites:await listFriendSites(env.DB)});
+  if (method==='POST' && path==='/api/friend-requests') {
+    if(!env.CMS_SESSION_SECRET)return fail('申請功能暫時無法使用',503);
+    const actor=await actorHash(req,env);
+    if(!await quota(env.DB,actor,'friend-request',5,15*60000))return fail('送出次數太多，請稍後再試',429);
+    const input=await jsonBody(req,6000);
+    if(!input||typeof input!=='object'||Array.isArray(input))return fail('申請資料不正確');
+    if(input.website_check)return fail('申請資料不正確');
+    const site=normalizeFriendSites([{name:input.name,url:input.url,description:input.description}])?.[0];
+    const contact=typeof input.contact==='string'?input.contact.trim():'';
+    if(!site||!site.description||!contact||contact.length>300)return fail('請填寫網站名稱、完整網址、介紹與聯絡方式');
+    const existing=await listFriendSites(env.DB);
+    if(existing.some(item=>item.url===site.url))return fail('這個網站已經在友站列表中',409);
+    const pending=await env.DB.prepare("SELECT id FROM friend_requests WHERE url=? AND status='pending'").bind(site.url).first();
+    if(pending)return fail('這個網站已有待審核的申請',409);
+    const count=await env.DB.prepare("SELECT COUNT(*) AS total FROM friend_requests WHERE status='pending'").first();
+    if(Number(count?.total)>=100)return fail('目前待審核申請較多，請稍後再試',429);
+    try {
+      await env.DB.prepare("INSERT INTO friend_requests(id,name,url,description,contact,status,created) SELECT ?,?,?,?,?,'pending',? WHERE (SELECT COUNT(*) FROM friend_requests WHERE status='pending')<100 AND NOT EXISTS(SELECT 1 FROM friend_sites,json_each(links_json) WHERE singleton=1 AND json_extract(json_each.value,'$.url')=?)")
+        .bind(crypto.randomUUID(),site.name,site.url,site.description,contact,new Date().toISOString(),site.url).run().then(result=>{if(result.meta?.changes===0)throw new Error('request_not_inserted');});
+    }catch(error){
+      if(/UNIQUE constraint failed/i.test(String(error)))return fail('這個網站已有待審核的申請',409);
+      if(String(error).includes('request_not_inserted'))return fail('暫時無法新增申請，請重新整理後再試',409);
+      throw error;
+    }
+    return json({ok:true},201);
+  }
 
   if (method==='GET' && /^\/api\/(posts|works)$/.test(path)) {
     const kind=path==='/api/posts'?'post':'work';
@@ -216,6 +242,24 @@ async function handle(req,env) {
       'ON CONFLICT(singleton) DO UPDATE SET links_json=excluded.links_json,updated=excluded.updated'
     ).bind(JSON.stringify(links),new Date().toISOString()).run();
     return json({ok:true});
+  }
+  if(method==='GET' && path==='/api/admin/friend-requests') {
+    const result=await env.DB.prepare("SELECT id,name,url,description,contact,status,created,reviewed FROM friend_requests WHERE status='pending' ORDER BY created ASC LIMIT 100").all();
+    return json({requests:result.results||[]});
+  }
+  if(method==='PUT' && path==='/api/admin/friend-requests') {
+    const input=await jsonBody(req,2000);
+    if(typeof input?.id!=='string'||!['approved','rejected'].includes(input.status))return fail('無效的審核操作');
+    try{
+      const result=await env.DB.prepare("UPDATE friend_requests SET status=?,reviewed=? WHERE id=? AND status='pending'")
+        .bind(input.status,new Date().toISOString(),input.id).run();
+      if(!result.meta?.changes)return fail('這筆申請已處理或不存在',409);
+      return json({ok:true});
+    }catch(error){
+      if(String(error).includes('friend_already_exists'))return fail('這個網址已在友站列表，請拒絕重複申請',409);
+      if(String(error).includes('friend_list_full'))return fail('友站已達60筆，請先移除一筆',409);
+      throw error;
+    }
   }
   if(method==='PUT' && path==='/api/admin/friends') {
     const input=await jsonBody(req,105000);

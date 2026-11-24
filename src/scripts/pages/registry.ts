@@ -1,3 +1,4 @@
+import { initFriendsPage } from './friends.client';
 import { initAboutPage } from './about.client';
 import { initBlogListPage } from './blog-list.client';
 import { initHomePage } from './home.client';
@@ -5,12 +6,13 @@ import { initTagDetailPage } from './tag-detail.client';
 import { initTagsIndexPage } from './tags-index.client';
 import { cleanupParallax } from './parallax';
 
-export type PageEnhancementId = 'home' | 'about' | 'blog-list' | 'tags-index' | 'tag-detail';
+export type PageEnhancementId = 'home' | 'about' | 'friends' | 'blog-list' | 'tags-index' | 'tag-detail';
 type PageEnhancementHandler = () => void;
 
 const handlers: Record<PageEnhancementId, PageEnhancementHandler> = {
 	home: initHomePage,
 	about: initAboutPage,
+	friends: initFriendsPage,
 	'blog-list': initBlogListPage,
 	'tags-index': initTagsIndexPage,
 	'tag-detail': initTagDetailPage,

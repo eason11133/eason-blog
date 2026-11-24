@@ -1,0 +1,32 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { DatabaseSync } from 'node:sqlite';
+import { readFileSync } from 'node:fs';
+import worker from './worker.mjs';
+import { adminHtml } from './admin.mjs';
+const sql=name=>readFileSync(new URL('./migrations/'+name,import.meta.url),'utf8');
+test('friend approval is atomic, never publishes contact, preserves manual entries',()=>{
+ const db=new DatabaseSync(':memory:');
+ db.exec(sql('0004_friend_sites.sql'));db.exec(sql('0006_friend_requests.sql'));
+ db.prepare('INSERT INTO friend_sites VALUES(1,?,?)').run(JSON.stringify([{name:'Existing',url:'https://existing.test/',description:''}]),'now');
+ const insert=db.prepare("INSERT INTO friend_requests(id,name,url,description,contact,created) VALUES(?,?,?,?,?,?)");
+ insert.run('1','Friend','https://friend.test/','hello','private@example.test','now');
+ insert.run('2','Duplicate','https://existing.test/','hello','private@example.test','now');
+ insert.run('3','Rejected','https://reject.test/','hello','private@example.test','now');
+ const list=()=>JSON.parse(db.prepare('SELECT links_json FROM friend_sites').get().links_json);
+ assert.equal(list().length,1);
+ db.exec("UPDATE friend_requests SET status='approved',reviewed='now' WHERE id='1'");
+ assert.deepEqual(list(),[{name:'Existing',url:'https://existing.test/',description:''},{name:'Friend',url:'https://friend.test/',description:'hello'}]);
+ assert.throws(()=>db.exec("UPDATE friend_requests SET status='approved',reviewed='now' WHERE id='2'"),/friend_already_exists/);
+ assert.equal(db.prepare("SELECT status FROM friend_requests WHERE id='2'").get().status,'pending');
+ db.exec("UPDATE friend_requests SET status='rejected',reviewed='now' WHERE id='3'");
+ assert.equal(list().length,2);
+ db.close();
+});
+test('friend request moderation requires administrator and blocks cross-origin writes',async()=>{
+ const env={DB:{},CMS_SESSION_SECRET:'test-only'};
+ const origin='https://cms.test';
+ assert.equal((await worker.fetch(new Request(origin+'/api/admin/friend-requests'),env)).status,401);
+ assert.equal((await worker.fetch(new Request(origin+'/api/friend-requests',{method:'POST',headers:{Origin:'https://other.test'}}),env)).status,403);
+ assert.ok(adminHtml.includes('friend-requests-list'));
+});
