@@ -4,11 +4,6 @@ const enc = new TextEncoder();
 const dec = new TextDecoder();
 const publicOrigin = COMMENT_PUBLIC_SITE_ORIGIN;
 const json = (data,status=200,headers={}) => new Response(JSON.stringify(data),{status,headers:{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store',...headers}});
-function siteOrigin(env) {
-  const origin=env.COMMENT_SITE_ORIGIN || publicOrigin;
-  try { const u=new URL(origin); return u.protocol==='https:' && u.origin===origin.replace(/\/$/,'') ? u.origin : publicOrigin; }
-  catch { return publicOrigin; }
-}
 function b64(bytes) { return btoa(String.fromCharCode(...bytes)).replaceAll('+','-').replaceAll('/','_').replaceAll('=',''); }
 function unb64(s) { const t=s.replaceAll('-','+').replaceAll('_','/'); return Uint8Array.from(atob(t.padEnd(Math.ceil(t.length/4)*4,'=')),c=>c.charCodeAt(0)); }
 async function key(secret) { return crypto.subtle.importKey('raw',enc.encode(secret),{name:'HMAC',hash:'SHA-256'},false,['sign','verify']); }
@@ -57,13 +52,13 @@ export async function commentUser(req,env) {
 function oauthRedirect(to,headers={}) { return new Response(null,{status:302,headers:{Location:to,'Cache-Control':'no-store',...headers}}); }
 const stateCookie='; HttpOnly; Secure; SameSite=Lax; Path=/api/auth; Max-Age=600';
 const sessionCookie='; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=1209600';
-async function begin(req,env,url,provider) {
+async function begin(env,url,provider) {
   const cfg=providerConfig(env,provider);
   if(!cfg || !env.CMS_SESSION_SECRET)return json({error:'此登入方式尚未設定'},503);
   const nonce=b64(crypto.getRandomValues(new Uint8Array(24)));
   const back=safeReturn(url.searchParams.get('return') || '');
   const state=await signed(env,{type:'state',provider,nonce,back,exp:Date.now()+600000});
-  const redirectUri=siteOrigin(env)+'/api/auth/'+provider+'/callback';
+  const redirectUri=publicOrigin+'/api/auth/'+provider+'/callback';
   const target=new URL(provider==='github'?'https://github.com/login/oauth/authorize':'https://accounts.google.com/o/oauth2/v2/auth');
   target.searchParams.set('client_id',cfg.id);
   target.searchParams.set('redirect_uri',redirectUri);
@@ -94,14 +89,14 @@ async function exchange(provider,cfg,code,redirectUri) {
 async function callback(req,env,url,provider) {
   const state=await verified(env,cookie(req,'eason_comment_state'));
   if(state?.type!=='state'||state.provider!==provider||url.searchParams.get('state')!==state.nonce)return json({error:'登入驗證已過期，請重新登入'},400);
-  const back=siteOrigin(env)+safeReturn(state.back);
+  const back=publicOrigin+safeReturn(state.back);
   if(url.searchParams.has('error'))return oauthRedirect(back+'?comment_auth=cancelled');
   const code=url.searchParams.get('code') || '';
   if(!code || code.length>2048)return json({error:'登入回傳內容無效'},400);
   const cfg=providerConfig(env,provider);
   if(!cfg)return json({error:'此登入方式尚未設定'},503);
   let user;
-  try { user=await exchange(provider,cfg,code,siteOrigin(env)+'/api/auth/'+provider+'/callback'); }
+  try { user=await exchange(provider,cfg,code,publicOrigin+'/api/auth/'+provider+'/callback'); }
   catch(error) { console.error('Public comment OAuth failed',error instanceof Error?error.message:'unknown'); return oauthRedirect(back+'?comment_auth=failed'); }
   const session=await signed(env,{type:'session',...user,exp:Date.now()+14*86400000});
   const headers=new Headers({Location:back,'Cache-Control':'no-store'});
@@ -115,7 +110,7 @@ export async function handleCommentAuth(req,env,url,path,method) {
     providers:{github:!!providerConfig(env,'github'),google:!!providerConfig(env,'google')},
   });
   const start=/^\/api\/auth\/(github|google)$/.exec(path);
-  if(method==='GET' && start)return begin(req,env,url,start[1]);
+  if(method==='GET' && start)return begin(env,url,start[1]);
   const done=/^\/api\/auth\/(github|google)\/callback$/.exec(path);
   if(method==='GET' && done)return callback(req,env,url,done[1]);
   if(method==='POST' && path==='/api/auth/logout')return json({ok:true},200,{'Set-Cookie':'eason_comment_session=; HttpOnly; Secure; SameSite=Lax; Path=/; Max-Age=0'});
