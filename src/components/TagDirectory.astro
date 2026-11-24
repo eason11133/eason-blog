@@ -11,7 +11,6 @@ interface Props { kind: 'blog' | 'works'; }
 const { kind } = Astro.props;
 const isWork = kind === 'works';
 const label = isWork ? '作品' : '文章';
-const back = isWork ? '/experience/' : '/blog/';
 const pathForTag = isWork ? getWorkTagPath : getTagPath;
 const tags = [...await (isWork ? getWorkTagStats() : getTagStats())]
   .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], 'zh-Hant'));
@@ -21,8 +20,7 @@ const tags = [...await (isWork ? getWorkTagStats() : getTagStats())]
   description={'瀏覽所有' + label + '標籤。'} pageId="tags-index" transparentHeader={false}>
   <div class="all-tags-page">
     <div class="all-tags-inner">
-      <a class="back" href={back}>{label}</a>
-      <InteriorHeading title="標籤" description={'共 ' + tags.length + ' 個'} />
+      <InteriorHeading title={label + '標籤'} description={'共 ' + tags.length + ' 個'} />
       <div class="tags-grid" aria-label={label + '標籤'}>
         {tags.map(([name, count]) => (
           <a class="tags-entry" href={pathForTag(name)} data-astro-prefetch="viewport">
@@ -44,8 +42,6 @@ const tags = [...await (isWork ? getWorkTagStats() : getTagStats())]
     padding: clamp(100px, 13vh, 145px) clamp(20px, 4vw, 48px) 48px;
   }
   .all-tags-inner { width: min(100%, 1280px); margin: 0 auto; }
-  .back { display: inline-block; margin-bottom: 1rem; color: #a9bbd2; font-size: .95rem; text-decoration: none; }
-  .back:hover, .back:focus-visible { color: var(--accent); }
   .tags-grid { display: flex; flex-wrap: wrap; align-items: center; gap: .6rem; }
   .tags-entry {
     display: inline-flex; align-items: center; gap: .35rem;
