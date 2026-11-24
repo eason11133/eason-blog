@@ -15,10 +15,11 @@ function setupTagOverflow() {
       const available = visible.clientWidth;
       const gap = Number.parseFloat(getComputedStyle(visible).columnGap) || 0;
       let used = all.getBoundingClientRect().width;
+      let hasOverflowed = false;
       for (const tag of tags) {
         const width = tag.getBoundingClientRect().width;
-        if (used + gap + width <= available + 0.5) used += gap + width;
-        else tag.hidden = true;
+        if (!hasOverflowed && used + gap + width <= available + 0.5) used += gap + width;
+        else { tag.hidden = true; hasOverflowed = true; }
       }
     };
     const schedule = () => {
