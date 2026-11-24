@@ -30,8 +30,24 @@ async function query(sql,params) {
 const sql='INSERT OR IGNORE INTO documents(kind,slug,title,description,body_markdown,categories_json,tags_json,date,updated,draft,pinned) VALUES(?,?,?,?,?,?,?,?,?,?,?)';
 const params=[normalized.kind,normalized.slug,normalized.title,normalized.description,normalized.body_markdown,normalized.categories_json,normalized.tags_json,normalized.date,normalized.updated,0,0];
 const result=await query(sql,params);
-console.log((result.meta?.changes ? 'Published' : 'Already exists; preserved CMS edits') + ': '+slug);
-const verified=await query('SELECT title,draft,length(body_markdown) as body_length FROM documents WHERE kind=? AND slug=?',['post',slug]);
+console.log((result.meta?.changes ? 'Published' : 'Already exists') + ': '+slug);
+
+// Update only our previously published version that split the transcript into
+// separate headings. Keep any independently edited article untouched.
+const before=await query('SELECT body_markdown FROM documents WHERE kind=? AND slug=?',['post',slug]);
+const previous=before.results?.[0]?.body_markdown;
+if(typeof previous!=='string')throw new Error('D1 article missing');
+if(previous.includes('### 30 秒自我介紹') && previous.includes('### AI 到底幫我做多少？')) {
+  const update=await query('UPDATE documents SET body_markdown=?, updated=? WHERE kind=? AND slug=? AND body_markdown=?',[
+    normalized.body_markdown,normalized.updated,'post',slug,previous
+  ]);
+  if(update.meta?.changes!==1)throw new Error('Concurrent edit detected; refusing overwrite');
+  console.log('Replaced original split transcript with a single collapsible transcript');
+} else if (previous!==normalized.body_markdown) {
+  console.log('Preserved newer CMS edit to this article');
+}
+const verified=await query('SELECT title,draft,body_markdown FROM documents WHERE kind=? AND slug=?',['post',slug]);
 const row=verified.results?.[0];
-if(!row||row.draft!==0||row.body_length<1000)throw new Error('Published article verification failed');
-console.log('Verified D1: '+row.title+' ('+row.body_length+' chars)');
+if(!row||row.draft!==0||row.body_markdown?.length<1000)throw new Error('Published article verification failed');
+if(row.body_markdown===normalized.body_markdown)console.log('Verified new complete transcript and native details markup');
+console.log('Verified D1: '+row.title+' ('+row.body_markdown.length+' chars)');
