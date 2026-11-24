@@ -509,204 +509,134 @@ html[data-theme="dark"] body[data-page-id="about"] .service-item { border-radius
   }
 }
 
-
-/* Post readability repair (Nov 24): scoped ONLY to blog/work article pages.
-   The homepage, sky animation, and archive layouts are intentionally untouched. */
+/* Article-only layout: preserve the Astro title animation and site's existing sky. */
 @media screen {
   html[data-theme="dark"] body[data-page-id="post"] .hero-header.hero-sky-only {
-    display: block;
-    width: 100%;
+    display: flex !important;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    box-sizing: border-box;
     height: auto !important;
     min-height: 0 !important;
-    box-sizing: border-box;
     margin: 0 !important;
-    padding: clamp(104px, 13vh, 148px) clamp(20px, 4vw, 48px) 32px !important;
+    padding: clamp(105px, 13vh, 145px) 24px 30px !important;
     overflow: visible;
   }
   html[data-theme="dark"] body[data-page-id="post"] .hero-header.hero-sky-only .hero-content {
     display: flex;
     flex-direction: column;
-    width: min(100%, 1040px) !important;
+    width: min(100%, 1040px);
     max-width: 1040px;
-    margin: 0 auto;
+    flex: 0 0 auto;
     box-sizing: border-box;
-    padding: 0 !important;
+    margin: 0 auto;
+    padding: 0;
     text-align: center;
   }
   html[data-theme="dark"] body[data-page-id="post"] .hero-header.hero-sky-only .post-topline {
-    width: 100%;
-    margin: 0 0 22px !important;
+    display: flex;
     justify-content: space-between;
-    align-items: center;
+    margin-bottom: 22px;
   }
   html[data-theme="dark"] body[data-page-id="post"] .hero-header.hero-sky-only .interior-heading {
-    width: 100%;
-    margin: 0 auto 12px !important;
-    text-align: center !important;
-  }
-  html[data-theme="dark"] body[data-page-id="post"] .hero-header.hero-sky-only .interior-heading h1 {
-    font-size: clamp(1.8rem, 3.1vw, 2.6rem) !important;
-    line-height: 1.35;
-    letter-spacing: -.02em;
-    overflow-wrap: break-word;
-  }
-  html[data-theme="dark"] body[data-page-id="post"] .hero-header.hero-sky-only .hero-meta {
-    align-items: center;
-    margin: 8px auto 0 !important;
+    margin: 0 0 10px;
     text-align: center;
   }
-  html[data-theme="dark"] body[data-page-id="post"] .hero-header.hero-sky-only .meta-row {
-    justify-content: center;
+  html[data-theme="dark"] body[data-page-id="post"] .hero-header.hero-sky-only .hero-meta {
+    margin: 0 auto;
   }
   html[data-theme="dark"] body[data-page-id="post"] .stats-wrapper {
-    width: 100%;
-    position: relative;
-    padding-top: 0;
-    margin: 0;
+    display: flow-root;
+    height: auto !important;
+    min-height: 0 !important;
   }
   html[data-theme="dark"] body[data-page-id="post"] .stats-wrapper .layout-container {
-    display: grid;
+    display: flex !important;
+    flex-direction: row;
+    align-items: flex-start;
     width: min(100%, 1120px);
     max-width: 1120px !important;
-    grid-template-columns: minmax(0, 1fr) 220px;
-    column-gap: clamp(28px, 4.5vw, 56px);
-    align-items: start;
+    height: auto !important;
     box-sizing: border-box;
     margin: 0 auto;
-    padding: 0 clamp(20px, 3.5vw, 44px) 90px !important;
+    gap: 42px;
+    padding: 0 24px 80px !important;
   }
   html[data-theme="dark"] body[data-page-id="post"] .layout-container > main.content-card {
     display: block;
-    width: 100% !important;
+    flex: 1 1 0;
     min-width: 0;
     max-width: none !important;
     box-sizing: border-box;
-    margin: 0 !important;
+    margin: 0;
     padding: 0 !important;
     min-height: 0;
-    background: transparent !important;
-    border: 0 !important;
-    box-shadow: none !important;
   }
-  html[data-theme="dark"] body[data-page-id="post"] main.content-card article,
-  html[data-theme="dark"] body[data-page-id="post"] main.content-card .prose {
-    width: 100%;
+  html[data-theme="dark"] body[data-page-id="post"] .layout-container > .sidebar-container {
+    flex: 0 0 220px;
     min-width: 0;
-    max-width: 100%;
+    padding-top: 12px;
   }
-  html[data-theme="dark"] body[data-page-id="post"] .prose {
-    font-size: 1rem;
+  html[data-theme="dark"] body[data-page-id="post"] .layout-container .prose {
+    width: 100%;
+    max-width: 100%;
     line-height: 1.9;
-    color: #e8f1fd;
-    text-shadow: 0 1px 2px rgba(0, 4, 18, .3);
-    overflow-wrap: anywhere;
-  }
-  html[data-theme="dark"] body[data-page-id="post"] .prose > p {
-    margin: 0 0 1.45rem !important;
-    max-width: 100%;
-  }
-  html[data-theme="dark"] body[data-page-id="post"] .prose h2 {
-    margin: 2.6rem 0 1.25rem !important;
-    padding: 0 !important;
-    border: 0 !important;
-    font-size: clamp(1.45rem, 2.3vw, 1.8rem);
-    line-height: 1.45;
-  }
-  html[data-theme="dark"] body[data-page-id="post"] .prose h3 {
-    margin-top: 2.1rem !important;
-    margin-bottom: 1rem !important;
-    padding: 0 !important;
-    border: 0 !important;
   }
   html[data-theme="dark"] body[data-page-id="post"] .prose img {
-    display: block;
-    width: auto;
-    max-width: min(100%, 680px);
-    max-height: 70vh;
-    height: auto;
-    object-fit: contain;
     filter: none !important;
+    max-width: 100%;
+    height: auto;
+    max-height: 72vh;
+    object-fit: contain;
     margin: 1.25rem auto 1.75rem;
     box-shadow: none;
-    transform: none !important;
   }
-  html[data-theme="dark"] body[data-page-id="post"] .prose img:hover {
-    filter: none !important;
-    transform: none !important;
-    box-shadow: none;
-  }
-  html[data-theme="dark"] body[data-page-id="post"] .sidebar-container {
-    padding-top: 18px !important;
-    min-width: 0;
-  }
-  html[data-theme="dark"] body[data-page-id="post"] .sidebar-container .sticky-toc {
-    top: 94px;
-    max-height: calc(100vh - 122px);
-  }
-  /* Keep the interview transcript as ONE native open/close section. */
   html[data-theme="dark"] body[data-page-id="post"] .prose details.interview-transcript {
-    width: 100%;
-    box-sizing: border-box;
-    margin: 1.1rem 0 2.25rem;
-    border: 1px solid rgba(162, 192, 227, .24);
+    margin: 1rem 0 2rem;
+    border: 1px solid rgba(162,192,227,.24);
     border-radius: 12px;
-    background: rgba(8, 21, 40, .20);
+    background: rgba(8,21,40,.20);
     overflow: hidden;
   }
-  html[data-theme="dark"] body[data-page-id="post"] .prose details.interview-transcript summary {
-    display: list-item;
+  html[data-theme="dark"] body[data-page-id="post"] .prose .interview-transcript summary {
     cursor: pointer;
     padding: 15px 20px;
-    color: #e5f0ff;
-    font-size: 1.02rem;
     font-weight: 650;
-  }
-  html[data-theme="dark"] body[data-page-id="post"] .prose details.interview-transcript summary:hover {
-    color: #b9d7ff;
+    color: #e5f0ff;
   }
   html[data-theme="dark"] body[data-page-id="post"] .prose .interview-transcript-body {
-    padding: 16px 20px 6px;
-    border-top: 1px solid rgba(162, 192, 227, .17);
+    padding: 14px 20px 4px;
+    border-top: 1px solid rgba(162,192,227,.17);
   }
-  html[data-theme="dark"] body[data-page-id="post"] .prose .interview-transcript-body .interview-turn {
+  html[data-theme="dark"] body[data-page-id="post"] .prose .interview-turn {
     margin: 0 0 1rem;
-    line-height: 1.85;
-    color: #e4edfa;
   }
-  html[data-theme="dark"] body[data-page-id="post"] .prose .interview-transcript-body .interview-note {
-    color: #a9bbd5;
+  html[data-theme="dark"] body[data-page-id="post"] .prose .interview-note {
     font-size: .91rem;
-    margin: .65rem 0 1rem;
-  }
-  html[data-theme="dark"] body[data-page-id="post"] .prose .interview-transcript-body strong {
-    color: #f3f7ff;
-    margin-right: .25em;
+    color: #a9bbd5;
+    margin: .6rem 0 1rem;
   }
 }
 @media screen and (max-width: 1100px) {
   html[data-theme="dark"] body[data-page-id="post"] .stats-wrapper .layout-container {
-    grid-template-columns: minmax(0, 1fr);
     max-width: 820px !important;
+    gap: 0;
   }
-  html[data-theme="dark"] body[data-page-id="post"] .sidebar-container {
+  html[data-theme="dark"] body[data-page-id="post"] .layout-container > .sidebar-container {
     display: none;
   }
 }
 @media screen and (max-width: 720px) {
   html[data-theme="dark"] body[data-page-id="post"] .hero-header.hero-sky-only {
-    padding: 100px 20px 24px !important;
+    padding: 100px 20px 26px !important;
   }
   html[data-theme="dark"] body[data-page-id="post"] .stats-wrapper .layout-container {
     padding: 0 20px 64px !important;
   }
-  html[data-theme="dark"] body[data-page-id="post"] .prose {
-    font-size: .98rem;
-    line-height: 1.85;
-  }
-  html[data-theme="dark"] body[data-page-id="post"] .prose details.interview-transcript summary {
-    padding: 13px 15px;
-  }
+  html[data-theme="dark"] body[data-page-id="post"] .prose .interview-transcript summary,
   html[data-theme="dark"] body[data-page-id="post"] .prose .interview-transcript-body {
-    padding: 14px 15px 4px;
+    padding-left: 15px;
+    padding-right: 15px;
   }
 }
