@@ -552,3 +552,13 @@ html[data-theme="dark"] body[data-page-id="post"] .prose .interview-transcript-t
 html[data-theme="dark"] body[data-page-id="post"] .prose img[src$="ncu-im-interview-seating.webp"] {
   filter: none !important;
 }
+
+
+/* On wide article/work pages, center the reading column beneath the title.
+   The optional TOC lives to its right; centering BOTH columns made the main
+   text appear shifted left. Preserve the existing widths and sticky TOC. */
+@media screen and (min-width: 1101px) {
+  html[data-theme="dark"] body[data-page-id="post"] .layout-container {
+    left: clamp(0px, calc((100vw - 1160px) / 2), 150px);
+  }
+}
