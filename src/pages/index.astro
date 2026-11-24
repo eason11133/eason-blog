@@ -44,7 +44,14 @@ const webSiteSchema = {
       .stats-wrapper {
         position: relative;
         background-color: var(--color-bg);
-        min-height: 50vh;
+        display: flow-root;
+        padding-bottom: 24px;
+      }
+
+      /* The parallax offset moves the card visually. Its negative bottom
+         margin removes the corresponding unused space in the document flow. */
+      .stats-wrapper :global(#stats-card) {
+        padding-bottom: 0;
       }
 
       .stats-container {
@@ -57,7 +64,6 @@ const webSiteSchema = {
       /* Restore the original Curry arena hero and a quiet dark article panel. */
       :global([data-theme="dark"]) .stats-wrapper {
         background: #171c25;
-        min-height: 50vh;
       }
 
       :global([data-theme="dark"]) .stats-container {

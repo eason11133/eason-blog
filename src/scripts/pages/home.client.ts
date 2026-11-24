@@ -94,6 +94,7 @@ export function initHomePage() {
 		coarsePointerRise: 48,
 		startAtHeroBottom: true,
 		revealTarget: true,
+		collapseLiftSpace: true,
 	});
 	setupCountUp();
 	setupPostsStagger();

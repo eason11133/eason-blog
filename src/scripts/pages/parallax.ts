@@ -3,6 +3,7 @@ interface ParallaxOptions {
 	coarsePointerRise: number;
 	startAtHeroBottom?: boolean;
 	revealTarget?: boolean;
+	collapseLiftSpace?: boolean;
 }
 
 const scrollHandlers = new WeakMap<HTMLElement, () => void>();
@@ -23,6 +24,7 @@ export function setupParallax({
 	coarsePointerRise,
 	startAtHeroBottom = false,
 	revealTarget = false,
+	collapseLiftSpace = false,
 }: ParallaxOptions) {
 	const target = document.getElementById('stats-card');
 	const mainContent = document.getElementById('main-content');
@@ -33,6 +35,7 @@ export function setupParallax({
 	if (revealTarget && target) {
 		target.style.opacity = '1';
 		target.style.transform = 'translateY(0)';
+		if (collapseLiftSpace) target.style.marginBottom = '0px';
 	}
 
 	if (!target || !mainContent || (startAtHeroBottom && !heroHeader)) return;
@@ -49,7 +52,9 @@ export function setupParallax({
 			: 0;
 		const distance = Math.max(0, mainContent.scrollTop - scrollStart);
 		const progress = Math.min(distance / (window.innerHeight * 0.5), 1);
-		target.style.transform = `translateY(-${progress * maxRise}px)`;
+		const lift = Math.min(progress * maxRise, target.offsetHeight);
+		target.style.transform = `translateY(-${lift}px)`;
+		if (collapseLiftSpace) target.style.marginBottom = `-${lift}px`;
 	};
 
 	const onScroll = () => {
