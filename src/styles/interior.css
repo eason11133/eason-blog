@@ -188,6 +188,11 @@ html[data-theme="dark"] body[data-page-id="experience"] .experience-body a {
     margin-top: auto;
     flex-shrink: 0;
   }
+  /* With the viewport-sized scroll container in flex mode, a long article must
+     not shrink beneath its content and cause the footer to overlap the text. */
+  body[data-page-id="post"] #main-content > .stats-wrapper {
+    flex-shrink: 0;
+  }
 }
 
 /* Article inner pages: restore the original compact HeroHeader layout.
