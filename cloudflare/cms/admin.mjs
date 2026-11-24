@@ -120,7 +120,7 @@ nav{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:16px}nav button[aria-curr
 <form id="document-form" class="fields" style="margin-top:18px">
 <div class="field"><label for="doc-title">標題</label><input id="doc-title" required maxlength="200"></div>
 <div class="field"><label for="doc-slug">網址代碼／slug（建立後請勿隨意改）</label><input id="doc-slug" required maxlength="120"></div>
-<div class="field"><label for="doc-date">日期</label><input id="doc-date" type="datetime-local" required></div>
+<div class="field"><label for="doc-date">日期（台灣時間 UTC+8）</label><input id="doc-date" type="datetime-local" required></div>
 <div class="field"><label for="doc-description">簡介</label><input id="doc-description" maxlength="1200"></div>
 <div class="field"><label for="doc-categories">分類（文章限一個）</label><input id="doc-categories" placeholder="心得"></div>
 <div class="field"><label for="doc-tags">標籤，用逗號分隔</label><input id="doc-tags" placeholder="特選,上機考"></div>
@@ -392,11 +392,28 @@ function getEditor(){
  return editor;
 }
 const parseList=s=>s.replaceAll(String.fromCharCode(10),',').split(/[，,]/).map(x=>x.trim()).filter(Boolean);
-const dateInput=v=>v?String(v).slice(0,16):new Date().toISOString().slice(0,16);
+const taipeiDateFormatter=new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Taipei',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hourCycle:'h23'});
+function dateInput(value){
+ const date=value?new Date(value):new Date();
+ if(!Number.isFinite(date.getTime()))return '';
+ const parts=Object.fromEntries(taipeiDateFormatter.formatToParts(date).map(p=>[p.type,p.value]));
+ return parts.year+'-'+parts.month+'-'+parts.day+'T'+parts.hour+':'+parts.minute;
+}
+function dateForSave(value,original){
+ // Keep the original instant, including seconds, if the field is unchanged.
+ if(original&&value===dateInput(original))return original;
+ if(!value)throw new Error('請填寫日期');
+ const date=new Date(value+'+08:00');
+ if(!Number.isFinite(date.getTime())||dateInput(date.toISOString())!==value)throw new Error('日期格式不正確');
+ return date.toISOString();
+}
+let originalDocDate='';
+
 function showDoc(d){
  const data=d||{};
  el('doc-title').value=data.title||'';
  el('doc-slug').value=data.slug||'';
+ originalDocDate=data.date||'';
  el('doc-date').value=dateInput(data.date);
  el('doc-description').value=data.description||'';
  el('doc-categories').value=(data.categories||[]).join(',');
@@ -676,7 +693,7 @@ el('document-form').onsubmit=async e=>{
  try{
   const payload={
    kind:tab,slug:el('doc-slug').value.trim(),title:el('doc-title').value.trim(),
-   date:new Date(el('doc-date').value).toISOString(),
+   date:dateForSave(el('doc-date').value,originalDocDate),
    description:el('doc-description').value,
    categories:parseList(el('doc-categories').value),
    tags:parseList(el('doc-tags').value),

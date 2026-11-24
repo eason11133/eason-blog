@@ -12,6 +12,7 @@ const { date, locale = siteLocale } = Astro.props;
 <time datetime={date.toISOString()}>
 	{
 		date.toLocaleDateString(locale, {
+			timeZone: 'Asia/Taipei',
 			year: 'numeric',
 			month: 'short',
 			day: 'numeric',

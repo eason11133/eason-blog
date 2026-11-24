@@ -126,7 +126,7 @@ function attachComments() {
         const author=document.createElement('strong');author.textContent=item.nickname||'訪客';
         const time=document.createElement('time');
         const timestamp=new Date(item.created);
-        time.textContent=Number.isNaN(timestamp.valueOf())?'':timestamp.toLocaleDateString('zh-TW');
+        time.textContent=Number.isNaN(timestamp.valueOf())?'':timestamp.toLocaleDateString('zh-TW',{timeZone:'Asia/Taipei'});
         const body=document.createElement('p');body.className='site-comment-body';body.textContent=item.body||'';
         header.append(author,time);entry.append(header,body);
         const reply=document.createElement('button');

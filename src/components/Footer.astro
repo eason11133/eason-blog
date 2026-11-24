@@ -3,7 +3,7 @@ import { profileConfig } from '../config';
 import { resolveSocialUrl } from '../lib/profile/social';
 import { getCmsFooterLinks, type CmsFooterLinks } from '../lib/cloudflare/live-content';
 
-const year = new Date().getFullYear();
+const year = new Intl.DateTimeFormat('en', { timeZone: 'Asia/Taipei', year: 'numeric' }).format(new Date());
 const footerLinks: Partial<CmsFooterLinks> = import.meta.env.PUBLIC_EASON_LIVE === 'true' ? await getCmsFooterLinks() : {};
 const socials = (['github', 'email', 'instagram', 'discord'] as const).map((key) => {
   const configured = profileConfig.socials.find((social) => social.key === key);

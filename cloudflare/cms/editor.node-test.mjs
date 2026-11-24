@@ -44,3 +44,17 @@ test('About settings uses editable fields and repeatable rows rather than raw JS
   for (const token of ['renderAboutForm', 'readAboutForm()', '新增標題區塊', '新增項目', 'sidebar_sections', '新增興趣', '新增時間軸區塊', '新增經歷', 'about-avatar-file', 'body_text']) assert.ok(adminHtml.includes(token), token);
   assert.ok(!adminHtml.includes('about-json'));
 });
+
+test('CMS date input and save use Taipei time independently of browser timezone', () => {
+  const start=adminHtml.indexOf('const taipeiDateFormatter=');
+  const end=adminHtml.indexOf('let originalDocDate=',start);
+  assert.ok(start>=0&&end>start);
+  const source=adminHtml.slice(start,end);
+  const result=vm.runInNewContext(source+String.fromCharCode(10)+
+    '({beforeMidnight:dateInput("2026-11-24T15:59:00Z"), midnight:dateInput("2026-11-24T16:00:00Z"), saved:dateForSave("2026-11-25T00:00",""), unchanged:dateForSave("2026-11-25T00:00","2026-11-24T16:00:53.123Z")})');
+  assert.equal(result.beforeMidnight,'2026-11-24T23:59');
+  assert.equal(result.midnight,'2026-11-25T00:00');
+  assert.equal(result.saved,'2026-11-24T16:00:00.000Z');
+  assert.equal(result.unchanged,'2026-11-24T16:00:53.123Z');
+  assert.ok(adminHtml.includes('date:dateForSave(el('));
+});
