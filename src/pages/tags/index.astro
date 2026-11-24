@@ -1,5 +1,120 @@
 ---
-// Keep existing /tags/ links and bookmarks working without a second article index.
-// Static Astro builds emit a client-side redirect to the canonical blog listing.
-return Astro.redirect('/blog/');
+import PageShell from '../../layouts/PageShell.astro';
+import InteriorHeading from '../../components/InteriorHeading.astro';
+import { getTagStats } from '../../lib/content/blog';
+import { getWorkTagStats } from '../../lib/content/works';
+import { getTagPath } from '../../lib/content/tag-path';
+import { getWorkTagPath } from '../../lib/content/work-tag-path';
+import { siteTitle } from '../../config';
+
+export const prerender = import.meta.env.PUBLIC_EASON_LIVE !== 'true';
+const [blogTags, workTags] = await Promise.all([getTagStats(), getWorkTagStats()]);
+const sortedBlogTags = [...blogTags].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], 'zh-Hant'));
+const sortedWorkTags = [...workTags].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], 'zh-Hant'));
 ---
+
+<PageShell
+  title={'所有標籤 | ' + siteTitle}
+  description="瀏覽 Eason 的文章與作品標籤。"
+  pageId="tags-index"
+  useMainWrapper={false}
+  transparentHeader={false}
+>
+  <main class="all-tags-page">
+    <div class="all-tags-inner">
+      <InteriorHeading title="所有標籤" centered={true} animated={true} />
+      <section class="tags-group" aria-labelledby="work-tags-heading">
+        <div class="tags-group-title">
+          <h2 id="work-tags-heading">作品</h2>
+          <a href="/experience/">查看所有作品 →</a>
+        </div>
+        <div class="tags-grid">
+          {sortedWorkTags.map(([name, count]) => (
+            <a class="tags-entry" href={getWorkTagPath(name)}>
+              <span class="tags-label"><span class="hash">#</span>{name}</span>
+              <span class="number">{count}</span>
+            </a>
+          ))}
+          {sortedWorkTags.length === 0 && <p class="empty">目前沒有作品標籤。</p>}
+        </div>
+      </section>
+      <section class="tags-group" aria-labelledby="blog-tags-heading">
+        <div class="tags-group-title">
+          <h2 id="blog-tags-heading">文章</h2>
+          <a href="/blog/">查看所有文章 →</a>
+        </div>
+        <div class="tags-grid">
+          {sortedBlogTags.map(([name, count]) => (
+            <a class="tags-entry" href={getTagPath(name)}>
+              <span class="tags-label"><span class="hash">#</span>{name}</span>
+              <span class="number">{count}</span>
+            </a>
+          ))}
+          {sortedBlogTags.length === 0 && <p class="empty">目前沒有文章標籤。</p>}
+        </div>
+      </section>
+    </div>
+  </main>
+</PageShell>
+
+<style>
+  .all-tags-page {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    box-sizing: border-box;
+    min-height: calc(100dvh - 64px);
+    padding: clamp(126px, 17vh, 180px) clamp(20px, 4vw, 48px) 72px;
+    background: transparent;
+  }
+  .all-tags-inner { width: min(100%, 1080px); margin: 0 auto; }
+  .tags-group { margin: 52px 0 0; }
+  .tags-group-title {
+    display: flex;
+    gap: 1rem;
+    align-items: baseline;
+    justify-content: space-between;
+    border-bottom: 1px solid rgba(163, 192, 228, .2);
+    padding-bottom: .7rem;
+    margin-bottom: 1.1rem;
+  }
+  .tags-group-title h2 { margin: 0; font-size: 1.4rem; color: #edf3fc; }
+  .tags-group-title a {
+    color: #a4bfdc;
+    font-size: .88rem;
+    text-decoration: none;
+  }
+  .tags-group-title a:hover { color: #e6f1ff; }
+  .tags-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: .5rem 1.4rem;
+  }
+  .tags-entry {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    min-width: 0;
+    color: #d2e1f1;
+    padding: .95rem .4rem;
+    text-decoration: none;
+    border-radius: 8px;
+    transition: background .2s ease, transform .2s ease;
+  }
+  .tags-entry:hover, .tags-entry:focus-visible {
+    background: rgba(94, 145, 200, .12);
+    transform: translateY(-2px);
+  }
+  .tags-label { min-width: 0; overflow-wrap: anywhere; }
+  .hash { color: #a4c5ea; margin-right: .3rem; }
+  .number { color: #91a9c4; font-size: .85rem; white-space: nowrap; }
+  .empty { color: #a9bbd0; }
+  @media (max-width: 900px) { .tags-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (max-width: 600px) {
+    .tags-grid { grid-template-columns: minmax(0, 1fr); }
+    .tags-group { margin-top: 38px; }
+    .tags-group-title h2 { font-size: 1.25rem; }
+  }
+  @media (prefers-reduced-motion: reduce) { .tags-entry { transition: none; } }
+</style>

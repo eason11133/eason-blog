@@ -523,12 +523,7 @@ const pageCount = Math.ceil(visiblePosts.length / CONTENT_PAGE_SIZE);
           </a>
         ))}
         </div>
-          <div class="tag-overflow" data-tag-more hidden>
-            <button class="tag-filter tag-more-button" type="button" data-tag-more-button aria-expanded="false" aria-haspopup="true" aria-label="查看更多標籤">
-              更多 <span class="tag-more-count" data-tag-more-count></span><span aria-hidden="true">⌄</span>
-            </button>
-            <div class="tag-overflow-menu" data-tag-more-menu hidden></div>
-          </div>
+          <a class="tag-all-link" href="/tags/" data-astro-prefetch="viewport">所有標籤 <span aria-hidden="true">→</span></a>
       </nav>
       <div class="articles-list blog-posts-list" data-tag-pagination data-page-count={pageCount}>
         {visiblePosts.map((post, index) => (

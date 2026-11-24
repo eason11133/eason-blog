@@ -1,77 +1,34 @@
 
-/**
- * Move only the tags which do not fit beside "More" into a dropdown.
- * Runs on client-navigation and window resize; original links remain valid.
- */
+/** Keep tag filters on one row; hidden tags stay discoverable on /tags/. */
 function setupTagOverflow() {
   for (const bar of document.querySelectorAll<HTMLElement>('[data-tag-overflow]')) {
     const visible = bar.querySelector<HTMLElement>('[data-tag-visible]');
-    const more = bar.querySelector<HTMLElement>('[data-tag-more]');
-    const menu = bar.querySelector<HTMLElement>('[data-tag-more-menu]');
-    const toggle = bar.querySelector<HTMLButtonElement>('[data-tag-more-button]');
-    const counter = bar.querySelector<HTMLElement>('[data-tag-more-count]');
-    if (!visible || !more || !menu || !toggle || !counter) continue;
+    if (!visible) continue;
     const all = visible.querySelector<HTMLAnchorElement>('.all-tag');
     if (!all) continue;
     const tags = [...visible.querySelectorAll<HTMLAnchorElement>('.tag-filter:not(.all-tag)')];
     if (!tags.length) continue;
     let animationFrame = 0;
-    const close = () => {
-      menu.hidden = true;
-      toggle.setAttribute('aria-expanded', 'false');
-    };
     const layout = () => {
-      close();
-      // Restore DOM order before each measurement, including after resizes.
-      for (const tag of tags) visible.appendChild(tag);
-      // Check whether everything already fits without the More button.
-      // Only reserve its width when there is an actual overflow.
-      more.hidden = true;
-      const gap = Number.parseFloat(getComputedStyle(visible).columnGap) || 0;
-      const naturalWidth = all.getBoundingClientRect().width
-        + tags.reduce((sum, tag) => sum + gap + tag.getBoundingClientRect().width, 0);
-      if (naturalWidth <= visible.clientWidth + .5) {
-        counter.textContent = '';
-        return;
-      }
-      more.hidden = false;
+      // Re-measure at each breakpoint and keep the most-used tags first.
+      for (const tag of tags) tag.hidden = false;
       const available = visible.clientWidth;
+      const gap = Number.parseFloat(getComputedStyle(visible).columnGap) || 0;
       let used = all.getBoundingClientRect().width;
       for (const tag of tags) {
-        const tagWidth = tag.getBoundingClientRect().width;
-        if (used + gap + tagWidth <= available + .5) {
-          used += gap + tagWidth;
-        } else {
-          menu.appendChild(tag);
-        }
+        const width = tag.getBoundingClientRect().width;
+        if (used + gap + width <= available + 0.5) used += gap + width;
+        else tag.hidden = true;
       }
-      const hiddenCount = menu.children.length;
-      counter.textContent = hiddenCount ? String(hiddenCount) : '';
-      more.hidden = hiddenCount === 0;
     };
     const schedule = () => {
       cancelAnimationFrame(animationFrame);
       animationFrame = requestAnimationFrame(layout);
     };
-    toggle.addEventListener('click', () => {
-      menu.hidden = !menu.hidden;
-      toggle.setAttribute('aria-expanded', String(!menu.hidden));
-    });
-    document.addEventListener('pointerdown', event => {
-      if (!bar.contains(event.target as Node)) close();
-    });
-    bar.addEventListener('keydown', event => {
-      if (event.key === 'Escape') {
-        close();
-        toggle.focus();
-      }
-    });
     if (typeof ResizeObserver !== 'undefined') {
-      const ro = new ResizeObserver(schedule);
-      ro.observe(bar);
-    } else {
-      window.addEventListener('resize', schedule, { passive: true });
-    }
+      const observer = new ResizeObserver(schedule);
+      observer.observe(bar);
+    } else window.addEventListener('resize', schedule, { passive: true });
     schedule();
   }
 }
