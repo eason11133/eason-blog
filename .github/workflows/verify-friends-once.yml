@@ -1,0 +1,41 @@
+name: One-time friend links smoke check
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/verify-friends-once.yml'
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Verify live friend page, menu, D1 API, and CMS editor
+        shell: bash
+        run: |
+          node <<'JS'
+          (async()=>{
+            const site='https://eason-blog-web-live.eason456h.workers.dev';
+            const cms='https://eason-blog.eason456h.workers.dev';
+            for(const path of ['/friends/','/']){
+              const r=await fetch(site+path);
+              const html=await r.text();
+              if(!r.ok)throw Error('Site '+path+' returned '+r.status);
+              if(!html.includes('href="/friends"'))throw Error('Nav friend link not present: '+path);
+              if(path==='/friends/'){
+                if(!html.includes('data-page-id="friends"'))throw Error('PageShell friends view absent');
+                if(!html.includes('目前還沒有友站'))throw Error('Empty-state friend page missing');
+              }
+              console.log('FRONTEND '+path+' '+r.status);
+            }
+            const api=await fetch(cms+'/api/friends');
+            const data=await api.json();
+            if(!api.ok||!Array.isArray(data.sites))throw Error('Friend API unavailable '+JSON.stringify(data));
+            console.log('FRIENDS API '+api.status+' count='+data.sites.length);
+            const admin=await fetch(cms+'/admin/');
+            const html=await admin.text();
+            if(!admin.ok||!html.includes('data-tab="friends"')||!html.includes('id="friends-form"'))
+              throw Error('Friend editor is not available in CMS');
+            console.log('ADMIN /admin/ '+admin.status+' friend editor available');
+            console.log('PASS: friend page, both menus, CMS API and editing controls are live');
+          })().catch(err=>{console.error(err);process.exitCode=1;});
+          JS
