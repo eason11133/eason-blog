@@ -1,0 +1,108 @@
+name: Verify listing pagination once
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/verify-pagination-once.yml'
+jobs:
+  browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Verify four cards and page-2 navigation on desktop and phone
+        shell: bash
+        run: |
+          python3 -m pip install --quiet selenium Pillow
+          python3 - <<'PY'
+          import time,json,io,base64
+          from selenium import webdriver
+          from selenium.webdriver.chrome.options import Options
+          from PIL import Image
+          base='https://eason-blog-web-live.eason456h.workers.dev'
+          options=Options()
+          options.add_argument('--headless=new')
+          options.add_argument('--no-sandbox')
+          options.add_argument('--disable-dev-shm-usage')
+          driver=webdriver.Chrome(options=options)
+          def inspect():
+            return driver.execute_script("""
+              const cards=[...document.querySelectorAll('.articles-list > .scroll-reveal:not([hidden])')];
+              const page=[...document.querySelectorAll('.pagination .page-numbers .page-btn')];
+              const nav=document.querySelector('.pagination');
+              return {cardCount:cards.length,titles:cards.map(x=>x.querySelector('.blog-post-title')?.textContent.trim()),
+                columns:getComputedStyle(document.querySelector('.articles-list')).gridTemplateColumns,
+                pageLinks:page.map(a=>({n:a.textContent.trim(),href:a.getAttribute('href'),active:a.classList.contains('active')})),
+                next:nav?.querySelector('.next-btn')?.getAttribute('href'),
+                prev:nav?.querySelector('.prev-btn')?.getAttribute('href'),
+                horizontalOverflow:document.documentElement.scrollWidth>document.documentElement.clientWidth+2};
+            """)
+          def shot(label):
+            driver.execute_script("document.querySelector('.articles-area').scrollIntoView()")
+            time.sleep(.15)
+            path='/tmp/'+label+'.png'
+            driver.save_screenshot(path)
+            im=Image.open(path).convert('RGB')
+            im.thumbnail((1100,760))
+            buf=io.BytesIO();im.save(buf,'JPEG',quality=55,optimize=True)
+            print('SCREEN_'+label+'_BEGIN',flush=True)
+            print(base64.b64encode(buf.getvalue()).decode('ascii'),flush=True)
+            print('SCREEN_'+label+'_END',flush=True)
+          try:
+            success=False
+            for index in range(25):
+              driver.set_window_size(1440,1000)
+              driver.get(base+'/experience/')
+              time.sleep(.7)
+              first=inspect()
+              if first['cardCount']==4 and first['next']=='/experience/page/2/':
+                driver.get(base+'/experience/page/2/')
+                time.sleep(.7)
+                second=inspect()
+                if second['cardCount']==1 and second['prev']=='/experience/':
+                  success=True;break
+              print('AWAITING_PRODUCTION_DEPLOY',index+1,json.dumps(first,ensure_ascii=False),flush=True)
+              time.sleep(4)
+            assert success,'Expected 4 works on first page and 1 work on second page'
+            print('WORKS_DESKTOP_PAGE1',json.dumps(first,ensure_ascii=False),flush=True)
+            print('WORKS_DESKTOP_PAGE2',json.dumps(second,ensure_ascii=False),flush=True)
+            assert not first['horizontalOverflow'] and not second['horizontalOverflow']
+            assert second['pageLinks'][1]['active']
+            shot('WORKS_PAGE2')
+            driver.get(base+'/blog/')
+            time.sleep(.7)
+            blog=inspect()
+            print('BLOG_DESKTOP',json.dumps(blog,ensure_ascii=False),flush=True)
+            assert blog['cardCount']==4
+            assert not blog['horizontalOverflow']
+            driver.set_window_size(420,900)
+            driver.get(base+'/experience/')
+            time.sleep(.6)
+            mobileFirst=inspect()
+            driver.get(base+'/experience/page/2/')
+            time.sleep(.6)
+            mobileSecond=inspect()
+            print('WORKS_MOBILE_PAGE1',json.dumps(mobileFirst,ensure_ascii=False),flush=True)
+            print('WORKS_MOBILE_PAGE2',json.dumps(mobileSecond,ensure_ascii=False),flush=True)
+            assert mobileFirst['cardCount']==4 and mobileSecond['cardCount']==1
+            assert not mobileFirst['horizontalOverflow'] and not mobileSecond['horizontalOverflow']
+            shot('WORKS_MOBILE_PAGE2')
+            # Tag filters should list only matching entries and remain readable.
+            driver.get(base+'/experience/')
+            time.sleep(.5)
+            tag=driver.execute_script("""
+              return document.querySelector('.article-tags .tag-filter:not(.all-tag)')?.getAttribute('href')
+            """)
+            assert tag,'No work tag found'
+            driver.get(base+tag)
+            time.sleep(.7)
+            page=driver.execute_script("""
+              return {count:document.querySelectorAll('.articles-list > .scroll-reveal:not([hidden])').length,
+                pageCount:document.querySelector('.articles-list')?.dataset.pageCount,
+                overflow:document.documentElement.scrollWidth>document.documentElement.clientWidth+2};
+            """)
+            print('TAG_MOBILE',tag,json.dumps(page,ensure_ascii=False),flush=True)
+            assert page['count']<=4 and not page['overflow']
+            print('PASS: works 4+1 across two pages, blog four cards, tag filter, and mobile layout',flush=True)
+          finally:
+            driver.quit()
+          PY
