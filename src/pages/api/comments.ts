@@ -1,7 +1,8 @@
 import type { APIRoute } from 'astro';
+import { BLOG_CMS_ORIGIN } from '../../../cloudflare/site-config.mjs';
 
 export const prerender = import.meta.env.PUBLIC_EASON_LIVE !== 'true';
-const CMS_ORIGIN = 'https://eason-blog.eason456h.workers.dev';
+const CMS_ORIGIN = BLOG_CMS_ORIGIN;
 const json = (data: unknown, status=200) => new Response(JSON.stringify(data), { status, headers: { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store' } });
 
 export const GET: APIRoute = async ({ url }) => {
