@@ -508,3 +508,41 @@ html[data-theme="dark"] body[data-page-id="about"] .service-item { border-radius
     border-radius: 17px !important;
   }
 }
+
+
+/* Keep every post/work metadata item in the same muted gray-blue (no white numbers). */
+html[data-theme="dark"] body[data-page-id="post"] .hero-header.hero-sky-only .post-back-link,
+html[data-theme="dark"] body[data-page-id="post"] .hero-header.hero-sky-only .post-back-link:hover {
+  color: #a9bbd3;
+}
+
+/* Optional native single-section transcript; any article can use
+   <details class="interview-transcript"> in the D1 Markdown editor. */
+html[data-theme="dark"] body[data-page-id="post"] .prose details.interview-transcript {
+  margin: 1.1rem 0 2.2rem;
+  max-width: 100%;
+  overflow: hidden;
+  border: 1px solid rgba(158, 186, 221, .20);
+  border-radius: 12px;
+  background: rgba(8, 22, 43, .18);
+}
+html[data-theme="dark"] body[data-page-id="post"] .prose details.interview-transcript > summary {
+  cursor: pointer;
+  padding: 14px 18px;
+  color: #a9bbd3;
+  font-weight: 600;
+}
+html[data-theme="dark"] body[data-page-id="post"] .prose details.interview-transcript[open] > summary {
+  border-bottom: 1px solid rgba(158, 186, 221, .16);
+}
+html[data-theme="dark"] body[data-page-id="post"] .prose .interview-transcript-text {
+  display: block;
+  margin: 0;
+  padding: 18px;
+  color: inherit;
+  font: inherit;
+  line-height: 1.9;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  word-break: normal;
+}

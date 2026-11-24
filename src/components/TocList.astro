@@ -16,13 +16,15 @@ interface Props {
 }
 
 const { nodes, root = false } = Astro.props;
+// Show headings faithfully in the article, while keeping parenthetical asides out of the TOC.
+const tocTitle = (text: string) => text.replace(/\([^()]*\)|（[^（）]*）/g, '').trim();
 ---
 
 <ul class:list={[root ? 'toc-list' : 'toc-children']} id={root ? 'toc-root' : undefined}>
 	{nodes.map((node) => (
 		<li class="toc-item" data-depth={node.heading.depth} data-slug={node.heading.slug}>
 			<a href={`#${node.heading.slug}`} class="toc-link">
-				<span class="toc-text">{node.heading.text}</span>
+				<span class="toc-text">{tocTitle(node.heading.text)}</span>
 			</a>
 			{node.children.length > 0 && <Astro.self nodes={node.children} />}
 		</li>
