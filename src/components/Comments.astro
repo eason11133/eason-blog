@@ -39,7 +39,7 @@ const { kind, slug } = Astro.props;
 .site-comments h2{font-size:1.4rem;color:#e7effa;font-weight:700;margin:0 0 1.25rem}
 .site-comments-list{font-size:.95rem;color:#a7b9d3;margin:0 0 1.7rem}
 .site-comment{border-bottom:1px solid rgba(158,186,221,.18);padding:1rem 0}
-.site-comment.is-reply{margin-left:2.5rem;padding-left:1rem;border-left:2px solid rgba(158,186,221,.25)}
+.site-comment.is-reply{margin-left:1.25rem;padding-left:1rem;border-left:2px solid rgba(158,186,221,.25)}
 .site-comment-header{display:flex;flex-wrap:wrap;align-items:center;gap:.6rem;color:#a7b9d3;font-size:.84rem}
 .site-comment-header strong{color:#e7effa}
 .site-comment-avatar,.site-comment-account-avatar{width:32px;height:32px;object-fit:cover;border-radius:50%;border:1px solid rgba(158,186,221,.26)}
@@ -87,6 +87,7 @@ function attachComments() {
   const endpoint='/api/comments?kind='+encodeURIComponent(kind)+'&slug='+encodeURIComponent(slug);
   let visitor:Visitor|null=null;
   let replyId:string|null=null;
+  const heading=root.querySelector<HTMLElement>('#site-comments-title')!;
   function clearReply(){replyId=null;replyTarget.hidden=true;replyLabel.textContent='';}
   replyCancel.addEventListener('click',clearReply);
   async function loadComments(){
@@ -97,10 +98,22 @@ function attachComments() {
       const comments:CommentItem[]=Array.isArray(data.comments)?data.comments:[];
       list.replaceChildren();
       if(!comments.length){list.textContent='目前還沒有留言。';return;}
+      heading.textContent='留言（'+comments.length+'）';
       const byId=new Map(comments.map(c=>[c.id,c]));
+      const children=new Map<string,CommentItem[]>();
       for(const item of comments){
+        if(item.parent_id && byId.has(item.parent_id)){
+          const group=children.get(item.parent_id)||[];
+          group.push(item);
+          children.set(item.parent_id,group);
+        }
+      }
+      const displayed=new Set<string>();
+      function render(item:CommentItem,host:HTMLElement,depth=0){
+        if(displayed.has(item.id))return;
+        displayed.add(item.id);
         const entry=document.createElement('article');entry.className='site-comment';
-        if(item.parent_id&&byId.has(item.parent_id))entry.classList.add('is-reply');
+        if(depth>0)entry.classList.add('is-reply');
         const header=document.createElement('div');header.className='site-comment-header';
         if(item.avatar_url){
           try{
@@ -123,7 +136,19 @@ function attachComments() {
           replyId=item.id;replyTarget.hidden=false;replyLabel.textContent='回覆 '+item.nickname;
           form.querySelector<HTMLTextAreaElement>('textarea')?.focus();
         });
-        entry.append(reply);list.append(entry);
+        entry.append(reply);host.append(entry);
+        const replies=children.get(item.id);
+        if(replies?.length){
+          const nested=document.createElement('div');nested.className='site-comment-children';
+          for(const child of replies)render(child,nested,depth+1);
+          entry.append(nested);
+        }
+      }
+      for(const item of comments){
+        if(!item.parent_id || !byId.has(item.parent_id))render(item,list);
+      }
+      for(const item of comments){
+        if(!displayed.has(item.id))render(item,list);
       }
     }catch(e){list.textContent=e instanceof Error?e.message:'無法載入留言';}
   }
@@ -133,7 +158,8 @@ function attachComments() {
       if(!response.ok)throw Error('登入服務暫時無法使用');
       const data=await response.json();
       visitor=data.user||null;
-      login.hidden=!!visitor;account.hidden=!visitor;form.hidden=!visitor;
+      login.hidden=!!visitor || (data.providers?.github===false && data.providers?.google===false);
+      account.hidden=!visitor;form.hidden=!visitor;
       if(visitor){
         name.textContent=visitor.name;
         if(visitor.avatar){accountAvatar.src=visitor.avatar;accountAvatar.hidden=false;}
@@ -145,7 +171,7 @@ function attachComments() {
           a.hidden=data.providers?.[provider]===false;
           a.href='/api/auth/'+provider+'?return='+encodeURIComponent(location.pathname);
         }
-        if(data.providers?.github===false&&data.providers?.google===false)authStatus.textContent='留言登入尚未開放。';
+        if(data.providers?.github===false&&data.providers?.google===false)authStatus.textContent='留言功能已準備好，正式網址及登入授權設定後開放。';
       }
     }catch(e){login.hidden=true;account.hidden=true;form.hidden=true;authStatus.textContent=e instanceof Error?e.message:'登入服務無法使用';}
   }
@@ -172,6 +198,9 @@ function attachComments() {
     }catch(e){status.textContent=e instanceof Error?e.message:'送出失敗';}
     finally{button.disabled=false;}
   });
+  const authResult=new URLSearchParams(location.search).get('comment_auth');
+  if(authResult==='cancelled')authStatus.textContent='你已取消登入。';
+  if(authResult==='failed')authStatus.textContent='登入未完成，請再試一次。';
   loadComments();loadUser();
 }
 attachComments();
