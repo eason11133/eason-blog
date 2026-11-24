@@ -26,7 +26,7 @@ const tags = [...await (isWork ? getWorkTagStats() : getTagStats())]
       <div class="tags-grid" aria-label={label + '標籤'}>
         {tags.map(([name, count]) => (
           <a class="tags-entry" href={pathForTag(name)} data-astro-prefetch="viewport">
-            <span class="tags-label">#{name}</span>
+            <span class="tags-label"><span class="hash">#</span> {name}</span>
             <span class="number">{count}</span>
           </a>
         ))}
@@ -46,26 +46,24 @@ const tags = [...await (isWork ? getWorkTagStats() : getTagStats())]
   .all-tags-inner { width: min(100%, 1280px); margin: 0 auto; }
   .back { display: inline-block; margin-bottom: 1rem; color: #a9bbd2; font-size: .95rem; text-decoration: none; }
   .back:hover, .back:focus-visible { color: var(--accent); }
-  .tags-grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 14px; }
+  .tags-grid { display: flex; flex-wrap: wrap; align-items: center; gap: .6rem; }
   .tags-entry {
-    display: flex; align-items: center; justify-content: space-between;
-    gap: .8rem; min-width: 0; min-height: 58px; box-sizing: border-box;
-    padding: 14px 18px; background: var(--color-tag-bg); color: var(--color-tag-text);
-    text-decoration: none; border-radius: 12px; font-weight: 650;
-    transition: background .2s ease, color .2s ease, transform .2s ease;
+    display: inline-flex; align-items: center; gap: .35rem;
+    min-width: 0; max-width: 100%; box-sizing: border-box;
+    padding: .4rem .72rem; background: var(--color-tag-bg); color: var(--color-tag-text);
+    border: 1px solid var(--color-border-subtle); border-radius: 9px;
+    text-decoration: none; font-size: .88rem; font-weight: 400;
+    transition: background .2s, color .2s, transform .2s;
   }
   .tags-entry:hover, .tags-entry:focus-visible {
     background: var(--accent); color: white; transform: translateY(-2px);
   }
   .tags-label { min-width: 0; overflow-wrap: anywhere; }
-  .number { font-size: .88rem; font-weight: 400; font-variant-numeric: tabular-nums; opacity: .8; white-space: nowrap; }
+  .hash { color: #9abce6; }
+  .number { color: #9dadc4; font-size: .78rem; margin-left: .15rem; white-space: nowrap; }
+  .tags-entry:hover *, .tags-entry:focus-visible * { color: inherit; }
   .empty { color: var(--color-text-secondary); }
-  @media (max-width: 1100px) { .tags-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
-  @media (max-width: 850px) { .tags-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
-  @media (max-width: 600px) {
-    .tags-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
-    .tags-entry { padding: 12px; min-height: 52px; }
-  }
+  @media (max-width: 620px) { .tags-grid { gap: .4rem; } }
   @media (prefers-reduced-motion: reduce) { .tags-entry { transition: none; } }
   :global(body[data-page-id="tags-index"] #main-content) { display: flex; flex-direction: column; }
   :global(body[data-page-id="tags-index"] #main-content > .page-shell-main) { flex: 0 0 auto; }
