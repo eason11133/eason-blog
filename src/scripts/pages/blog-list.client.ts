@@ -58,7 +58,7 @@ function setupTagOverflow() {
         toggle.focus();
       }
     });
-    if ('ResizeObserver' in window) {
+    if (typeof ResizeObserver !== 'undefined') {
       const ro = new ResizeObserver(schedule);
       ro.observe(bar);
     } else {
