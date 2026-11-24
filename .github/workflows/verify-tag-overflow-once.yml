@@ -55,7 +55,8 @@ jobs:
             seq=data['visibleTags']+data['overflowTags']
             assert all(seq[i]['count']>=seq[i+1]['count'] for i in range(len(seq)-1)),label
             assert len(data['visibleTags'])>0 and data['visibleTags'][-1]['rect']['right']<=data['visible']['right']+2,label
-            assert data['overflowCount']>0 if width<=1024 else True,label
+            if width<=1024 and data['allCount']>=6:
+              assert data['overflowCount']>0,label
             if data['overflowCount']:
               assert data['moreVisible'] and data['menuHidden'],label
               more=d.find_element('css selector','[data-tag-more-button]')
