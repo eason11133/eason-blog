@@ -92,13 +92,13 @@ jobs:
           import urllib.error
           import json
           site='https://eason-blog-web-live.eason456h.workers.dev'
-          with urllib.request.urlopen(site+'/api/auth/me',timeout=20) as r:
+          with urllib.request.urlopen(urllib.request.Request(site+'/api/auth/me',headers={'User-Agent':'Mozilla/5.0'}),timeout=20) as r:
             data=json.load(r)
             assert r.status==200 and data.get('user') is None
             assert isinstance(data.get('providers'),dict)
             print('OAuth session API: 200, unauthenticated',flush=True)
           body=json.dumps({'kind':'post','slug':'demo','body':'not sent'}).encode()
-          req=urllib.request.Request(site+'/api/comments',data=body,method='POST',headers={'Origin':site,'Content-Type':'application/json'})
+          req=urllib.request.Request(site+'/api/comments',data=body,method='POST',headers={'Origin':site,'Content-Type':'application/json','User-Agent':'Mozilla/5.0'})
           try:
             with urllib.request.urlopen(req,timeout=20) as r:
               code=r.status
