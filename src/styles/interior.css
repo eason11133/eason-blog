@@ -570,7 +570,7 @@ html[data-theme="dark"] body[data-page-id="post"] .prose img[src$="ncu-im-interv
 }
 
 
-/* Blog index: responsive two-column, fine-outline floating cards. */
+/* Blog index: transparent two-column entries; only hover adds a subtle lift. */
 html[data-theme="dark"] body[data-page-id="blog-list"] {
   --interior-width: 1120px;
 }
@@ -584,10 +584,10 @@ html[data-theme="dark"] body[data-page-id="blog-list"] .articles-list > .scroll-
   display: flex;
   flex-direction: column;
   min-width: 0;
-  min-height: 174px;
+  min-height: 0;
   box-sizing: border-box;
   padding: 19px 21px !important;
-  border: 1px solid rgba(164, 190, 223, .22) !important;
+  border: 0 !important;
   border-radius: 14px !important;
   background: transparent !important;
   box-shadow: none !important;
@@ -596,13 +596,9 @@ html[data-theme="dark"] body[data-page-id="blog-list"] .articles-list > .scroll-
 html[data-theme="dark"] body[data-page-id="blog-list"] .articles-list > .scroll-reveal::before {
   inset: 0;
   border-radius: inherit;
-  border: 0;
+  border: 0 !important;
   background: rgba(60, 100, 149, .075);
   box-shadow: 0 12px 30px rgba(0, 7, 19, .17);
-}
-html[data-theme="dark"] body[data-page-id="blog-list"] .articles-list > .scroll-reveal:hover,
-html[data-theme="dark"] body[data-page-id="blog-list"] .articles-list > .scroll-reveal:focus-within {
-  border-color: rgba(167, 205, 249, .48) !important;
 }
 html[data-theme="dark"] body[data-page-id="blog-list"] .articles-list .blog-post-item {
   display: flex;
