@@ -218,7 +218,7 @@ async function handle(req,env) {
   }
   if(method==='PUT'&&path==='/api/admin/content') {
     const normalized=normalizeDocument(await jsonBody(req));
-    if(!normalized)return fail('Invalid document. Published blog posts require a category and tag.');
+    if(!normalized)return fail('文章資料不正確，請檢查標題、網址代碼及日期。');
     await env.DB.prepare(
       'INSERT INTO documents(kind,slug,title,description,body_markdown,categories_json,tags_json,date,updated,draft,pinned) VALUES(?,?,?,?,?,?,?,?,?,?,?) '+
       'ON CONFLICT(kind,slug) DO UPDATE SET title=excluded.title,description=excluded.description,body_markdown=excluded.body_markdown,categories_json=excluded.categories_json,tags_json=excluded.tags_json,date=excluded.date,updated=excluded.updated,draft=excluded.draft,pinned=excluded.pinned'

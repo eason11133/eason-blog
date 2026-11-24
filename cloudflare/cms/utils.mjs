@@ -11,7 +11,6 @@ export function normalizeDocument(input) {
   const cats = asArray(input.categories).slice(0,1);
   const tags = asArray(input.tags);
   const draft = input.draft !== false;
-  if (!draft && input.kind === 'post' && (!cats.length || !tags.length)) return null;
   const body = typeof input.body_markdown === 'string' ? input.body_markdown : '';
   if (body.length > 250000) return null;
   return {
