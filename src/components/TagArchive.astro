@@ -7,6 +7,7 @@ import { siteTitle } from '../config';
 import { extractExcerpt } from '../lib/content/text';
 import { getTagPath } from '../lib/content/tag-path';
 import { getWorkTagPath } from '../lib/content/work-tag-path';
+import { CONTENT_PAGE_SIZE } from '../lib/cloudflare/pagination';
 
 interface Props {
   tag: string;
@@ -26,6 +27,7 @@ const visiblePosts = [...posts].sort((a, b) =>
   Number(b.data.pinned) - Number(a.data.pinned)
   || b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
 );
+const pageCount = Math.ceil(visiblePosts.length / CONTENT_PAGE_SIZE);
 ---
 
 <PageShell title={`#${tag} | ${siteTitle}`} description={`查看 #${tag} 的${label}`} transparentHeader={false} pageId="blog-list">
@@ -519,9 +521,9 @@ const visiblePosts = [...posts].sort((a, b) =>
           </a>
         ))}
       </nav>
-      <div class="articles-list blog-posts-list">
-        {visiblePosts.map((post) => (
-          <div class="scroll-reveal">
+      <div class="articles-list blog-posts-list" data-tag-pagination data-page-count={pageCount}>
+        {visiblePosts.map((post, index) => (
+          <div class="scroll-reveal" data-page-number={Math.floor(index / CONTENT_PAGE_SIZE) + 1} hidden={index >= CONTENT_PAGE_SIZE}>
             {post.data.pinned && <div class="pinned-mark" aria-label={`置頂${label}`}>📌 置頂</div>}
             <PostListItem
               post={post}
@@ -541,6 +543,23 @@ const visiblePosts = [...posts].sort((a, b) =>
           </div>
         ))}
       </div>
+      {pageCount > 1 && (
+        <nav class="pagination tag-pagination" aria-label={`${label}分頁`}>
+          <a class="page-btn disabled" data-tag-nav="prev" aria-label="上一頁" aria-disabled="true">‹</a>
+          <div class="page-numbers">
+            {Array.from({ length: pageCount }, (_, i) => i + 1).map(number => (
+              <a
+                href={number === 1 ? pathForTag(tag) : `${pathForTag(tag)}?page=${number}`}
+                class:list={['page-btn', { active: number === 1 }]}
+                data-tag-page-link
+                data-page-number={number}
+                aria-current={number === 1 ? 'page' : undefined}
+              >{number}</a>
+            ))}
+          </div>
+          <a class="page-btn" data-tag-nav="next" href={`${pathForTag(tag)}?page=2`} aria-label="下一頁">›</a>
+        </nav>
+      )}
     </div>
   </section>
 </PageShell>

@@ -51,7 +51,43 @@ function setupScrollReveal() {
 	}, 1200);
 }
 
+function setupTagPagination() {
+  const list = document.querySelector<HTMLElement>('[data-tag-pagination]');
+  if (!list) return;
+  const cards = [...list.querySelectorAll<HTMLElement>(':scope > [data-page-number]')];
+  const pageCount = Math.max(1, Number(list.dataset.pageCount) || 1);
+  const parsed = Number(new URL(location.href).searchParams.get('page') || 1);
+  const page = Number.isSafeInteger(parsed) && parsed >= 1 ? Math.min(parsed, pageCount) : 1;
+  for (const card of cards) {
+    card.hidden = Number(card.dataset.pageNumber) !== page;
+    card.classList.remove('reveal-pending');
+    if (card.hidden) card.classList.remove('visible');
+    else card.classList.add('visible');
+  }
+  const nav = document.querySelector<HTMLElement>('.tag-pagination');
+  if (!nav) return;
+  for (const link of nav.querySelectorAll<HTMLAnchorElement>('[data-tag-page-link]')) {
+    const active = Number(link.dataset.pageNumber) === page;
+    link.classList.toggle('active', active);
+    if (active) link.setAttribute('aria-current', 'page');
+    else link.removeAttribute('aria-current');
+  }
+  for (const direction of ['prev', 'next'] as const) {
+    const anchor = nav.querySelector<HTMLAnchorElement>('[data-tag-nav="' + direction + '"]');
+    if (!anchor) continue;
+    const next = page + (direction === 'next' ? 1 : -1);
+    const disabled = next < 1 || next > pageCount;
+    anchor.classList.toggle('disabled', disabled);
+    if (disabled) { anchor.removeAttribute('href'); anchor.setAttribute('aria-disabled', 'true'); }
+    else {
+      anchor.href = location.pathname + (next === 1 ? '' : '?page=' + next);
+      anchor.removeAttribute('aria-disabled');
+    }
+  }
+}
+
 export function initBlogListPage() {
-	setupScrollReveal();
-	}
+  setupTagPagination();
+  setupScrollReveal();
+}
 

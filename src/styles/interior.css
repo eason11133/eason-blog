@@ -693,3 +693,38 @@ html[data-theme="dark"] body[data-page-id="post"] .prose table tbody tr:hover {
     margin-bottom: 0;
   }
 }
+
+/* Lightweight pagination beneath the transparent 2-column listings. */
+html[data-theme="dark"] body[data-page-id="blog-list"] .articles-list > .scroll-reveal[hidden] {
+  display: none !important;
+}
+html[data-theme="dark"] body[data-page-id="blog-list"] .pagination {
+  margin-top: 1.2rem;
+  padding-top: 1rem;
+  gap: .55rem;
+  border-top: 0;
+}
+html[data-theme="dark"] body[data-page-id="blog-list"] .page-btn {
+  width: 36px;
+  height: 36px;
+  color: #b2c5dd;
+  background: transparent;
+  border: 1px solid rgba(160, 191, 229, .19);
+  border-radius: 9px;
+  box-shadow: none;
+}
+html[data-theme="dark"] body[data-page-id="blog-list"] .page-btn.active {
+  color: #e6f1ff;
+  background: rgba(130, 170, 221, .16);
+  border-color: rgba(163, 202, 240, .4);
+  transform: none;
+  box-shadow: none;
+}
+html[data-theme="dark"] body[data-page-id="blog-list"] .page-btn.disabled {
+  opacity: .32;
+}
+@media(max-width: 480px) {
+  html[data-theme="dark"] body[data-page-id="blog-list"] .pagination {
+    justify-content: center;
+  }
+}
