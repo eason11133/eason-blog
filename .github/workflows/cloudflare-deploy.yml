@@ -82,4 +82,5 @@ jobs:
       - name: Verify frontend is online
         shell: bash
         run: |
-          curl -fsS --retry 3 --retry-delay 2 'https://eason-blog-web-live.eason456h.workers.dev/' | grep -qi '<html'
+          curl -fsS --retry 3 --retry-delay 2 -o /tmp/eason-live-homepage.html 'https://eason-blog-web-live.eason456h.workers.dev/'
+          grep -qi '<html' /tmp/eason-live-homepage.html
