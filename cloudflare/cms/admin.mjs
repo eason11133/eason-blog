@@ -8,6 +8,13 @@ export const adminHtml = `<!doctype html>
 <title>Eason｜內容管理</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
 <style>
+.friend-entry{padding:16px 0 18px;border-bottom:1px solid #39465a;margin-bottom:14px}
+.friend-entry .friend-fields{display:grid;grid-template-columns:1fr 1.5fr;gap:12px}
+.friend-entry .friend-fields label{display:block;margin-bottom:7px}
+.friend-entry .friend-description{margin-top:12px}
+.friend-entry .friend-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.friend-entry .friend-actions button{padding:6px 11px;font-size:.9rem}
+@media(max-width:720px){.friend-entry .friend-fields{grid-template-columns:1fr}}
 :root{color-scheme:dark;font-family:system-ui,-apple-system,"Noto Sans TC",sans-serif;background:#111823;color:#e9edf5}
 *{box-sizing:border-box}body{margin:0;min-height:100vh}main{max-width:1380px;margin:auto;padding:26px 20px 80px}
 header{display:flex;justify-content:space-between;align-items:center;gap:16px;border-bottom:1px solid #39465a;padding-bottom:18px;margin-bottom:22px}
@@ -97,6 +104,7 @@ nav{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:16px}nav button[aria-curr
 <button type="button" class="secondary" data-tab="work">作品</button>
 <button type="button" class="secondary" data-tab="homepage">首頁</button>
 <button type="button" class="secondary" data-tab="about">關於我</button>
+<button type="button" class="secondary" data-tab="friends">友站</button>
 <button type="button" class="secondary" data-tab="comments">留言審核</button>
 </nav>
 <section id="documents" class="card">
@@ -171,6 +179,14 @@ nav{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:16px}nav button[aria-curr
 <div class="span-2 editor-actions"><button id="save-doc" type="submit">儲存到 D1</button><small>正式發布會立即更新資料庫，不經 GitHub 或 Vercel</small></div>
 </form></section>
 <section id="settings-panel" class="card hidden"><h2 id="settings-heading"></h2><form id="settings-form"><div id="settings-fields"></div><div class="editor-actions"><button type="submit">儲存設定到 D1</button></div></form></section>
+<section id="friends-panel" class="card hidden">
+<h2>友站管理</h2>
+<p>新增友站名稱、網址和介紹，儲存後立即更新網站「友站」頁面。</p>
+<form id="friends-form">
+<div id="friends-list"></div>
+<div class="editor-actions"><button id="add-friend" type="button" class="secondary">＋ 新增友站</button><button type="submit">儲存友站到 D1</button></div>
+</form>
+</section>
 <section id="comments-panel" class="card hidden"><h2>留言管理</h2><p>GitHub／Google 登入的訪客留言會直接公開。你可以隱藏或恢復留言；舊版待審留言仍可個別核准。</p><div id="comments-list"></div></section>
 </section>
 </main>
@@ -378,15 +394,61 @@ async function loadDocs(){
  for(const doc of docs){const o=document.createElement('option');o.value=doc.slug;o.textContent=(doc.draft?'[草稿] ':'')+doc.title;select.appendChild(o);}
  if(docs.length){select.value=docs[0].slug;showDoc(docs[0]);}else showDoc(null);
 }
+function currentFriendRows(){
+ return Array.from(el('friends-list').querySelectorAll('.friend-entry')).map(row=>({
+  name:row.querySelector('[data-friend-field=name]').value,
+  url:row.querySelector('[data-friend-field=url]').value,
+  description:row.querySelector('[data-friend-field=description]').value,
+ }));
+}
+function renderFriendRows(items){
+ const target=el('friends-list');target.replaceChildren();
+ if(!items.length){const note=document.createElement('p');note.textContent='還沒有友站，按下方「新增友站」即可。';target.appendChild(note);return;}
+ const createField=(container,field,labelText,value,multiline=false)=>{
+  const wrap=document.createElement('div');wrap.className='field'+(field==='description'?' friend-description':'');
+  const label=document.createElement('label');label.textContent=labelText;
+  const control=document.createElement(multiline?'textarea':'input');
+  control.dataset.friendField=field;
+  control.value=value||'';
+  if(!multiline){control.required=true;control.maxLength=field==='url'?1500:100;}
+  else{control.rows=2;control.maxLength=300;}
+  if(field==='url'){control.type='url';control.placeholder='https://example.com';}
+  if(field==='name')control.placeholder='網站名稱';
+  wrap.append(label,control);container.appendChild(wrap);
+ };
+ items.forEach((item,index)=>{
+  const row=document.createElement('div');row.className='friend-entry';
+  const cols=document.createElement('div');cols.className='friend-fields';
+  createField(cols,'name','友站名稱',item.name);
+  createField(cols,'url','網站網址',item.url);
+  row.appendChild(cols);
+  createField(row,'description','簡短介紹（選填）',item.description,true);
+  const actions=document.createElement('div');actions.className='friend-actions';
+  const action=(label,disabled,callback)=>{
+   const button=document.createElement('button');button.className='secondary';button.type='button';
+   button.textContent=label;button.disabled=disabled;button.onclick=callback;actions.appendChild(button);
+  };
+  action('上移',index===0,()=>{const all=currentFriendRows();[all[index-1],all[index]]=[all[index],all[index-1]];renderFriendRows(all);});
+  action('下移',index===items.length-1,()=>{const all=currentFriendRows();[all[index+1],all[index]]=[all[index],all[index+1]];renderFriendRows(all);});
+  action('刪除',false,()=>{const all=currentFriendRows();all.splice(index,1);renderFriendRows(all);});
+  row.appendChild(actions);target.appendChild(row);
+ });
+}
+async function loadFriends(){
+ const data=await api('/api/friends');
+ renderFriendRows(Array.isArray(data.sites)?data.sites:[]);
+}
 function showPanel(next){
  tab=next;
  for(const b of document.querySelectorAll('nav [data-tab]'))b.setAttribute('aria-current',b.dataset.tab===tab?'page':'false');
  el('documents').classList.toggle('hidden',!['post','work'].includes(tab));
  el('settings-panel').classList.toggle('hidden',!['homepage','about'].includes(tab));
  el('comments-panel').classList.toggle('hidden',tab!=='comments');
+ el('friends-panel').classList.toggle('hidden',tab!=='friends');
  if(['post','work'].includes(tab))loadDocs().catch(e=>say(e.message,true));
  if(['homepage','about'].includes(tab))loadSettings().catch(e=>say(e.message,true));
  if(tab==='comments')loadComments().catch(e=>say(e.message,true));
+ if(tab==='friends')loadFriends().catch(e=>say(e.message,true));
 }
 async function loadSettings(){
  const data=await api('/api/admin/settings/'+tab);
@@ -442,6 +504,19 @@ el('logout').onclick=async()=>{
 document.querySelectorAll('nav [data-tab]').forEach(b=>b.onclick=()=>showPanel(b.dataset.tab));
 el('documents-list').onchange=e=>showDoc(docs.find(d=>d.slug===e.target.value)||null);
 el('new-doc').onclick=()=>{el('documents-list').value='';showDoc(null);};
+el('add-friend').onclick=()=>renderFriendRows([...currentFriendRows(),{name:'',url:'',description:''}]);
+el('friends-form').onsubmit=async e=>{
+ e.preventDefault();
+ try{
+  const sites=currentFriendRows().map(site=>({
+   name:site.name.trim(),url:site.url.trim(),description:site.description.trim()
+  }));
+  if(sites.some(site=>!site.name||!site.url))throw new Error('每個友站都要填名稱和網址');
+  await api('/api/admin/friends','PUT',{sites});
+  say('友站已儲存，前台立即更新');
+  await loadFriends();
+ }catch(err){say(err.message,true);}
+};
 el('document-form').onsubmit=async e=>{
  e.preventDefault();
  try{

@@ -96,3 +96,25 @@ export async function getCmsSettings<T extends object>(key: 'homepage' | 'about'
   if (!value || typeof value !== 'object' || Array.isArray(value)) throw new Error('Invalid CMS settings');
   return value as T;
 }
+
+
+export interface CmsFriendSite {
+  name: string;
+  url: string;
+  description: string;
+}
+
+/** Fetch public friend links from D1 on every live page request. */
+export async function getCmsFriends(): Promise<CmsFriendSite[]> {
+  const payload = await getJson('/api/friends') as { sites?: unknown };
+  if (!Array.isArray(payload.sites)) return [];
+  return payload.sites.filter((item): item is CmsFriendSite => {
+    if (!item || typeof item !== 'object') return false;
+    const site = item as Record<string, unknown>;
+    if (typeof site.name !== 'string' || typeof site.description !== 'string' || typeof site.url !== 'string') return false;
+    try {
+      const url = new URL(site.url);
+      return ['https:', 'http:'].includes(url.protocol) && !url.username && !url.password;
+    } catch { return false; }
+  });
+}

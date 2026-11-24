@@ -78,6 +78,33 @@ async function jsonBody(req, sizeLimit = 280000) {
 function sameOriginWrite(req, url) {
   return req.headers.get('Origin') === url.origin;
 }
+// Friend links are stored separately from posts, homepage and about.
+function normalizeFriendSites(items) {
+  if (!Array.isArray(items) || items.length > 60) return null;
+  const normalized = [];
+  const seen = new Set();
+  for (const item of items) {
+    if (!item || typeof item !== 'object' || Array.isArray(item)) return null;
+    if (typeof item.name !== 'string' || typeof item.url !== 'string') return null;
+    if (item.description != null && typeof item.description !== 'string') return null;
+    const name = item.name.trim();
+    const rawUrl = item.url.trim();
+    const description = (item.description || '').trim();
+    if (!name || name.length > 100 || !rawUrl || rawUrl.length > 1500 || description.length > 300) return null;
+    let parsed;
+    try { parsed = new URL(rawUrl); } catch { return null; }
+    if (!['http:', 'https:'].includes(parsed.protocol) || !parsed.hostname || parsed.username || parsed.password) return null;
+    const url = parsed.toString();
+    if (seen.has(url)) return null;
+    seen.add(url);
+    normalized.push({ name, url, description });
+  }
+  return normalized;
+}
+async function listFriendSites(db) {
+  const row = await db.prepare('SELECT links_json FROM friend_sites WHERE singleton=1').first();
+  return normalizeFriendSites(safeJsonParse(row?.links_json || '[]', [])) || [];
+}
 async function listDocs(db, kind, admin) {
   const sql = admin ?
     'SELECT * FROM documents WHERE kind=? ORDER BY pinned DESC,date DESC LIMIT 200' :
@@ -142,6 +169,8 @@ async function handle(req,env) {
     return json({ok:true,status:'approved'},201);
   }
 
+  if (method==='GET' && path==='/api/friends') return json({sites:await listFriendSites(env.DB)});
+
   if (method==='GET' && /^\/api\/(posts|works)$/.test(path)) {
     const kind=path==='/api/posts'?'post':'work';
     return json({items:await listDocs(env.DB,kind,false)});
@@ -172,6 +201,16 @@ async function handle(req,env) {
   if(!env.CMS_SESSION_SECRET)return fail('Auth not configured',503);
   if(!await authenticate(req,env))return fail('Login required',401);
   if(method==='GET' && path==='/api/admin/me')return json({authenticated:true});
+  if(method==='PUT' && path==='/api/admin/friends') {
+    const input=await jsonBody(req,105000);
+    const sites=normalizeFriendSites(input?.sites);
+    if(!sites)return fail('友站資料有誤：請確認名稱、網址及是否重複（最多 60 筆）');
+    await env.DB.prepare(
+      'INSERT INTO friend_sites(singleton,links_json,updated) VALUES(1,?,?) '+
+      'ON CONFLICT(singleton) DO UPDATE SET links_json=excluded.links_json,updated=excluded.updated'
+    ).bind(JSON.stringify(sites),new Date().toISOString()).run();
+    return json({ok:true,sites});
+  }
   if(method==='GET' && path==='/api/admin/content') {
     const kind=url.searchParams.get('kind');
     if(!['post','work'].includes(kind))return fail('Invalid kind');
