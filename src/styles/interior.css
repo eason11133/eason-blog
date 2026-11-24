@@ -190,7 +190,8 @@ html[data-theme="dark"] body[data-page-id="experience"] .experience-body a {
   }
   /* With the viewport-sized scroll container in flex mode, a long article must
      not shrink beneath its content and cause the footer to overlap the text. */
-  body[data-page-id="post"] #main-content > .stats-wrapper {
+  body[data-page-id="post"] #main-content > .stats-wrapper,
+  body[data-page-id="post"] #main-content > .hero-header.hero-sky-only {
     flex-shrink: 0;
   }
 }
@@ -550,4 +551,10 @@ html[data-theme="dark"] body[data-page-id="post"] .prose .interview-transcript-t
   white-space: pre-wrap;
   overflow-wrap: anywhere;
   word-break: normal;
+}
+
+
+/* Display only the supplied central-interview diagram at its original brightness. */
+html[data-theme="dark"] body[data-page-id="post"] .prose img[src$="ncu-im-interview-seating.webp"] {
+  filter: none !important;
 }
