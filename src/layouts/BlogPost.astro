@@ -709,7 +709,7 @@ const articleSchema = {
 		</div>
 	</div>
 		
-	{import.meta.env.PUBLIC_EASON_LIVE === 'true' && <Comments kind={workMode ? 'work' : 'post'} slug={Astro.url.pathname.split('/').filter(Boolean).at(-1) || ''} />}
+	{import.meta.env.PUBLIC_EASON_LIVE === 'true' && <Comments kind={workMode ? 'work' : 'post'} slug={decodeURIComponent(Astro.url.pathname.split('/').filter(Boolean).at(-1) || '')} />}
 
 	<!-- Lightbox HTML -->
 	<div id="lightbox" class="lightbox-overlay">
