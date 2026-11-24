@@ -118,3 +118,19 @@ export async function getCmsFriends(): Promise<CmsFriendSite[]> {
     } catch { return false; }
   });
 }
+
+export type CmsFooterLinks = Record<'github' | 'email' | 'instagram' | 'discord', string>;
+
+export async function getCmsFooterLinks(): Promise<Partial<CmsFooterLinks>> {
+  // A CMS outage must not make the entire website fail to render.
+  try {
+    const payload = await getJson('/api/footer-links') as Partial<CmsFooterLinks>;
+    if (!payload || typeof payload !== 'object') return {};
+    const links: Partial<CmsFooterLinks> = {};
+    for (const key of ['github', 'email', 'instagram', 'discord'] as const) {
+      const value = payload[key];
+      if (typeof value === 'string') links[key] = value;
+    }
+    return links;
+  } catch { return {}; }
+}

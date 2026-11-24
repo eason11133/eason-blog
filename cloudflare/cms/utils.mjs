@@ -31,3 +31,26 @@ export function publicDocument(row) {
     draft:Boolean(row.draft), pinned:Boolean(row.pinned),
   };
 }
+
+export function normalizeFooterLinks(input) {
+  if (!input || typeof input !== 'object' || Array.isArray(input)) return null;
+  const links = {};
+  for (const key of ['github','email','instagram','discord']) {
+    if (typeof input[key] !== 'string') return null;
+    const value = input[key].trim();
+    if (!value) { links[key] = ''; continue; }
+    if (key === 'email') {
+      const email = value.replace(/^mailto:/i,'');
+      if (email.length > 254 || !/^[A-Z0-9.!#$%&'*+/=_~-]+@[A-Z0-9-]+(?:\.[A-Z0-9-]+)+$/i.test(email)) return null;
+      links[key] = email;
+      continue;
+    }
+    if (value.length > 1500) return null;
+    try {
+      const url = new URL(value);
+      if (!['http:','https:'].includes(url.protocol) || !url.hostname || url.username || url.password) return null;
+      links[key] = url.toString();
+    } catch { return null; }
+  }
+  return links;
+}

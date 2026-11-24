@@ -1,7 +1,7 @@
 import { adminHtml } from './admin.mjs';
 import { commentUser, handleCommentAuth } from './comment-auth.mjs';
 import { handleViews } from './views.mjs';
-import { normalizeDocument, publicDocument, validSlug, safeText, safeJsonParse } from './utils.mjs';
+import { normalizeDocument, publicDocument, validSlug, safeText, safeJsonParse, normalizeFooterLinks } from './utils.mjs';
 
 const encoder = new TextEncoder();
 const noStore = { 'Cache-Control': 'no-store', 'X-Content-Type-Options': 'nosniff' };
@@ -105,6 +105,11 @@ async function listFriendSites(db) {
   const row = await db.prepare('SELECT links_json FROM friend_sites WHERE singleton=1').first();
   return normalizeFriendSites(safeJsonParse(row?.links_json || '[]', [])) || [];
 }
+async function getFooterLinks(db) {
+  const row = await db.prepare('SELECT links_json FROM footer_links WHERE singleton=1').first();
+  return normalizeFooterLinks(safeJsonParse(row?.links_json || '{}', {})) ||
+    { github:'', email:'', instagram:'', discord:'' };
+}
 async function listDocs(db, kind, admin) {
   const sql = admin ?
     'SELECT * FROM documents WHERE kind=? ORDER BY pinned DESC,date DESC LIMIT 200' :
@@ -169,6 +174,7 @@ async function handle(req,env) {
     return json({ok:true,status:'approved'},201);
   }
 
+  if (method==='GET' && path==='/api/footer-links') return json(await getFooterLinks(env.DB));
   if (method==='GET' && path==='/api/friends') return json({sites:await listFriendSites(env.DB)});
 
   if (method==='GET' && /^\/api\/(posts|works)$/.test(path)) {
@@ -201,6 +207,16 @@ async function handle(req,env) {
   if(!env.CMS_SESSION_SECRET)return fail('Auth not configured',503);
   if(!await authenticate(req,env))return fail('Login required',401);
   if(method==='GET' && path==='/api/admin/me')return json({authenticated:true});
+  if (method==='GET' && path==='/api/admin/footer-links') return json(await getFooterLinks(env.DB));
+  if (method==='PUT' && path==='/api/admin/footer-links') {
+    const links = normalizeFooterLinks(await jsonBody(req,10000));
+    if (!links) return fail('連結格式不正確，請填寫完整的 HTTP/HTTPS 網址或有效的 Email 地址。');
+    await env.DB.prepare(
+      'INSERT INTO footer_links(singleton,links_json,updated) VALUES(1,?,?) '+
+      'ON CONFLICT(singleton) DO UPDATE SET links_json=excluded.links_json,updated=excluded.updated'
+    ).bind(JSON.stringify(links),new Date().toISOString()).run();
+    return json({ok:true});
+  }
   if(method==='PUT' && path==='/api/admin/friends') {
     const input=await jsonBody(req,105000);
     const sites=normalizeFriendSites(input?.sites);

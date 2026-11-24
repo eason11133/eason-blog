@@ -105,6 +105,7 @@ nav{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:16px}nav button[aria-curr
 <button type="button" class="secondary" data-tab="homepage">首頁</button>
 <button type="button" class="secondary" data-tab="about">關於我</button>
 <button type="button" class="secondary" data-tab="friends">友站</button>
+<button type="button" class="secondary" data-tab="footer">頁尾連結</button>
 <button type="button" class="secondary" data-tab="comments">留言審核</button>
 </nav>
 <section id="documents" class="card">
@@ -185,6 +186,17 @@ nav{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:16px}nav button[aria-curr
 <form id="friends-form">
 <div id="friends-list"></div>
 <div class="editor-actions"><button id="add-friend" type="button" class="secondary">＋ 新增友站</button><button type="submit">儲存友站到 D1</button></div>
+</form>
+</section>
+<section id="footer-panel" class="card hidden">
+<h2>頁尾連結</h2>
+<p>設定全站頁尾的四個社群圖示。未填寫的圖示會維持灰色、不可點擊。Email 可直接填信箱地址，其他欄位請填完整網址。</p>
+<form id="footer-form">
+<div class="home-field"><label for="footer-github">GitHub</label><input id="footer-github" type="url" placeholder="https://github.com/你的帳號" maxlength="1500"></div>
+<div class="home-field"><label for="footer-email">Email（公開聯絡信箱）</label><input id="footer-email" type="text" inputmode="email" placeholder="你的信箱地址" maxlength="254"></div>
+<div class="home-field"><label for="footer-instagram">Instagram</label><input id="footer-instagram" type="url" placeholder="https://www.instagram.com/你的帳號/" maxlength="1500"></div>
+<div class="home-field"><label for="footer-discord">Discord</label><input id="footer-discord" type="url" placeholder="https://discord.com/users/..." maxlength="1500"></div>
+<div class="editor-actions"><button id="save-footer" type="submit" disabled>儲存頁尾連結到 D1</button></div>
 </form>
 </section>
 <section id="comments-panel" class="card hidden"><h2>留言管理</h2><p>GitHub／Google 登入的訪客留言會直接公開。你可以隱藏或恢復留言；舊版待審留言仍可個別核准。</p><div id="comments-list"></div></section>
@@ -438,6 +450,13 @@ async function loadFriends(){
  const data=await api('/api/friends');
  renderFriendRows(Array.isArray(data.sites)?data.sites:[]);
 }
+const footerKeys=['github','email','instagram','discord'];
+async function loadFooter(){
+ el('save-footer').disabled=true;
+ const data=await api('/api/admin/footer-links');
+ for(const key of footerKeys)el('footer-'+key).value=data[key]||'';
+ el('save-footer').disabled=false;
+}
 function showPanel(next){
  tab=next;
  for(const b of document.querySelectorAll('nav [data-tab]'))b.setAttribute('aria-current',b.dataset.tab===tab?'page':'false');
@@ -445,10 +464,12 @@ function showPanel(next){
  el('settings-panel').classList.toggle('hidden',!['homepage','about'].includes(tab));
  el('comments-panel').classList.toggle('hidden',tab!=='comments');
  el('friends-panel').classList.toggle('hidden',tab!=='friends');
+ el('footer-panel').classList.toggle('hidden',tab!=='footer');
  if(['post','work'].includes(tab))loadDocs().catch(e=>say(e.message,true));
  if(['homepage','about'].includes(tab))loadSettings().catch(e=>say(e.message,true));
  if(tab==='comments')loadComments().catch(e=>say(e.message,true));
  if(tab==='friends')loadFriends().catch(e=>say(e.message,true));
+ if(tab==='footer')loadFooter().catch(e=>say(e.message,true));
 }
 async function loadSettings(){
  const data=await api('/api/admin/settings/'+tab);
@@ -533,6 +554,18 @@ el('document-form').onsubmit=async e=>{
   say('已儲存至 Cloudflare D1，不需 GitHub / Vercel');
   await loadDocs();el('documents-list').value=payload.slug;showDoc(docs.find(d=>d.slug===payload.slug));
  }catch(err){say(err.message,true);}
+};
+el('footer-form').onsubmit=async e=>{
+ e.preventDefault();
+ const button=el('save-footer');
+ if(button.disabled)return;
+ button.disabled=true;
+ try{
+  const data=Object.fromEntries(footerKeys.map(key=>[key,el('footer-'+key).value.trim()]));
+  await api('/api/admin/footer-links','PUT',data);
+  say('頁尾連結已儲存，重新整理前台即可看到更新');
+ }catch(err){say(err.message,true);}
+ finally{button.disabled=false;}
 };
 el('settings-form').onsubmit=async e=>{
  e.preventDefault();

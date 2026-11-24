@@ -1,16 +1,29 @@
 ---
 import { profileConfig } from '../config';
 import { resolveSocialUrl } from '../lib/profile/social';
+import { getCmsFooterLinks, type CmsFooterLinks } from '../lib/cloudflare/live-content';
 
 const year = new Date().getFullYear();
-const socials = profileConfig.socials.filter((social) =>
-  ['github', 'email', 'instagram', 'discord'].includes(social.key)
-).map((social) => ({
-  ...social,
-  link: social.url.trim() && !social.url.includes('example.com')
-    ? resolveSocialUrl(social.key, social.url)
-    : '',
-}));
+const footerLinks: Partial<CmsFooterLinks> = import.meta.env.PUBLIC_EASON_LIVE === 'true' ? await getCmsFooterLinks() : {};
+const socials = (['github', 'email', 'instagram', 'discord'] as const).map((key) => {
+  const configured = profileConfig.socials.find((social) => social.key === key);
+  const value = (footerLinks[key] ?? configured?.url ?? '').trim();
+  let link = '';
+  if (value) {
+    if (key === 'email') {
+      const email = value.replace(/^mailto:/i, '');
+      if (/^[A-Z0-9.!#$%&'*+/=_~-]+@[A-Z0-9-]+(?:\.[A-Z0-9-]+)+$/i.test(email)) {
+        link = resolveSocialUrl(key, email);
+      }
+    } else {
+      try {
+        const url = new URL(value);
+        if (['http:', 'https:'].includes(url.protocol) && !url.username && !url.password) link = url.href;
+      } catch {}
+    }
+  }
+  return { key, label: configured?.label ?? key, link };
+});
 ---
 
 <footer transition:animate="none">
