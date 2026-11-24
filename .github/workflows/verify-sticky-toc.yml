@@ -55,6 +55,10 @@ jobs:
               driver.set_window_size(width,900)
               driver.get(url)
               time.sleep(1.5)
+              # The site's normal per-page scroll restoration remembers the
+              # previous viewport; explicitly reset for initial-layout testing.
+              driver.execute_script("document.getElementById('main-content').scrollTop=0")
+              time.sleep(.2)
               initial=geometry()
               print('TOC_INITIAL',width,json.dumps(initial,ensure_ascii=False))
               assert initial['sidebar'] and initial['toc'] and len(initial['tocLinks'])==4
