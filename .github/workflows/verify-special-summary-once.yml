@@ -1,0 +1,75 @@
+name: Verify special selection summary table once
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/verify-special-summary-once.yml'
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 7
+    steps:
+      - name: Check GFM table, seven columns, and mobile horizontal scrolling
+        shell: bash
+        run: |
+          python3 -m pip install --quiet selenium Pillow
+          python3 - <<'PY'
+          import time,json,io,base64
+          from selenium import webdriver
+          from selenium.webdriver.chrome.options import Options
+          from PIL import Image
+          url='https://eason-blog-web-live.eason456h.workers.dev/blog/%E4%B8%BB%E9%A2%98%E6%A0%B7%E5%BC%8F%E5%AE%8C%E5%85%A8%E5%B1%95%E7%A4%BA_20260714/'
+          options=Options()
+          options.add_argument('--headless=new')
+          options.add_argument('--no-sandbox')
+          options.add_argument('--disable-dev-shm-usage')
+          browser=webdriver.Chrome(options=options)
+          try:
+            for label,width in [('DESKTOP',1440),('MOBILE',420)]:
+              browser.set_window_size(width,940)
+              browser.get(url)
+              time.sleep(1.5)
+              state=browser.execute_script("""
+                const table=document.querySelector('.prose .table-shell .table-scroll table');
+                const scroll=document.querySelector('.prose .table-scroll');
+                const cols=table?[...table.querySelectorAll('thead th')].map(e=>e.textContent.trim()):[];
+                const rows=table?[...table.querySelectorAll('tbody tr')]:[];
+                return {title:document.querySelector('.interior-heading h1')?.textContent.trim(),
+                  headings:[...document.querySelectorAll('.prose h2')].map(e=>e.textContent.trim()),
+                  cols,rows:rows.length,tableScroll:!!scroll,
+                  scrollWidth:scroll?.scrollWidth,clientWidth:scroll?.clientWidth,
+                  overflowX:scroll?getComputedStyle(scroll).overflowX:null,
+                  htmlOverflow:document.documentElement.scrollWidth>document.documentElement.clientWidth+2,
+                  central:rows.find(r=>r.textContent.includes('中央大學'))?.textContent.trim(),
+                  centralLink:table?.querySelector('a[href*="中央資管"]')?.getAttribute('href')||
+                    table?.querySelector('a[href*="%E4%B8%AD%E5%A4%AE"]')?.getAttribute('href')};
+              """)
+              print('SUMMARY_'+label,json.dumps(state,ensure_ascii=False),flush=True)
+              assert '116 特選心得' in (state['title'] or '')
+              assert state['headings']==['統整'],state['headings']
+              assert state['cols']==['學校','科系','一階分數','二階分數','加權總分','錄取情況','心得']
+              assert state['rows']==11,'11 applicant schools are expected'
+              assert state['tableScroll'],'Missing responsive table wrapper'
+              assert state['central'] and '備取6' in state['central']
+              assert state['centralLink'],'The central interview article is not linked'
+              assert not state['htmlOverflow'],'Page has horizontal overflow'
+              if label=='MOBILE':
+                assert state['scrollWidth']>state['clientWidth']+50,'Mobile table should be horizontally scrollable'
+                moved=browser.execute_script("""
+                  const s=document.querySelector('.prose .table-scroll');
+                  s.scrollLeft=160;return s.scrollLeft;
+                """)
+                assert moved>0,'Scrolling seven-column table did not work'
+              browser.execute_script("document.getElementById('main-content').scrollTop=60")
+              browser.save_screenshot('/tmp/selection-'+label.lower()+'.png')
+              img=Image.open('/tmp/selection-'+label.lower()+'.png').convert('RGB')
+              img.thumbnail((1100,820))
+              buf=io.BytesIO();img.save(buf,format='JPEG',quality=52,optimize=True)
+              print('CAPTURE_'+label+'_BEGIN',flush=True)
+              print(base64.b64encode(buf.getvalue()).decode('ascii'),flush=True)
+              print('CAPTURE_'+label+'_END',flush=True)
+            print('PASS: 116 特選心得 now includes 7-column, 11-row Markdown table with mobile scrolling',flush=True)
+          finally:
+            browser.quit()
+          PY
