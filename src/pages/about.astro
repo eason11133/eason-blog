@@ -13,6 +13,7 @@ interface AboutPageData {
     avatar_image?: string;
     specialty?: string;
     specialties?: string[];
+    sidebar_sections?: Array<{ title: string; items: string[] }>;
   };
   interests_title: string;
   interests: Array<{ icon: string; title: string; description: string }>;
@@ -29,6 +30,10 @@ const live = import.meta.env.PUBLIC_EASON_LIVE === 'true';
 const about = live
   ? await getCmsSettings<AboutPageData & { body_markdown?: string; body_text?: string }>('about')
   : (frontmatter as AboutPageData);
+const sidebarSections = Array.isArray(about.profile.sidebar_sections)
+  ? about.profile.sidebar_sections
+  : [{ title: '專長', items: about.profile.specialties?.length
+      ? about.profile.specialties : about.profile.specialty ? [about.profile.specialty] : [] }];
 const aboutBodyText = live && 'body_text' in about && typeof about.body_text === 'string' ? about.body_text : undefined;
 const aboutBodyHtml = live && aboutBodyText === undefined
   ? (await renderCmsMarkdown('body_markdown' in about ? String(about.body_markdown ?? '') : '')).html
@@ -63,14 +68,16 @@ const aboutBodyHtml = live && aboutBodyText === undefined
         </div>
       </div>
 
-      <section class="sidebar-specialty" aria-labelledby="sidebar-specialty-heading">
-        <h3 id="sidebar-specialty-heading">專長</h3>
-        {about.profile.specialties?.length ? (
-          <ul class="specialty-list">
-            {about.profile.specialties.map((item) => <li>{item}</li>)}
-          </ul>
-        ) : about.profile.specialty && <p>{about.profile.specialty}</p>}
-      </section>
+      {sidebarSections.map((section, index) => (
+        <section class="sidebar-specialty" aria-labelledby={`sidebar-section-${index}-heading`}>
+          <h3 id={`sidebar-section-${index}-heading`}>{section.title}</h3>
+          {section.items?.length > 0 && (
+            <ul class="specialty-list">
+              {section.items.map((item) => <li>{item}</li>)}
+            </ul>
+          )}
+        </section>
+      ))}
     </aside>
 
     <div class="vcard-main-content">

@@ -552,7 +552,15 @@ function renderAboutForm(target,data){
    avatar.value=result.url;refreshAvatar();say('頭像已上傳，請儲存關於我');
   }catch(err){say(err.message,true);}finally{upload.disabled=false;upload.value='';}
  };
- const specialties=repeat(section('專長'),Array.isArray(profile.specialties)?profile.specialties:profile.specialty?[profile.specialty]:[],'＋ 新增專長',(row,v)=>{const control=field(row,'專長',v,{required:true});return ()=>control.value;},()=>'');
+ const legacySpecialties=Array.isArray(profile.specialties)&&profile.specialties.length?profile.specialties:profile.specialty?[profile.specialty]:[];
+ const sidebarSections=repeat(section('左側個人資料區塊'),Array.isArray(profile.sidebar_sections)?profile.sidebar_sections:[{title:'專長',items:legacySpecialties}],'＋ 新增標題區塊',(row,value)=>{
+  const v=asObject(value);
+  const title=field(row,'區塊標題',v.title,{required:true,placeholder:'例如：專長、語言、工具'});
+  const items=repeat(row,asList(v.items),'＋ 新增項目',(itemRow,item)=>{
+   const control=field(itemRow,'項目',item,{required:true});return ()=>control.value;
+  },()=>'');
+  return ()=>({...v,title:title.value.trim(),items:items().map(x=>x.trim()).filter(Boolean)});
+ },()=>({title:'',items:[]}));
  const originalBody=typeof data.body_text==='string'?data.body_text:asText(data.body_markdown);
  const intro=field(section('自我介紹'),'介紹文字（直接輸入文字，可換行）',originalBody,{rows:5});
  const interestsSection=section('興趣');
@@ -584,7 +592,7 @@ function renderAboutForm(target,data){
   return ()=>({...v,title:title.value,items:items()});
  },()=>({title:'',items:[]}));
  return ()=>{
-  const result={...data,page_title:pageTitle.value,profile:{...profile,name:name.value,avatar_image:avatar.value.trim(),specialties:specialties().map(x=>x.trim()).filter(Boolean),specialty:''},interests_title:interestsTitle.value,interests:interests(),website:{...website,title:websiteTitle.value,description:websiteDescription.value,link_text:linkText.value,link_url:linkUrl.value.trim()},timelines:timelines()};
+  const result={...data,page_title:pageTitle.value,profile:{...profile,name:name.value,avatar_image:avatar.value.trim(),sidebar_sections:sidebarSections()},interests_title:interestsTitle.value,interests:interests(),website:{...website,title:websiteTitle.value,description:websiteDescription.value,link_text:linkText.value,link_url:linkUrl.value.trim()},timelines:timelines()};
   // Preserve old formatted content unless the introduction is actually edited.
   if(typeof data.body_text==='string'||intro.value!==originalBody)result.body_text=intro.value;
   return result;
