@@ -654,14 +654,13 @@ const articleSchema = {
 			</div>
 		</div>
 		<InteriorHeading slot="title" title={title} centered={true} animated={true} />
-        <div class="hero-meta">
-				{import.meta.env.DEV && draft && (
-					<div class="meta-row">
-						<DraftBadge {draft} overlay={true} />
-					</div>
-				)}
-				
-        </div>
+        {import.meta.env.DEV && draft && (
+            <div class="hero-meta">
+                <div class="meta-row">
+                    <DraftBadge {draft} overlay={true} />
+                </div>
+            </div>
+        )}
 	</HeroHeader>
 
 	<div class="stats-wrapper">
