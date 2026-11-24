@@ -186,11 +186,11 @@ if (skyOnly) heroClass += ' hero-sky-only';
         padding: 0;
     }
 
-    /* Wide displays: align greeting with the centered portrait instead
-       of the outer monitor edge. Preserve the existing windowed position. */
+    /* Wide displays: align with the status card's inner text edge.
+       ContentCard is 1200px wide with 1em side padding; the panel adds its padding and border. */
     @media screen and (min-width: 1600px) and (min-aspect-ratio: 7/5) {
         .hero-header.hero-interactive .hero-content {
-            left: calc(50% - min(480px, 35vw, 57.5vh) + 70px);
+            left: calc(50% - 600px + 1rem + clamp(1.5rem, 3.2vw, 3rem) + 1px);
         }
     }
 

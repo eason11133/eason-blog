@@ -1,0 +1,73 @@
+---
+import PageShell from '../layouts/PageShell.astro';
+import InteriorHeading from './InteriorHeading.astro';
+import { getTagStats } from '../lib/content/blog';
+import { getWorkTagStats } from '../lib/content/works';
+import { getTagPath } from '../lib/content/tag-path';
+import { getWorkTagPath } from '../lib/content/work-tag-path';
+import { siteTitle } from '../config';
+
+interface Props { kind: 'blog' | 'works'; }
+const { kind } = Astro.props;
+const isWork = kind === 'works';
+const label = isWork ? '作品' : '文章';
+const back = isWork ? '/experience/' : '/blog/';
+const pathForTag = isWork ? getWorkTagPath : getTagPath;
+const tags = [...await (isWork ? getWorkTagStats() : getTagStats())]
+  .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], 'zh-Hant'));
+---
+
+<PageShell title={label + '標籤 | ' + siteTitle}
+  description={'瀏覽所有' + label + '標籤。'} pageId="tags-index" transparentHeader={false}>
+  <div class="all-tags-page">
+    <div class="all-tags-inner">
+      <a class="back" href={back}>{label}</a>
+      <InteriorHeading title="標籤" description={'共 ' + tags.length + ' 個'} />
+      <div class="tags-grid" aria-label={label + '標籤'}>
+        {tags.map(([name, count]) => (
+          <a class="tags-entry" href={pathForTag(name)} data-astro-prefetch="viewport">
+            <span class="tags-label">#{name}</span>
+            <span class="number">{count}</span>
+          </a>
+        ))}
+      </div>
+      {tags.length === 0 && <p class="empty">目前沒有{label}標籤。</p>}
+    </div>
+  </div>
+</PageShell>
+
+<style>
+  .all-tags-page {
+    position: relative;
+    width: 100%;
+    box-sizing: border-box;
+    padding: clamp(100px, 13vh, 145px) clamp(20px, 4vw, 48px) 48px;
+  }
+  .all-tags-inner { width: min(100%, 1280px); margin: 0 auto; }
+  .back { display: inline-block; margin-bottom: 1rem; color: #a9bbd2; font-size: .95rem; text-decoration: none; }
+  .back:hover, .back:focus-visible { color: var(--accent); }
+  .tags-grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 14px; }
+  .tags-entry {
+    display: flex; align-items: center; justify-content: space-between;
+    gap: .8rem; min-width: 0; min-height: 58px; box-sizing: border-box;
+    padding: 14px 18px; background: var(--color-tag-bg); color: var(--color-tag-text);
+    text-decoration: none; border-radius: 12px; font-weight: 650;
+    transition: background .2s ease, color .2s ease, transform .2s ease;
+  }
+  .tags-entry:hover, .tags-entry:focus-visible {
+    background: var(--accent); color: white; transform: translateY(-2px);
+  }
+  .tags-label { min-width: 0; overflow-wrap: anywhere; }
+  .number { font-size: .88rem; font-weight: 400; font-variant-numeric: tabular-nums; opacity: .8; white-space: nowrap; }
+  .empty { color: var(--color-text-secondary); }
+  @media (max-width: 1100px) { .tags-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+  @media (max-width: 850px) { .tags-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+  @media (max-width: 600px) {
+    .tags-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+    .tags-entry { padding: 12px; min-height: 52px; }
+  }
+  @media (prefers-reduced-motion: reduce) { .tags-entry { transition: none; } }
+  :global(body[data-page-id="tags-index"] #main-content) { display: flex; flex-direction: column; }
+  :global(body[data-page-id="tags-index"] #main-content > .page-shell-main) { flex: 0 0 auto; }
+  :global(body[data-page-id="tags-index"] #main-content > footer) { margin-top: auto; flex-shrink: 0; }
+</style>
