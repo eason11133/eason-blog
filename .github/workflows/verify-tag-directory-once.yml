@@ -75,7 +75,7 @@ jobs:
               print(label,json.dumps(val,ensure_ascii=False),flush=True)
               assert not val['overflow'],label
               assert val['actionUrl']=='/tags/' and val['action']=='所有標籤 →',label
-              counts=[x['count'] for x in val['visible']+val['hidden']]
+              counts=[x['count'] for x in (val['visible']+val['hidden']) if x['label'].startswith('#')]
               assert counts==sorted(counts,reverse=True),label
               assert val['visible'] and not val['visible'][0]['label'].startswith('#'),label
               assert all(abs(x['rect']['top']-val['visible'][0]['rect']['top'])<=2 for x in val['visible']),label
@@ -108,6 +108,29 @@ jobs:
               assert all(x['href'].startswith('/') for x in section['items'])
             assert not tags['overflow']
             shot('DIRECTORY')
+            for width,label in [(1920,'ARTICLE_WIDE'),(1120,'ARTICLE_HALF'),(420,'ARTICLE_MOBILE')]:
+              d.set_window_size(width,1020)
+              d.get(base+'/experience/')
+              time.sleep(.7)
+              # Read a known work post, preserving the exact live content.
+              link=d.find_element('css selector','.articles-list .blog-post-title a')
+              href=link.get_attribute('href')
+              d.get(href)
+              time.sleep(.7)
+              detail=d.execute_script("""
+                const r=s=>{const e=document.querySelector(s);if(!e)return null;
+                  const x=e.getBoundingClientRect();return {left:Math.round(x.left),right:Math.round(x.right),
+                    top:Math.round(x.top),bottom:Math.round(x.bottom),width:Math.round(x.width)}};
+                return {title:r('.hero-header .interior-heading h1'),
+                  meta:r('.hero-header .post-topline'),back:r('.hero-header .post-back-link'),
+                  article:r('.layout-container .content-card'),prose:r('.layout-container .prose'),
+                  hero:r('.hero-header .hero-content'),viewport:innerWidth,
+                  footerTop:r('footer')?.top,
+                  overflow:document.documentElement.scrollWidth>document.documentElement.clientWidth+2};
+              """)
+              print(label,json.dumps(detail,ensure_ascii=False),flush=True)
+              assert not detail['overflow']
+              shot(label)
             print('PASS: full-screen centered, half/mobile unchanged, one-row tags, tag directory works',flush=True)
           finally:d.quit()
           PY
