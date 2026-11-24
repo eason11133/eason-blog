@@ -29,6 +29,47 @@ jobs:
             --screenshot=/tmp/eason-ncu-mobile.png \
             'https://eason-blog-web-live.eason456h.workers.dev/blog/ncu-im-116/' 2>>/tmp/chrome-log
           test -s /tmp/eason-ncu-mobile.png
+      - name: Inspect computed article geometry (real Chrome layout)
+        shell: bash
+        run: |
+          python3 -m pip install --quiet selenium
+          python3 - <<'PY'
+          from selenium import webdriver
+          from selenium.webdriver.chrome.options import Options
+          opts=Options()
+          opts.add_argument('--headless=new')
+          opts.add_argument('--no-sandbox')
+          opts.add_argument('--disable-dev-shm-usage')
+          opts.add_argument('--window-size=1440,900')
+          browser=webdriver.Chrome(options=opts)
+          try:
+            browser.get('https://eason-blog-web-live.eason456h.workers.dev/blog/ncu-im-116/')
+            metrics=browser.execute_script("""
+              const inspect=(selector)=>{
+                const el=document.querySelector(selector);
+                if(!el)return {error:'not-found',selector};
+                const r=el.getBoundingClientRect(),s=getComputedStyle(el);
+                return {top:Math.round(r.top),bottom:Math.round(r.bottom),height:Math.round(r.height),
+                  marginTop:s.marginTop,marginBottom:s.marginBottom,
+                  position:s.position,display:s.display,transform:s.transform,overflow:s.overflow};
+              };
+              return {
+                hero:inspect('.hero-header.hero-sky-only'),
+                heroContent:inspect('.hero-header.hero-sky-only .hero-content'),
+                heroTitle:inspect('.interior-heading h1'),
+                heroMeta:inspect('.hero-meta'),
+                statsWrapper:inspect('.stats-wrapper'),
+                contentCard:inspect('.content-card'),
+                firstParagraph:inspect('.prose > p'),
+                prose:inspect('.prose'),
+                toc:inspect('.sidebar-container'),
+                imageFilter:getComputedStyle(document.querySelector('.prose img')).filter
+              };
+            """)
+            print('BROWSER_GEOMETRY',metrics,flush=True)
+          finally:
+            browser.quit()
+          PY
       - name: Emit compressed screenshots for visual QA
         shell: bash
         run: |
