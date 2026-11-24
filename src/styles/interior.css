@@ -180,13 +180,18 @@ html[data-theme="dark"] body[data-page-id="experience"] .experience-body a {
  * so a footer immediately after sparse content otherwise slices the night
  * above the mountain ridge. Scope this to posts/works; preserve home layout. */
 @media screen {
-  body[data-page-id="post"] #main-content {
+  body[data-page-id="post"] #main-content,
+  body[data-page-id="blog-list"] #main-content {
     display: flex;
     flex-direction: column;
   }
-  body[data-page-id="post"] #main-content > footer {
+  body[data-page-id="post"] #main-content > footer,
+  body[data-page-id="blog-list"] #main-content > footer {
     margin-top: auto;
     flex-shrink: 0;
+  }
+  body[data-page-id="blog-list"] #main-content > .page-shell-main {
+    flex: 0 0 auto;
   }
   /* With the viewport-sized scroll container in flex mode, a long article must
      not shrink beneath its content and cause the footer to overlap the text. */
