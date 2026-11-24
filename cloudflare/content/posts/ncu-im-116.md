@@ -16,105 +16,57 @@
 
 ## 面試逐字稿
 
-### 30 秒自我介紹
-
-**教授 C：** 現在有 30 秒自我介紹。
-
-**我：** 好，沒問題。各位教授好，我是黃元逸，來自台北市陽明高中，然後我就讀校內的人工智慧學程。
-
-然後我國中是體育班，直到高中才接觸資訊領域。然後呢，在高一時，我開發一套公共廁所 LINE Bot，最後到現在累積超過 35,000 名好友。後續野灣野生動物保育協會用過我的 LINE Bot 後聯繫到我，希望我幫他們……
-
-*（這裡 30 秒鈴響）*
-
-### 公共廁所 LINE Bot
-
-**教授 A：** 你的 LINE Bot 的主要功能是什麼？
-
-**我：** 你是說公廁的嗎？
-
-**教授 A：** 對。
-
-**我：** 就是主要是幫使用者找附近的廁所，這是最主要的功能。然後還有其他的附加功能，像是新增廁所或者是回饋，有點像 Google Map。只是跟 Google Map 不一樣的地方是，它可以讓使用者自己新增廁所，然後也可以有點類似玩遊戲的感覺，可以累積一些徽章這樣。
-
-**教授 B：** Google Map 上面搜尋公廁搜尋得到嗎？
-
-**我：** 搜尋得到，但很少。我的可以找得比較多，因為資料結合了三個來源：政府開放資料、使用者新增，還有 OSM 開放地理平台的搜尋資料。
-
-*（中間空白了大概 12、13 秒）*
-
-### 志願排序與為什麼選資管
-
-**教授 A：** 除了中央以外，你還有報考其他的系所嗎？
-
-**我：** 有，就是其他間的……
-
-**教授 A：** 哪幾間？
-
-**我：** 就是清交，還有一些其他的中字輩都有報。
-
-**教授 A：** 那你可以用你的報名大概排序一下你的志願嗎？真實的想法。
-
-**我：** 真實的想法，第一間是交大，再來是中央。
-
-**教授 A：** 交大是不分系嗎？
-
-**我：** 對。
-
-**教授 A：** 那你覺得你有什麼樣的特點與能力，可以說服我們讓你進資管？
-
-**我：** 嗯～我覺得我的能力是可以……因為我會接觸到客戶嘛，所以我比較需要去辨識一些像是行銷或者是管理……就是因為未來我想要開公司嘛，所以呢，我需要練習一些管理能力，或者是一些資訊能力也一樣提升，因為我也要持續開發我的產品，所以這樣。
-
-### AI 到底幫我做多少？
-
-**教授 B：** 那你可以簡單說一下你的 AI 使用範圍嗎？
-
-**我：** AI 主要是負責幫我實作產品，我主要是提出我的產品定位，然後跟它說我想要達到的成效是什麼。然後如果它開發一個新功能，結果開發錯了，我就會問它剛剛開發的是什麼、程式改哪裡，然後我就去看說哪裡錯，再跟它說。
-
-**教授 B：** 你有用哪些 AI？
-
-**我：** 其實我用很多，像 GPT、Claude、Codex 那些都會用。
-
-**教授 B：** 所以你主要是用 Codex 來寫程式嗎？
-
-**我：** 一開始不會用 Codex，就是後來才有用到。
-
-**教授 B：** 你專案這麼多，所以你應該不太會去看程式碼吧？
-
-**我：** 對，除非有問題才會去看，不然就不太會。
-
-**教授 B：** 所以就是它寫程式，然後你去看它做得怎麼樣？
-
-**我：** 對。
-
-*（過了 2 秒，第一聲鈴響；中間又空白了大概 10 秒）*
-
-### 團隊合作、溝通，還有棒球
-
-**教授 B：** 那你都是單獨開發對吧？
-
-**我：** 對。
-
-**教授 B：** 那你跟團隊，比如說人之類的互動都沒有嗎？
-
-**我：** 喔，我只有公共廁所是團隊開發。
-
-**教授 B：** 幾個人？
-
-**我：** 3 個人，但是我還是……全部的程式幾乎都是我寫的，他們主要就是寫一些方向跟……
-
-**教授 B：** 你現在都跟 AI 共同開發，那你會不會覺得跟人溝通很麻煩？
-
-**我：** 不會，因為就像有點像是客戶討論的時候，需要知道他們的需求嘛，所以我覺得跟……
-
-*（第二聲鈴響）*
-
-**我：** 客戶溝通需要知道他們的需求，我覺得蠻有趣的。對。
-
-**教授 C：** 你不是說你之前是打棒球的，啊你沒有想要開發類似的專案嗎？
-
-**我：** 有，只是我還沒有一個……就是因為我以前打棒球，然後接觸到，其實也接觸到蠻多運科的。但是其實運科的東西我沒有到特別了解，所以我目前沒有一個特別清楚的方向去想說要怎麼做。
-
-**教授 C：** 那我們就到這了，謝謝。
+<details class="interview-transcript">
+<summary>展開完整面試逐字稿（點一下可收起）</summary>
+<div class="interview-transcript-body">
+<p class="interview-turn"><strong>教授 C：</strong>現在有30秒自我介紹</p>
+<p class="interview-turn"><strong>我：</strong>好沒問題，各位教授好，我是黃元逸，來自台北市陽明高中，然後我就讀校內的人工智慧學程</p>
+<p class="interview-turn"><strong>我：</strong>然後我國中是體育班，直到高中才接觸資訊領域。然後呢，在高一時，我開發一套公共廁所LINE Bot，然後呢最後再到現在累積超過35000名好友，然後呢，後續並後續在野灣野生動物保育協會用過我的LINE bot後聯繫到我，然後叫我幫他們(這裡30秒鈴響)開發一套屬於他們的LINE Bot</p>
+<p class="interview-turn"><strong>教授 A：</strong>你的LINE Bot的主要功能是甚麼?</p>
+<p class="interview-turn"><strong>我：</strong>你是說公廁的嗎</p>
+<p class="interview-turn"><strong>教授 A：</strong>對</p>
+<p class="interview-turn"><strong>我：</strong>就是主要是幫使用者找附近的廁所，這是最主要的功能，然後還有其他的附加功能，像是一些新增廁所或者是其他的像回饋，或者是有點像Google Map，只是比Google map不一樣的地方是它可以讓使用者自己新增廁所，然後呢，也可以去有點像類似玩遊戲的感覺，可以累積一些徽章這樣。</p>
+<p class="interview-turn"><strong>教授 B：</strong>Google map上面搜尋公廁搜尋的到嗎?</p>
+<p class="interview-turn"><strong>我：</strong>搜尋的什麼我可以找的比較多</p>
+<p class="interview-turn"><strong>我：</strong>因為我的到，但很少。就是它資料。</p>
+<p class="interview-turn"><strong>教授 B：</strong>那為資訊是結合3個，就是一個是政府開放資料，然後一個是那個使用者新增，然後一個救是OSM的開放地理平台的一些搜尋資料她可以找到公廁。</p>
+<p class="interview-note"><em>(中間空白了12 13 秒左右)</em></p>
+<p class="interview-turn"><strong>教授 A：</strong>除了中央以外你還有報考其他的系所嗎</p>
+<p class="interview-turn"><strong>我：</strong>有，就是其他間的...</p>
+<p class="interview-turn"><strong>教授 A：</strong>哪幾間</p>
+<p class="interview-turn"><strong>我：</strong>就是清交還有一些其他的中字輩都有報</p>
+<p class="interview-turn"><strong>教授 A：</strong>那你可以用你的報名大概排序一下你的志願嗎?真實的想法</p>
+<p class="interview-turn"><strong>我：</strong>真實的想法，第一間是交大，再來是中央</p>
+<p class="interview-turn"><strong>教授 A：</strong>交大是不分系嗎</p>
+<p class="interview-turn"><strong>我：</strong>對</p>
+<p class="interview-turn"><strong>教授 A：</strong>那你覺得你有什麼要的特點與能力可以說服我們讓你進資管?</p>
+<p class="interview-turn"><strong>我：</strong>恩~我覺得我的能力是可以，因為我會接觸到客戶嘛，所以我比較需要去辨識一些像是行銷或者是管就是因為後未來我想要開公司嘛，所以呢，我需要練習一些管理能力，或者是一些資訊能力也一樣提升，因為我也要持續開發我的產品，所以這樣。</p>
+<p class="interview-turn"><strong>教授 B：</strong>那你可以簡單說一下你的AI使用範圍嗎?</p>
+<p class="interview-turn"><strong>我：</strong>AI 主要是負責幫我實作產品，我主要是提出我的產品的定位，然後跟她說我想要達到的成效是什麼，然後還有如果他，假設他開發一個新功能，然後他開發錯了，然後我就會問他，他剛剛開發的是開發為什麼會程式是改哪裡，然後我就去看說哪裡錯，然後跟他說。</p>
+<p class="interview-turn"><strong>教授 B：</strong>你有用那些 AI?</p>
+<p class="interview-turn"><strong>我：</strong>其實我用很多，像GPT、Claude、codex那些都會用。</p>
+<p class="interview-turn"><strong>教授 B：</strong>所以你主要是用codex來寫程式嗎?</p>
+<p class="interview-turn"><strong>我：</strong>一開始不會用codex，就是後6來才有用到。</p>
+<p class="interview-turn"><strong>教授 B：</strong>你專案這麼多，所以你應該不太會去看程式碼吧</p>
+<p class="interview-turn"><strong>我：</strong>對除非有問題才會去看，不然就不太會</p>
+<p class="interview-turn"><strong>教授 B：</strong>所以就是他寫程式然後你去看他做的怎麼樣</p>
+<p class="interview-turn"><strong>我：</strong>對</p>
+<p class="interview-note"><em>(過了2秒)</em></p>
+<p class="interview-note"><em>(第一聲鈴響)</em></p>
+<p class="interview-note"><em>(中間空白了10 秒左右)</em></p>
+<p class="interview-turn"><strong>教授 B：</strong>那你都是單獨開發對吧</p>
+<p class="interview-turn"><strong>我：</strong>對</p>
+<p class="interview-turn"><strong>教授 B：</strong>那你跟團隊比如說人之類的互動都沒有嗎</p>
+<p class="interview-turn"><strong>我：</strong>喔，我只有公共廁所是團隊開發</p>
+<p class="interview-turn"><strong>教授 B：</strong>幾個人</p>
+<p class="interview-turn"><strong>我：</strong>3個人，但是我還是但是全部的程式幾乎都是我寫的，他們主要就是寫一些方向跟。</p>
+<p class="interview-turn"><strong>教授 B：</strong>你現在都跟AI共同開發，那你會不會覺得跟人溝通很麻煩</p>
+<p class="interview-turn"><strong>我：</strong>不會，因為就像有點像是客戶討論的時候，需要知道他們的需求嘛，所以我覺得跟(第二聲鈴響)客戶溝通需要知道他們的需求，我覺得蠻有趣的。對</p>
+<p class="interview-turn"><strong>教授 C：</strong>你不是說你之前是打棒球的，ㄚ你沒有想要開發類似的專案嗎</p>
+<p class="interview-turn"><strong>我：</strong>有，只是我還沒有一個就是因為我以前打棒球，然後接觸到其實也接觸到蠻多運科的，但是其實運科的東西我沒有到特別了解，所以我目前沒有一個特別清楚的方向去想說要怎麼做</p>
+<p class="interview-turn"><strong>教授 C：</strong>那我們就到這了謝謝</p>
+</div>
+</details>
 
 ## 面試完的感覺
 
