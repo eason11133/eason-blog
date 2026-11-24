@@ -1,0 +1,69 @@
+name: Deploy Eason blog to Cloudflare
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'cloudflare/cms/**'
+      - 'cloudflare/live-site/**'
+      - 'src/**'
+      - 'astro.config.mjs'
+      - 'package.json'
+      - 'package-lock.json'
+      - '.github/workflows/cloudflare-deploy.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: eason-blog-cloudflare-production
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    name: Build, migrate, and deploy both Workers
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+    steps:
+      - name: Check required Cloudflare credentials
+        shell: bash
+        run: |
+          if [[ -z "$CLOUDFLARE_API_TOKEN" || -z "$CLOUDFLARE_ACCOUNT_ID" ]]; then
+            echo '::error::Missing GitHub Actions secrets CLOUDFLARE_API_TOKEN and/or CLOUDFLARE_ACCOUNT_ID. Configure these once in repository Settings > Secrets and variables > Actions.'
+            exit 1
+          fi
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Install locked dependencies
+        run: npm ci
+      - name: Verify CMS code and editor
+        run: node --test cloudflare/cms/*.node-test.mjs
+      - name: Install pinned Cloudflare adapter
+        run: npm install --no-save --package-lock=false @astrojs/cloudflare@13.7.0
+      - name: Build live frontend
+        run: node cloudflare/live-site/build.mjs
+      - name: Prepare live Worker configuration
+        run: node cloudflare/live-site/prepare-deploy.mjs
+      - name: Validate live Worker bundle without deploying
+        run: ./node_modules/.bin/wrangler deploy --config dist-cloudflare/server/wrangler.json --dry-run --outdir ./.wrangler/live-dry-run
+      - name: Apply D1 migrations (preserves current content)
+        run: ./node_modules/.bin/wrangler d1 migrations apply eason-blog-content --config cloudflare/cms/wrangler.jsonc --remote --yes
+      - name: Deploy CMS Worker (eason-blog)
+        run: ./node_modules/.bin/wrangler deploy --config cloudflare/cms/wrangler.jsonc
+      - name: Deploy live frontend Worker (eason-blog-web-live)
+        run: ./node_modules/.bin/wrangler deploy --config dist-cloudflare/server/wrangler.json
+      - name: Verify CMS is healthy
+        shell: bash
+        run: |
+          curl -fsS --retry 3 --retry-delay 2 'https://eason-blog.eason456h.workers.dev/health' | grep -q '"ok":true'
+      - name: Verify frontend is online
+        shell: bash
+        run: |
+          curl -fsS --retry 3 --retry-delay 2 'https://eason-blog-web-live.eason456h.workers.dev/' | grep -qi '<html'
