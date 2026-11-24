@@ -24,10 +24,18 @@ function setupTagOverflow() {
       close();
       // Restore DOM order before each measurement, including after resizes.
       for (const tag of tags) visible.appendChild(tag);
-      more.hidden = false;
-      // Reserve the More button in advance so it can never create a second row.
-      const available = visible.clientWidth;
+      // Check whether everything already fits without the More button.
+      // Only reserve its width when there is an actual overflow.
+      more.hidden = true;
       const gap = Number.parseFloat(getComputedStyle(visible).columnGap) || 0;
+      const naturalWidth = all.getBoundingClientRect().width
+        + tags.reduce((sum, tag) => sum + gap + tag.getBoundingClientRect().width, 0);
+      if (naturalWidth <= visible.clientWidth + .5) {
+        counter.textContent = '';
+        return;
+      }
+      more.hidden = false;
+      const available = visible.clientWidth;
       let used = all.getBoundingClientRect().width;
       for (const tag of tags) {
         const tagWidth = tag.getBoundingClientRect().width;
