@@ -6,8 +6,6 @@ on:
     paths:
       - 'cloudflare/site-config.mjs'
       - 'cloudflare/cms/**'
-      - 'cloudflare/content/**'
-      - 'public/images/ncu-im-interview-seating.webp'
       - 'cloudflare/live-site/**'
       - 'src/**'
       - 'astro.config.mjs'
@@ -78,43 +76,6 @@ jobs:
         run: ./node_modules/.bin/wrangler deploy --config cloudflare/cms/wrangler.jsonc
       - name: Deploy live frontend Worker (eason-blog-web-live)
         run: ./node_modules/.bin/wrangler deploy --config dist-cloudflare/server/wrangler.json
-      - name: Publish checked-in interview article to D1
-        run: node cloudflare/content/publish-post.mjs
-      - name: Confirm interview article is public
-        shell: bash
-        run: |
-          curl -fsS --retry 3 --retry-delay 2 -A 'Mozilla/5.0' \
-            'https://eason-blog.eason456h.workers.dev/api/posts/ncu-im-116' \
-            -o /tmp/eason-ncu-article.json
-          python3 - <<'PY'
-          import json
-          with open('/tmp/eason-ncu-article.json',encoding='utf-8') as f:
-            doc=json.load(f)
-          assert doc['slug']=='ncu-im-116' and doc['draft'] is False
-          assert '面試逐字稿' in doc['body_markdown']
-          assert '中央資管' in doc['title']
-          print('Public CMS article verified',flush=True)
-          PY
-          curl -fsS --retry 3 --retry-delay 2 -A 'Mozilla/5.0' \
-            'https://eason-blog-web-live.eason456h.workers.dev/images/ncu-im-interview-seating.webp' \
-            -o /tmp/eason-ncu-interview-image.webp
-          test "$(wc -c </tmp/eason-ncu-interview-image.webp)" -gt 5000
-      - name: Verify NCU post layout and the single complete collapsible transcript
-        shell: bash
-        run: |
-          curl -fsS --retry 3 --retry-delay 2 -A 'Mozilla/5.0' \
-            'https://eason-blog-web-live.eason456h.workers.dev/blog/ncu-im-116/' \
-            -o /tmp/eason-ncu-rendered.html
-          python3 - <<'PY'
-          from pathlib import Path
-          page=Path('/tmp/eason-ncu-rendered.html').read_text(encoding='utf-8')
-          assert page.count('<details class="interview-transcript">')==1,'Expected one native details for the whole transcript'
-          assert '<summary>' in page,'Missing collapsible summary'
-          assert page.count('class="interview-turn"')>=40,'Transcript conversations missing'
-          assert 'ncu-im-interview-seating.webp' in page,'Diagram missing'
-          assert '面試完的感覺' in page and '放榜：備取 6' in page,'Body sections missing'
-          print('PASS: one collapsible full transcript, image, experience, and result',flush=True)
-          PY
       - name: Verify CMS is healthy
         shell: bash
         run: |
