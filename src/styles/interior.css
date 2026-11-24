@@ -816,4 +816,9 @@ html[data-theme="dark"] body[data-page-id="blog-list"] .article-tags[data-tag-ov
     /* Let short posts end after their actual text, rather than force 240px. */
     min-height: 0;
   }
+  html[data-theme="dark"] body[data-page-id="post"] .site-comments {
+    /* Continue the same reading column all the way through comments. */
+    position: relative;
+    left: -100px;
+  }
 }
