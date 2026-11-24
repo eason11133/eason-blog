@@ -1,4 +1,5 @@
 import { adminHtml } from './admin.mjs';
+import { commentUser, handleCommentAuth } from './comment-auth.mjs';
 import { normalizeDocument, publicDocument, validSlug, safeText, safeJsonParse } from './utils.mjs';
 
 const encoder = new TextEncoder();
@@ -92,6 +93,11 @@ async function handle(req,env) {
       'Content-Security-Policy':"default-src 'none'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://unpkg.com; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com; font-src 'self' data:; img-src 'self' https: data: blob:; connect-src 'self'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'"},
   });
   if (!env.DB) return fail('Database not configured',503);
+  if (path.startsWith('/api/auth/')) {
+    if (method==='POST' && !sameOriginWrite(req,url)) return fail('Invalid request origin',403);
+    const auth=await handleCommentAuth(req,env,url,path,method);
+    if(auth)return auth;
+  }
   if (method!=='GET' && method!=='HEAD' && !sameOriginWrite(req,url)) return fail('Invalid request origin',403);
 
   if (method==='POST' && path==='/api/admin/login') {
@@ -109,26 +115,28 @@ async function handle(req,env) {
   if (method==='GET' && path==='/api/comments') {
     const kind=url.searchParams.get('kind') || 'post', slug=url.searchParams.get('slug');
     if (!['post','work'].includes(kind) || !validSlug(slug)) return fail('Invalid article');
-    const rows=await env.DB.prepare('SELECT id,parent_id,nickname,body,created FROM comments WHERE kind=? AND slug=? AND status=? ORDER BY created ASC LIMIT 250').bind(kind,slug,'approved').all();
+    const rows=await env.DB.prepare('SELECT id,parent_id,nickname,body,created,avatar_url,auth_provider FROM comments WHERE kind=? AND slug=? AND status=? ORDER BY created ASC LIMIT 250').bind(kind,slug,'approved').all();
     return json({comments:rows.results||[]});
   }
   if (method==='POST' && path==='/api/comments') {
     const form=await jsonBody(req,7000);
     const kind=form?.kind,slug=form?.slug;
-    const nickname=safeText(form?.nickname,60),body=safeText(form?.body,1600);
-    if (!['post','work'].includes(kind)||!validSlug(slug)||nickname.length<1||body.length<2) return fail('Invalid comment');
+    const user=await commentUser(req,env);
+    if(!user)return fail('請先使用 GitHub 或 Google 登入',401);
+    const nickname=user.name,body=safeText(form?.body,1600);
+    if (!['post','work'].includes(kind)||!validSlug(slug)||body.length<2) return fail('Invalid comment');
     const exists=await env.DB.prepare('SELECT slug FROM documents WHERE kind=? AND slug=? AND draft=0').bind(kind,slug).first();
     if (!exists) return fail('Article not found',404);
     const actor=await actorHash(req,env);
-    if (!await quota(env.DB,actor,'comment',3,15*60000)) return fail('Please try again later',429);
+    if (!await quota(env.DB,actor,'comment',5,15*60000)) return fail('Please try again later',429);
     const parent=typeof form.parent_id==='string' && form.parent_id ? form.parent_id : null;
     if (parent) {
       const parentRow=await env.DB.prepare('SELECT id FROM comments WHERE id=? AND kind=? AND slug=? AND status=?').bind(parent,kind,slug,'approved').first();
       if(!parentRow) return fail('Invalid parent comment');
     }
-    await env.DB.prepare('INSERT INTO comments(id,kind,slug,parent_id,nickname,body,status,created) VALUES(?,?,?,?,?,?,?,?)')
-      .bind(crypto.randomUUID(),kind,slug,parent,nickname,body,'pending',new Date().toISOString()).run();
-    return json({ok:true,status:'pending'},201);
+    await env.DB.prepare('INSERT INTO comments(id,kind,slug,parent_id,nickname,body,status,created,auth_provider,auth_user_id,avatar_url) VALUES(?,?,?,?,?,?,?,?,?,?,?)')
+      .bind(crypto.randomUUID(),kind,slug,parent,nickname,body,'approved',new Date().toISOString(),user.provider,user.id,user.avatar).run();
+    return json({ok:true,status:'approved'},201);
   }
 
   if (method==='GET' && /^\/api\/(posts|works)$/.test(path)) {
