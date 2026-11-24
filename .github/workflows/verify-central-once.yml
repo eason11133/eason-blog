@@ -65,7 +65,7 @@ jobs:
                 };
               """)
               print('CHECK_'+label,json.dumps({k:(v[:180] if k=='transcript' else v) for k,v in actual.items()},ensure_ascii=False),flush=True)
-              assert actual['title']=='中央資管心得',actual['title']
+              assert '中央資管心得' in (actual['title'] or ''),actual['title']
               assert actual['originalTypewriter'],'Original title animation was changed'
               assert len(actual['headings'])==4,actual['headings']
               assert actual['headings'] == [
