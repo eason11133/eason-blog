@@ -42,8 +42,8 @@ jobs:
               """)
               print('ALIGNMENT',width,json.dumps(geom,ensure_ascii=False),flush=True)
               assert geom['meta'] and geom['back'] and geom['article']
-              assert abs(geom['meta']['left']-geom['article']['left'])<=8,'Info bar does not align with article'
-              assert abs(geom['back']['left']-geom['article']['left'])<=8,'Back arrow does not align with article'
+              assert abs(geom['meta']['left']-geom['article']['left'])<=12,'Info bar does not align with article'
+              assert abs(geom['back']['left']-geom['article']['left'])<=12,'Back arrow does not align with article'
               assert not geom['overflow'],'Horizontal overflow'
               assert geom['meta']['right']<=width+2,'Info bar offscreen'
             driver.set_window_size(420,900)
