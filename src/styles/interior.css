@@ -203,7 +203,7 @@ html[data-theme="dark"] body[data-page-id="post"] .hero-header.hero-sky-only {
   height: auto;
   min-height: 0;
   margin: 0;
-  padding: clamp(116px, 16vh, 164px) clamp(20px, 4vw, 48px) 2rem;
+  padding: clamp(108px, 15vh, 156px) clamp(20px, 4vw, 48px) 1.5rem;
   overflow: visible;
   background: transparent !important;
 }
@@ -267,12 +267,6 @@ html[data-theme="dark"] body[data-page-id="post"] .hero-header.hero-sky-only .me
   justify-content: flex-start;
   flex-wrap: wrap;
   gap: .85rem;
-}
-html[data-theme="dark"] body[data-page-id="post"] .hero-header.hero-sky-only .pdf-export-button {
-  background: transparent;
-  color: #b4cdec;
-  border-color: var(--interior-line);
-  font-size: .85rem;
 }
 html[data-theme="dark"] body[data-page-id="post"] .stats-wrapper {
   min-height: 0 !important;
