@@ -1,5 +1,7 @@
 import type { Page } from 'astro';
 
+export const CONTENT_PAGE_SIZE = 4;
+
 export type PageUrlFactory = (current: number, last: number) => {
   current: string; prev: string | undefined; next: string | undefined;
 };
@@ -8,7 +10,7 @@ export function buildContentPage<T>(
   entries: T[],
   number: number,
   urls: PageUrlFactory,
-  pageSize = 15,
+  pageSize = CONTENT_PAGE_SIZE,
 ): Page<T> | undefined {
   const total = entries.length;
   const lastPage = Math.max(1, Math.ceil(total / pageSize));
