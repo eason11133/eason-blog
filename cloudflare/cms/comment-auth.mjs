@@ -1,7 +1,8 @@
 // Public visitor OAuth for comments. This is separate from the CMS admin login.
+import { COMMENT_PUBLIC_SITE_ORIGIN } from '../site-config.mjs';
 const enc = new TextEncoder();
 const dec = new TextDecoder();
-const publicOrigin = 'https://eason-blog-web-live.eason456h.workers.dev';
+const publicOrigin = COMMENT_PUBLIC_SITE_ORIGIN;
 const json = (data,status=200,headers={}) => new Response(JSON.stringify(data),{status,headers:{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store',...headers}});
 function siteOrigin(env) {
   const origin=env.COMMENT_SITE_ORIGIN || publicOrigin;
