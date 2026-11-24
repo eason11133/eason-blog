@@ -1,0 +1,93 @@
+name: Verify borderless blog and reordered article header once
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/verify-blog-header-once.yml'
+jobs:
+  browser-check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - name: Verify layout in real Chrome after deployment
+        shell: bash
+        run: |
+          python3 -m pip install --quiet selenium Pillow
+          python3 - <<'PY'
+          import json,time,io,base64
+          from PIL import Image
+          from selenium import webdriver
+          from selenium.webdriver.chrome.options import Options
+          base='https://eason-blog-web-live.eason456h.workers.dev'
+          o=Options()
+          o.add_argument('--headless=new')
+          o.add_argument('--no-sandbox')
+          o.add_argument('--disable-dev-shm-usage')
+          d=webdriver.Chrome(options=o)
+          def shot(name):
+            d.save_screenshot('/tmp/'+name+'.png')
+            im=Image.open('/tmp/'+name+'.png').convert('RGB')
+            im.thumbnail((1040,740))
+            buffer=io.BytesIO()
+            im.save(buffer,format='JPEG',quality=53,optimize=True)
+            print('CAPTURE_'+name+'_BEGIN',flush=True)
+            print(base64.b64encode(buffer.getvalue()).decode('ascii'),flush=True)
+            print('CAPTURE_'+name+'_END',flush=True)
+          def check(width,mode):
+            d.set_window_size(width,900)
+            d.get(base+'/blog/')
+            time.sleep(1)
+            grid=d.execute_script("""
+              const el=document.querySelector('.articles-list');
+              const cards=[...el.querySelectorAll(':scope > .scroll-reveal')];
+              return {display:getComputedStyle(el).display,
+                cols:getComputedStyle(el).gridTemplateColumns,
+                cards:cards.map(e=>{let r=e.getBoundingClientRect(),c=getComputedStyle(e);return {
+                  x:Math.round(r.x),y:Math.round(r.y),width:Math.round(r.width),
+                  border:c.borderTopWidth,borderColor:c.borderTopColor,background:c.backgroundColor}}),
+                horizontalOverflow:document.documentElement.scrollWidth>document.documentElement.clientWidth+2};
+            """)
+            print('GRID_'+mode,json.dumps(grid,ensure_ascii=False),flush=True)
+            if grid['display']=='grid' and len(grid['cards'])>=4 and all(e['border']=='0px' for e in grid['cards']):
+              if width>820 and grid['cards'][0]['y']==grid['cards'][1]['y'] and grid['cards'][0]['x']<grid['cards'][1]['x']:
+                pass
+              elif width<=820 and grid['cards'][1]['y']>grid['cards'][0]['y']:
+                pass
+              else:return False
+              if grid['horizontalOverflow']:return False
+            else:return False
+            if mode=='DESKTOP':
+              d.execute_script("document.querySelector('.articles-area').scrollIntoView()")
+              shot('BLOG_DESKTOP')
+            d.get(base+'/blog/%E4%B8%AD%E5%A4%AE%E8%B3%87%E7%AE%A1/')
+            time.sleep(1)
+            info=d.execute_script("""
+              const rect=s=>{const el=document.querySelector(s);if(!el)return null;
+                let r=el.getBoundingClientRect();return {top:Math.round(r.top),bottom:Math.round(r.bottom),x:Math.round(r.x),width:Math.round(r.width)}};
+              return {title:rect('.hero-header .interior-heading h1'),
+                row:rect('.hero-header .post-topline'),
+                body:rect('.content-card .prose'),
+                labels:[...document.querySelectorAll('.post-fact-label')].map(x=>x.textContent.trim()),
+                typewriter:!!document.querySelector('.hero-header .interior-heading h1.typewriter'),
+                horizontalOverflow:document.documentElement.scrollWidth>document.documentElement.clientWidth+2};
+            """)
+            print('ARTICLE_'+mode,json.dumps(info,ensure_ascii=False),flush=True)
+            if not(info['title'] and info['row'] and info['body'] and info['typewriter']):return False
+            if not(info['title']['bottom']<=info['row']['top']+3 and info['row']['bottom']<=info['body']['top']+3):return False
+            if info['labels']!=['建立','最新更新','字數','閱讀','瀏覽'] or info['horizontalOverflow']:return False
+            shot('ARTICLE_'+mode)
+            return True
+          try:
+            ok=False
+            for i in range(30):
+              if check(1440,'DESKTOP'):
+                ok=True
+                break
+              print('WAITING_FOR_LATEST_DEPLOYMENT',i+1,flush=True)
+              time.sleep(4)
+            assert ok,'New desktop layout did not become visible within the verification window'
+            assert check(420,'MOBILE'),'Mobile layout failed'
+            print('PASS: borderless 2-column desktop cards, 1-column mobile cards, title before metadata, and no overflow',flush=True)
+          finally:
+            d.quit()
+          PY
