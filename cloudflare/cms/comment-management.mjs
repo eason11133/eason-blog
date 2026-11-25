@@ -30,7 +30,10 @@ async function notificationFetch(target,init,channel,stage){
   const controller=new AbortController();
   const timer=setTimeout(()=>controller.abort(),10000);
   try{
-    const res=await fetch(target,{...init,redirect:'error',signal:controller.signal});
+    // workerd rejects redirect:'error' at request construction.
+    // Manual mode prevents bearer credentials from following any redirect.
+    const res=await fetch(target,{...init,redirect:'manual',signal:controller.signal});
+    if(res.status>=300&&res.status<400)throw new NotificationError((channel==='line'?'LINE':'Discord')+' '+stage+'：服務回傳重新導向（HTTP '+res.status+'），已停止請求以保護憑證。');
     if(!res.ok)throw notificationError(channel,stage,res.status);
     return res;
   }catch(error){

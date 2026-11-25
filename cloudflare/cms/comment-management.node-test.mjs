@@ -68,3 +68,30 @@ test('LINE diagnostics distinguish invalid user IDs, token failures, and recipie
   await assert.rejects(()=>checkLineRecipient(env),/接收者檢查（HTTP 404）/);
  }finally{globalThis.fetch=prev;}
 });
+
+test('notification requests use Workers-compatible manual redirects and never follow redirect responses',async()=>{
+ const prev=globalThis.fetch,calls=[];
+ const env={COMMENT_LINE_ACCESS_TOKEN:'test-token',COMMENT_LINE_USER_ID:'U'+'a'.repeat(32)};
+ try{
+  globalThis.fetch=async(url,init)=>{
+   if(init.redirect==='error')throw new TypeError('Unsupported redirect mode: error');
+   assert.equal(init.redirect,'manual');
+   calls.push(String(url));
+   return new Response(null,{status:String(url).endsWith('/push')?204:200});
+  };
+  await checkLineRecipient(env);
+  await sendCommentNotification(env,'line','test');
+  assert.deepEqual(calls,[
+   'https://api.line.me/v2/bot/info',
+   'https://api.line.me/v2/bot/profile/'+env.COMMENT_LINE_USER_ID,
+   'https://api.line.me/v2/bot/message/push'
+  ]);
+  calls.length=0;
+  globalThis.fetch=async(url,init)=>{
+   assert.equal(init.redirect,'manual');calls.push(String(url));
+   return new Response(null,{status:302,headers:{Location:'https://evil.test/'}});
+  };
+  await assert.rejects(()=>checkLineRecipient(env),/重新導向（HTTP 302）/);
+  assert.equal(calls.length,1);
+ }finally{globalThis.fetch=prev;}
+});
