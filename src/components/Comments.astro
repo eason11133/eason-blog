@@ -38,20 +38,25 @@ const { kind, slug } = Astro.props;
 .site-comments [hidden]{display:none!important}
 .site-comments h2{font-size:1.4rem;color:#e7effa;font-weight:700;margin:0 0 1.25rem}
 .site-comments-list{font-size:.95rem;color:#a7b9d3;margin:0 0 1.7rem}
-.site-comment{border-bottom:1px solid rgba(158,186,221,.18);padding:1rem 0}
-.site-comment.is-reply{margin-left:1.25rem;padding-left:1rem;border-left:2px solid rgba(158,186,221,.25)}
-.site-comment-header{display:flex;flex-wrap:wrap;align-items:center;gap:.6rem;color:#a7b9d3;font-size:.84rem}
-.site-comment-header strong{color:#e7effa}
-.site-comment-avatar,.site-comment-account-avatar{width:32px;height:32px;object-fit:cover;border-radius:50%;border:1px solid rgba(158,186,221,.26)}
-.site-comment-body{white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.8;color:#e7effa;margin:.55rem 0}
+/* Comment rows are created by client-side DOM calls, so their selectors
+   must not require Astro's generated scope attribute. Scope to this list instead. */
+.site-comments-list :global(.site-comment){border-bottom:1px solid rgba(158,186,221,.18);padding:1rem 0;min-width:0}
+.site-comments-list :global(.site-comment.is-reply){margin-left:1.25rem;padding-left:1rem;border-left:2px solid rgba(158,186,221,.25)}
+.site-comments-list :global(.site-comment-header){display:flex;flex-wrap:wrap;align-items:center;gap:.6rem;color:#a7b9d3;font-size:.84rem}
+.site-comments-list :global(.site-comment-header strong){color:#e7effa;overflow-wrap:anywhere;min-width:0}
+.site-comments-list :global(.site-comment-header time){color:#a7b9d3;font-size:.8rem;white-space:nowrap}
+.site-comments-list :global(.site-comment-avatar),.site-comment-account-avatar{display:block;box-sizing:border-box;width:32px;height:32px;min-width:32px;max-width:32px;flex:0 0 32px;object-fit:cover;border-radius:50%;border:1px solid rgba(158,186,221,.26)}
+.site-comments-list :global(.site-comment-body){white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.8;color:#e7effa;margin:.55rem 0}
+.site-comments-list :global(.site-comment-children){margin-top:.5rem;min-width:0}
+.site-comments-list :global(.site-comment-children > .site-comment:last-child){border-bottom:0}
 .site-comment-login{display:grid;gap:.75rem;margin-bottom:1.1rem}
 .site-comment-login p{margin:0;color:#a7b9d3;font-size:.9rem}
 .site-login-actions{display:flex;flex-wrap:wrap;gap:.7rem}
 .site-login-actions a,.site-comments-actions button{display:inline-flex;align-items:center;justify-content:center;font:inherit;font-size:.9rem;text-decoration:none;border:1px solid rgba(158,186,221,.3);border-radius:9px;padding:.65rem 1.1rem;background:rgba(29,66,108,.42);color:#e7effa;cursor:pointer}
 .site-login-actions a:hover,.site-comments-actions button:hover{background:rgba(55,96,140,.65)}
 .site-comment-account{display:flex;align-items:center;gap:.65rem;margin-bottom:1rem;color:#e7effa}
-.site-comment-logout,.site-comment-reply-cancel,.site-comment-reply-button{border:0;background:none;padding:.25rem;color:#a7b9d3;font:inherit;font-size:.8rem;cursor:pointer}
-.site-comment-logout:hover,.site-comment-reply-cancel:hover,.site-comment-reply-button:hover{color:#fff;text-decoration:underline}
+.site-comment-logout,.site-comment-reply-cancel,.site-comments-list :global(.site-comment-reply-button){border:0;background:none;padding:.25rem;color:#a7b9d3;font:inherit;font-size:.8rem;cursor:pointer}
+.site-comment-logout:hover,.site-comment-reply-cancel:hover,.site-comments-list :global(.site-comment-reply-button:hover){color:#fff;text-decoration:underline}
 .site-comments-form{display:grid;gap:.8rem}
 .site-comments-form label{font-size:.9rem;color:#bacde4}
 .site-comments-form textarea{width:100%;box-sizing:border-box;border:1px solid rgba(158,186,221,.26);border-radius:10px;padding:.8rem .9rem;background:rgba(12,27,45,.44);color:#e7effa;font:inherit}
@@ -61,7 +66,7 @@ const { kind, slug } = Astro.props;
 .site-comments-actions button:disabled{opacity:.65;cursor:wait}
 .site-comments-status:empty,.site-comments-auth-status:empty{display:none}
 .site-comment-reply-target{display:flex;align-items:center;gap:.5rem;color:#a7b9d3;font-size:.84rem}
-@media(max-width:600px){.site-comment.is-reply{margin-left:1rem;padding-left:.7rem}}
+@media(max-width:600px){.site-comments-list :global(.site-comment.is-reply){margin-left:1rem;padding-left:.7rem}}
 </style>
 
 <script>
@@ -97,7 +102,7 @@ function attachComments() {
       const data=await response.json();
       const comments:CommentItem[]=Array.isArray(data.comments)?data.comments:[];
       list.replaceChildren();
-      if(!comments.length){list.textContent='目前還沒有留言。';return;}
+      if(!comments.length){heading.textContent='留言';list.textContent='目前還沒有留言。';return;}
       heading.textContent='留言（'+comments.length+'）';
       const byId=new Map(comments.map(c=>[c.id,c]));
       const children=new Map<string,CommentItem[]>();
@@ -119,7 +124,7 @@ function attachComments() {
           try{
             const url=new URL(item.avatar_url);
             if(url.protocol==='https:' && ['avatars.githubusercontent.com','lh3.googleusercontent.com','lh4.googleusercontent.com','lh5.googleusercontent.com','lh6.googleusercontent.com'].includes(url.hostname)){
-              const avatar=document.createElement('img');avatar.className='site-comment-avatar';avatar.src=url.href;avatar.alt='';avatar.loading='lazy';header.append(avatar);
+              const avatar=document.createElement('img');avatar.className='site-comment-avatar';avatar.src=url.href;avatar.alt='';avatar.width=32;avatar.height=32;avatar.loading='lazy';header.append(avatar);
             }
           }catch{}
         }
