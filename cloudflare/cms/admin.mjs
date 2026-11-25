@@ -233,7 +233,7 @@ nav{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:16px}nav button[aria-curr
 <div class="inbox-heading"><h2>留言管理</h2><button class="secondary" type="button" id="inbox-refresh">重新整理</button></div>
 <div class="inbox-account"><div id="inbox-owner"></div><div class="inbox-owner-actions"><button class="secondary" id="inbox-pair" type="button">連結我的留言帳號</button><button class="ghost hidden" id="inbox-unpair" type="button">解除連結</button></div><a class="hidden" id="inbox-pair-link" target="_blank" rel="noopener noreferrer">開啟帳號連結頁面 ↗</a></div>
 <details class="inbox-notification"><summary>手機通知設定</summary><p>有人留言時傳送文章名稱及網址，不包含訪客的帳號或留言內容。請先設定所選服務的 Cloudflare Secrets。</p>
-<div class="inbox-notification-controls"><select id="inbox-channel" aria-label="通知方式"><option value="off">關閉通知</option><option value="line">LINE</option><option value="discord">Discord</option></select><button type="button" id="inbox-save-channel">儲存</button><button class="secondary" type="button" id="inbox-test-channel">傳送測試通知</button></div><small id="inbox-notification-state"></small>
+<div class="inbox-notification-controls"><select id="inbox-channel" aria-label="通知方式"><option value="off">關閉通知</option><option value="line">LINE</option><option value="discord">Discord</option></select><button type="button" id="inbox-save-channel">儲存</button><button class="secondary" type="button" id="inbox-test-channel">傳送測試通知</button></div><small id="inbox-notification-state"></small><p id="inbox-notification-result" role="status" aria-live="polite" style="overflow-wrap:anywhere"></p>
 <details><summary>所需 Secrets</summary><p>LINE：<code>COMMENT_LINE_ACCESS_TOKEN</code>、<code>COMMENT_LINE_USER_ID</code><br>Discord：<code>COMMENT_DISCORD_WEBHOOK</code></p></details></details>
 <div class="inbox-summary" id="inbox-summary"></div>
 <div class="inbox-layout">
@@ -838,7 +838,7 @@ el('inbox-compose-form').onsubmit=async event=>{
  try{await api('/api/admin/comment-inbox','POST',{kind:doc.kind,slug:doc.slug,body,parent_id:inbox.reply?.id||null});el('inbox-compose-body').value='';clearInboxReply();say('留言已公開');inbox.offset=0;await loadComments();}catch(e){say(e.message,true);}finally{b.disabled=!inbox.owner;}
 };
 el('inbox-save-channel').onclick=async()=>{try{await api('/api/admin/comment-notifications','PUT',{channel:el('inbox-channel').value});say('通知設定已儲存');await loadComments();}catch(e){say(e.message,true);}};
-el('inbox-test-channel').onclick=async()=>{const b=el('inbox-test-channel');b.disabled=true;try{await api('/api/admin/comment-notifications','POST',{});say('測試通知已送出，請確認手機。');}catch(e){say(e.message,true);}finally{b.disabled=false;}};
+el('inbox-test-channel').onclick=async()=>{const b=el('inbox-test-channel'),result=el('inbox-notification-result');b.disabled=true;result.style.color='#b8c7df';result.textContent='正在驗證通知服務並傳送測試訊息…';try{await api('/api/admin/comment-notifications','POST',{});result.style.color='#a7dcaa';result.textContent='測試通知已送出，請確認手機。';say(result.textContent);}catch(e){result.style.color='#ffacac';result.textContent=e.message;say(e.message,true);}finally{b.disabled=false;}};
 el('login-form').addEventListener('submit',async e=>{
  e.preventDefault();
  try{await api('/api/admin/login','POST',{password:el('password').value});el('password').value='';await loggedIn();}

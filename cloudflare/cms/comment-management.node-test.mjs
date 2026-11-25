@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { DatabaseSync } from 'node:sqlite';
 import { readFileSync } from 'node:fs';
 import worker from './worker.mjs';
-import { sendCommentNotification } from './comment-management.mjs';
+import { sendCommentNotification, checkLineRecipient } from './comment-management.mjs';
 import { adminHtml } from './admin.mjs';
 const origin='https://cms.test',secret='test-only-cms-secret';
 function dbFixture(){
@@ -48,7 +48,23 @@ test('notifications only use approved provider destinations and disable Discord 
   await sendCommentNotification({COMMENT_DISCORD_WEBHOOK:'https://discord.com/api/webhooks/123/test-token'},'discord','test');
   assert.equal(JSON.parse(calls[0].init.body).allowed_mentions.parse.length,0);
   await assert.rejects(()=>sendCommentNotification({COMMENT_DISCORD_WEBHOOK:'https://evil.test/api/webhooks/123/test-token'},'discord','test'));
-  await sendCommentNotification({COMMENT_LINE_ACCESS_TOKEN:'test',COMMENT_LINE_USER_ID:'Utest'},'line','test');
-  assert.equal(calls[1].url,'https://api.line.me/v2/bot/message/push');assert.equal(JSON.parse(calls[1].init.body).to,'Utest');
+  await sendCommentNotification({COMMENT_LINE_ACCESS_TOKEN:'test',COMMENT_LINE_USER_ID:'U'+'a'.repeat(32)},'line','test');
+  assert.equal(calls[1].url,'https://api.line.me/v2/bot/message/push');assert.equal(JSON.parse(calls[1].init.body).to,'U'+'a'.repeat(32));
+ }finally{globalThis.fetch=prev;}
+});
+
+test('LINE diagnostics distinguish invalid user IDs, token failures, and recipient lookup failures without revealing credentials',async()=>{
+ const prev=globalThis.fetch,calls=[];
+ const env={COMMENT_LINE_ACCESS_TOKEN:' private-token ',COMMENT_LINE_USER_ID:' U'+'a'.repeat(32)+' '};
+ try{
+  globalThis.fetch=async(url,init)=>{calls.push({url,init});return new Response(null,{status:401});};
+  await assert.rejects(()=>checkLineRecipient(env),/官方帳號驗證（HTTP 401）/);
+  assert.equal(calls.length,1);
+  assert.equal(calls[0].init.headers.Authorization,'Bearer private-token');
+  calls.length=0;
+  await assert.rejects(()=>checkLineRecipient({...env,COMMENT_LINE_USER_ID:'@wrong'}),/User ID 格式錯誤/);
+  assert.equal(calls.length,0);
+  globalThis.fetch=async(url)=>new Response(null,{status:String(url).endsWith('/info')?200:404});
+  await assert.rejects(()=>checkLineRecipient(env),/接收者檢查（HTTP 404）/);
  }finally{globalThis.fetch=prev;}
 });

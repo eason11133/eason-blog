@@ -7,20 +7,57 @@ async function notificationChannel(env){
   const channel=row?.channel||'off';
   return configured(env)[channel]?channel:'off';
 }
+class NotificationError extends Error {}
+function lineCredentials(env){
+  const token=String(env.COMMENT_LINE_ACCESS_TOKEN||'').trim();
+  const userId=String(env.COMMENT_LINE_USER_ID||'').trim();
+  if(!token||!userId)throw new NotificationError('LINE 憑證尚未完整設定');
+  if(!/^U[0-9a-f]{32}$/i.test(userId)||!userId.startsWith('U'))throw new NotificationError('LINE User ID 格式錯誤：須為 U 開頭加 32 個十六進位字元，請複製 Basic settings 的 Your user ID，而非 LINE ID 或 Channel ID');
+  return {token,userId};
+}
+function notificationError(channel,stage,status){
+  const prefix=(channel==='line'?'LINE':'Discord')+' '+stage+'（HTTP '+status+'）：';
+  if(channel==='line'){
+    if(status===401)return new NotificationError(prefix+'Channel access token 無效或已失效，請確認不是 Channel secret，並確認是 Eason Blog 的 token。');
+    if(status===403)return new NotificationError(prefix+'官方帳號或 token 沒有執行此操作的權限。');
+    if(status===404&&stage==='接收者檢查')return new NotificationError(prefix+'找不到接收者。確認 Your user ID 來自同一個 Provider，且已加入此官方帳號好友、沒有封鎖，並允許個人資料存取。');
+    if(status===400)return new NotificationError(prefix+'LINE 拒絕了請求，請確認接收者 ID 與官方帳號設定。');
+    if(status===429)return new NotificationError(prefix+'已達發送額度或頻率限制，請檢查官方帳號的訊息用量。');
+  }
+  return new NotificationError(prefix+'服務拒絕請求，請檢查通知服務設定。');
+}
+async function notificationFetch(target,init,channel,stage){
+  const controller=new AbortController();
+  const timer=setTimeout(()=>controller.abort(),10000);
+  try{
+    const res=await fetch(target,{...init,redirect:'error',signal:controller.signal});
+    if(!res.ok)throw notificationError(channel,stage,res.status);
+    return res;
+  }catch(error){
+    if(error instanceof NotificationError)throw error;
+    throw new NotificationError((channel==='line'?'LINE':'Discord')+' '+stage+'：'+(controller.signal.aborted?'請求逾時':'連線失敗，未取得 HTTP 回應')+'。');
+  }finally{clearTimeout(timer);}
+}
+export async function checkLineRecipient(env){
+  const {token,userId}=lineCredentials(env);
+  const headers={Authorization:'Bearer '+token};
+  await notificationFetch('https://api.line.me/v2/bot/info',{method:'GET',headers},'line','官方帳號驗證');
+  await notificationFetch('https://api.line.me/v2/bot/profile/'+encodeURIComponent(userId),{method:'GET',headers},'line','接收者檢查');
+}
 export async function sendCommentNotification(env,channel,message){
   let target,headers={'Content-Type':'application/json'},body;
   if(channel==='line'&&configured(env).line){
     target='https://api.line.me/v2/bot/message/push';
-    headers.Authorization='Bearer '+env.COMMENT_LINE_ACCESS_TOKEN;
-    body={to:env.COMMENT_LINE_USER_ID,messages:[{type:'text',text:message}]};
+    const {token,userId}=lineCredentials(env);
+    headers.Authorization='Bearer '+token;
+    body={to:userId,messages:[{type:'text',text:message}]};
   }else if(channel==='discord'&&configured(env).discord){
     const url=new URL(env.COMMENT_DISCORD_WEBHOOK);
     if(url.protocol!=='https:'||url.hostname!=='discord.com'||url.username||url.password||!/^\/api\/webhooks\/\d+\/[A-Za-z0-9_-]+$/.test(url.pathname))throw Error('Invalid Discord webhook');
     url.search='?wait=true';url.hash='';target=url.href;
     body={content:message,allowed_mentions:{parse:[]},flags:4};
   }else throw Error('Notification not configured');
-  const res=await fetch(target,{method:'POST',headers,body:JSON.stringify(body),redirect:'error',signal:AbortSignal.timeout(10000)});
-  if(!res.ok)throw Error('Notification HTTP '+res.status);
+  await notificationFetch(target,{method:'POST',headers,body:JSON.stringify(body)},channel,'推播');
 }
 async function setNotification(env,id,status){
   await env.DB.prepare('UPDATE comments SET notification_status=? WHERE id=?').bind(status,id).run();
@@ -114,8 +151,10 @@ export async function handleCommentManagement(req,env,url,path,method,h){
      if(!comment||!['failed','pending'].includes(comment.notification_status))return fail('此留言無需重送',409);
      return await deliver(env,comment,channel)?json({ok:true}):fail('通知傳送失敗，請確認憑證與接收端',502);
    }
-   try{await sendCommentNotification(env,channel,'Eason Blog 留言通知測試成功');return json({ok:true});}
-   catch{return fail('通知傳送失敗，請確認憑證與接收端',502);}
+   try{
+     if(channel==='line')await checkLineRecipient(env);
+     await sendCommentNotification(env,channel,'Eason Blog 留言通知測試成功');return json({ok:true});
+   }catch(error){return fail(error instanceof NotificationError?error.message:'通知傳送失敗，請確認憑證與接收端',502);}
  }
  return null;
 }
