@@ -6,10 +6,10 @@ const { kind, slug } = Astro.props;
   <h2 id="site-comments-title">留言</h2>
   <div class="site-comments-list" aria-live="polite">正在讀取留言…</div>
   <div class="site-comment-login">
-    <p>登入後就可以直接留言。</p>
+    <p>登入留言</p>
     <div class="site-login-actions">
-      <a class="site-login-github" data-provider="github" href="/api/auth/github">使用 GitHub 登入</a>
-      <a class="site-login-google" data-provider="google" href="/api/auth/google">使用 Google 登入</a>
+      <a class="site-login-github" data-provider="github" href="/api/auth/github" aria-label="使用 GitHub 登入"><svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18" fill="currentColor"><path d="M12 .75a11.25 11.25 0 0 0-3.56 21.92c.56.1.77-.24.77-.54v-2.1c-3.13.68-3.79-1.33-3.79-1.33-.51-1.3-1.25-1.65-1.25-1.65-1.02-.7.08-.69.08-.69 1.13.08 1.72 1.16 1.72 1.16 1 .1.65 2.22 3.26 1.58.1-.73.39-1.23.71-1.51-2.5-.28-5.13-1.25-5.13-5.56 0-1.23.44-2.23 1.16-3.02-.12-.28-.5-1.43.11-2.98 0 0 .95-.3 3.09 1.15a10.7 10.7 0 0 1 5.62 0c2.14-1.45 3.08-1.15 3.08-1.15.62 1.55.23 2.7.12 2.98.72.79 1.15 1.79 1.15 3.02 0 4.32-2.63 5.27-5.14 5.55.4.35.76 1.03.76 2.08v3.09c0 .3.2.65.77.54A11.25 11.25 0 0 0 12 .75Z"/></svg><span>GitHub</span></a>
+      <a class="site-login-google" data-provider="google" href="/api/auth/google" aria-label="使用 Google 登入"><svg aria-hidden="true" viewBox="0 0 48 48" width="18" height="18"><path fill="#4285F4" d="M43.6 24.46c0-1.36-.12-2.66-.35-3.92H24v7.43h11a9.4 9.4 0 0 1-4.08 6.17v5h6.59c3.85-3.55 6.09-8.78 6.09-14.68Z"/><path fill="#34A853" d="M24 44c5.51 0 10.13-1.83 13.51-4.86l-6.59-5c-1.83 1.23-4.16 1.96-6.92 1.96-5.31 0-9.81-3.58-11.42-8.39H5.79v5.15A20 20 0 0 0 24 44Z"/><path fill="#FBBC05" d="M12.58 27.71a12 12 0 0 1 0-7.42v-5.15H5.79a20 20 0 0 0 0 17.72l6.79-5.15Z"/><path fill="#EA4335" d="M24 11.9c3 0 5.69 1.03 7.8 3.05l5.85-5.85C34.12 5.82 29.5 4 24 4A20 20 0 0 0 5.79 15.14l6.79 5.15C14.19 15.48 18.69 11.9 24 11.9Z"/></svg><span>Google</span></a>
     </div>
   </div>
   <div class="site-comment-account" hidden>
@@ -49,11 +49,14 @@ const { kind, slug } = Astro.props;
 .site-comments-list :global(.site-comment-body){white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.8;color:#e7effa;margin:.55rem 0}
 .site-comments-list :global(.site-comment-children){margin-top:.5rem;min-width:0}
 .site-comments-list :global(.site-comment-children > .site-comment:last-child){border-bottom:0}
-.site-comment-login{display:grid;gap:.75rem;margin-bottom:1.1rem}
-.site-comment-login p{margin:0;color:#a7b9d3;font-size:.9rem}
-.site-login-actions{display:flex;flex-wrap:wrap;gap:.7rem}
-.site-login-actions a,.site-comments-actions button{display:inline-flex;align-items:center;justify-content:center;font:inherit;font-size:.9rem;text-decoration:none;border:1px solid rgba(158,186,221,.3);border-radius:9px;padding:.65rem 1.1rem;background:rgba(29,66,108,.42);color:#e7effa;cursor:pointer}
-.site-login-actions a:hover,.site-comments-actions button:hover{background:rgba(55,96,140,.65)}
+.site-comment-login{display:flex;align-items:center;flex-wrap:wrap;gap:.8rem 1rem;margin-bottom:1.1rem}
+.site-comment-login p{margin:0;color:#a7b9d3;font-size:.86rem}
+.site-login-actions{display:flex;flex-wrap:wrap;gap:.45rem}
+.site-login-actions a{display:inline-flex;align-items:center;justify-content:center;gap:.45rem;font:inherit;font-size:.84rem;font-weight:550;text-decoration:none;border:0;border-radius:8px;padding:.48rem .65rem;background:transparent;color:#e7effa;cursor:pointer;transition:background .2s,color .2s}
+.site-login-actions a svg{flex:none}
+.site-login-actions a:hover,.site-login-actions a:focus-visible{background:rgba(158,186,221,.14);color:#fff}
+.site-comments-actions button{display:inline-flex;align-items:center;justify-content:center;font:inherit;font-size:.9rem;text-decoration:none;border:1px solid rgba(158,186,221,.3);border-radius:9px;padding:.65rem 1.1rem;background:rgba(29,66,108,.42);color:#e7effa;cursor:pointer}
+.site-comments-actions button:hover{background:rgba(55,96,140,.65)}
 .site-comment-account{display:flex;align-items:center;gap:.65rem;margin-bottom:1rem;color:#e7effa}
 .site-comment-logout,.site-comment-reply-cancel,.site-comments-list :global(.site-comment-reply-button){border:0;background:none;padding:.25rem;color:#a7b9d3;font:inherit;font-size:.8rem;cursor:pointer}
 .site-comment-logout:hover,.site-comment-reply-cancel:hover,.site-comments-list :global(.site-comment-reply-button:hover){color:#fff;text-decoration:underline}
@@ -184,7 +187,7 @@ function attachComments() {
     try{
       const response=await fetch('/api/auth/logout',{method:'POST',headers:{Origin:location.origin}});
       if(!response.ok)throw Error('登出失敗');
-      visitor=null;clearReply();authStatus.textContent='已登出。';await loadUser();
+      visitor=null;clearReply();authStatus.textContent='';await loadUser();
     }catch(e){authStatus.textContent=e instanceof Error?e.message:'登出失敗';}
   });
   form.addEventListener('submit',async event=>{

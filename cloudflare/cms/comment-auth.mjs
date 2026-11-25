@@ -29,6 +29,7 @@ function cookie(req,name) {
   return raw.split(';').map(v=>v.trim()).find(v=>v.startsWith(name+'='))?.slice(name.length+1) || '';
 }
 function safeReturn(path) {
+  if(path==='/comment-account/')return path;
   return typeof path==='string' && path.length<260 && /^\/(blog|experience)\/[^\s?#]+$/.test(path) && !path.includes('//')
     ? path : '/blog/';
 }

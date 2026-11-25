@@ -1,6 +1,7 @@
 import { adminHtml } from './admin.mjs';
 import { commentUser, handleCommentAuth } from './comment-auth.mjs';
 import { handleViews } from './views.mjs';
+import { handleCommentManagement, notifyVisitorComment } from './comment-management.mjs';
 import { normalizeDocument, publicDocument, validSlug, safeText, safeJsonParse, normalizeFooterLinks } from './utils.mjs';
 
 const encoder = new TextEncoder();
@@ -117,7 +118,7 @@ async function listDocs(db, kind, admin) {
   const out = await db.prepare(sql).bind(kind).all();
   return (out.results || []).map(publicDocument);
 }
-async function handle(req,env) {
+async function handle(req,env,ctx) {
   const url=new URL(req.url), path=url.pathname, method=req.method.toUpperCase();
   if (method==='GET' && path==='/health') return json({ok:true,service:'eason-blog-cms',storage:'D1'});
   if (method==='GET' && (path==='/admin' || path==='/admin/')) return new Response(adminHtml,{
@@ -147,6 +148,10 @@ async function handle(req,env) {
 
   if (path==='/api/views') return handleViews(req,env,url);
 
+  if(path==='/api/comment-owner/link'){
+    const result=await handleCommentManagement(req,env,url,path,method,{json,fail,jsonBody,signToken,commentUser,safeText,validSlug});
+    if(result)return result;
+  }
   if (method==='GET' && path==='/api/comments') {
     const kind=url.searchParams.get('kind') || 'post', slug=url.searchParams.get('slug');
     if (!['post','work'].includes(kind) || !validSlug(slug)) return fail('Invalid article');
@@ -169,8 +174,13 @@ async function handle(req,env) {
       const parentRow=await env.DB.prepare('SELECT id FROM comments WHERE id=? AND kind=? AND slug=? AND status=?').bind(parent,kind,slug,'approved').first();
       if(!parentRow) return fail('Invalid parent comment');
     }
+    const id=crypto.randomUUID();
     await env.DB.prepare('INSERT INTO comments(id,kind,slug,parent_id,nickname,body,status,created,auth_provider,auth_user_id,avatar_url) VALUES(?,?,?,?,?,?,?,?,?,?,?)')
-      .bind(crypto.randomUUID(),kind,slug,parent,nickname,body,'approved',new Date().toISOString(),user.provider,user.id,user.avatar).run();
+      .bind(id,kind,slug,parent,nickname,body,'approved',new Date().toISOString(),user.provider,user.id,user.avatar).run();
+    if(env.COMMENT_DISCORD_WEBHOOK || (env.COMMENT_LINE_ACCESS_TOKEN && env.COMMENT_LINE_USER_ID)){
+      const task=(async()=>{const doc=await env.DB.prepare('SELECT title FROM documents WHERE kind=? AND slug=?').bind(kind,slug).first();await notifyVisitorComment(env,{id,kind,slug,user,title:doc?.title||slug});})().catch(()=>{});
+      if(ctx?.waitUntil)ctx.waitUntil(task);else await task;
+    }
     return json({ok:true,status:'approved'},201);
   }
 
@@ -233,6 +243,10 @@ async function handle(req,env) {
   if(!env.CMS_SESSION_SECRET)return fail('Auth not configured',503);
   if(!await authenticate(req,env))return fail('Login required',401);
   if(method==='GET' && path==='/api/admin/me')return json({authenticated:true});
+  if(path.startsWith('/api/admin/comment-')){
+    const result=await handleCommentManagement(req,env,url,path,method,{json,fail,jsonBody,signToken,commentUser,safeText,validSlug});
+    if(result)return result;
+  }
   if (method==='GET' && path==='/api/admin/footer-links') return json(await getFooterLinks(env.DB));
   if (method==='PUT' && path==='/api/admin/footer-links') {
     const links = normalizeFooterLinks(await jsonBody(req,10000));
@@ -322,8 +336,8 @@ async function handle(req,env) {
   return fail('Not found',404);
 }
 export default {
-  async fetch(request,env) {
-    try { return await handle(request,env); }
+  async fetch(request,env,ctx) {
+    try { return await handle(request,env,ctx); }
     catch(err) { console.error('CMS request failed',err instanceof Error ? err.name : 'unknown'); return fail('Server error',500); }
   },
 };

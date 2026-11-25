@@ -1,0 +1,46 @@
+---
+import PageShell from '../layouts/PageShell.astro';
+export const prerender=import.meta.env.PUBLIC_EASON_LIVE!=='true';
+---
+<PageShell title="連結站長留言帳號" description="站長留言帳號連結" noindex={true}>
+  <main class="owner-connect">
+    <h1>連結站長留言帳號</h1>
+    <p>此頁只用來把你的前台登入身分連結到已登入的管理後台，不會授予網站管理權限。</p>
+    <div id="owner-connect-login" hidden>
+      <a href="/api/auth/github?return=%2Fcomment-account%2F" data-astro-reload data-provider="github">GitHub 登入</a>
+      <a href="/api/auth/google?return=%2Fcomment-account%2F" data-astro-reload data-provider="google">Google 登入</a>
+    </div>
+    <div id="owner-connect-user" hidden><p id="owner-connect-name"></p><button id="owner-connect-confirm" type="button">確認連結這個帳號</button><button id="owner-connect-switch" type="button">切換帳號</button></div>
+    <p id="owner-connect-status" role="status" aria-live="polite">正在確認登入狀態…</p>
+  </main>
+</PageShell>
+<style>
+.owner-connect{max-width:620px;width:calc(100% - 40px);margin:120px auto 40px;min-height:280px;color:#e7effa}
+.owner-connect h1{font-size:1.6rem;margin:0 0 1rem}
+.owner-connect p{line-height:1.7;color:#b7c8df}
+.owner-connect :is(a,button){display:inline-flex;align-items:center;padding:.55rem .85rem;margin:0 .5rem .5rem 0;border:1px solid rgba(158,186,221,.3);border-radius:8px;color:#e7effa;background:rgba(29,66,108,.25);font:inherit;text-decoration:none;cursor:pointer}
+.owner-connect [hidden]{display:none!important}
+</style>
+<script>
+function setup(){
+ const root=document.querySelector<HTMLElement>('.owner-connect');if(!root||root.dataset.ready)return;root.dataset.ready='1';
+ const login=document.getElementById('owner-connect-login')!,account=document.getElementById('owner-connect-user')!,status=document.getElementById('owner-connect-status')!,name=document.getElementById('owner-connect-name')!;
+ const key='eason-owner-pair';
+ const hash=location.hash.slice(1);if(/^[a-f0-9-]{36}$/.test(hash)){sessionStorage.setItem(key,hash);history.replaceState(null,'',location.pathname+location.search);}
+ const code=sessionStorage.getItem(key);
+ if(!code){status.textContent='請從管理後台的留言管理開啟此頁。';return;}
+ async function load(){
+  try{const r=await fetch('/api/auth/me',{cache:'no-store'});if(!r.ok)throw Error('登入服務暫時無法使用');
+   const data=await r.json();login.hidden=!!data.user;account.hidden=!data.user;
+   login.querySelectorAll<HTMLAnchorElement>('[data-provider]').forEach(a=>a.hidden=!data.providers?.[a.dataset.provider||'']);
+   name.textContent=data.user?'目前登入：'+data.user.name+'（'+data.user.provider+'）':'';
+   status.textContent=data.user?'確認是自己的帳號再連結。':'請先登入要使用的帳號。';
+  }catch(e){status.textContent=e instanceof Error?e.message:'登入服務無法使用';}
+ }
+ const confirm=document.getElementById('owner-connect-confirm') as HTMLButtonElement;
+ confirm.onclick=async()=>{confirm.disabled=true;try{const r=await fetch('/api/comment-owner-link',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({code})});const d=await r.json();if(!r.ok)throw Error(d.error||'連結失敗');sessionStorage.removeItem(key);account.hidden=true;status.textContent='已連結成功，可以關閉此分頁並回到管理後台。';}catch(e){status.textContent=e instanceof Error?e.message:'連結失敗';confirm.disabled=false;}};
+ (document.getElementById('owner-connect-switch') as HTMLButtonElement).onclick=async()=>{try{const r=await fetch('/api/auth/logout',{method:'POST'});if(!r.ok)throw Error('登出失敗');await load();}catch(e){status.textContent=e instanceof Error?e.message:'登出失敗';}};
+ load();
+}
+setup();document.addEventListener('astro:page-load',setup);
+</script>
