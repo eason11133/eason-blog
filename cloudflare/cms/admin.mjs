@@ -86,6 +86,17 @@ nav{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:16px}nav button[aria-curr
 .editor-actions{display:flex;gap:10px;align-items:center;margin-top:20px}
 .comment{border-bottom:1px solid #36445a;padding:14px 0}.comment:last-child{border:0}
 .comment p{white-space:pre-wrap;color:#e0e7f1}.actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.inbox-heading,.inbox-account,.inbox-owner-actions,.inbox-notification-controls,.inbox-compose-actions,.inbox-toolbar,.inbox-pagination{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.inbox-heading{justify-content:space-between;margin-bottom:12px}.inbox-heading h2{margin:0}
+.inbox-account{justify-content:space-between;padding:12px 0 16px;border-bottom:1px solid #39485e}.inbox-account a{color:#9accff}.inbox-person{display:flex;align-items:center;gap:10px;min-width:0}.inbox-person small{display:block}.inbox-avatar{width:38px;height:38px;flex:none;object-fit:cover;border-radius:50%;background:#34465f;display:grid;place-items:center;color:#c6d4e7;font-size:.85rem}
+.inbox-notification{padding:14px 0;border-bottom:1px solid #39485e;color:#b8c7df}.inbox-notification summary{cursor:pointer}.inbox-notification p{font-size:.9rem;margin:.6rem 0}.inbox-notification select{width:auto;min-width:140px}.inbox-notification small{display:block;margin:8px 0}.inbox-notification code{overflow-wrap:anywhere}
+.inbox-summary{display:flex;gap:24px;flex-wrap:wrap;padding:20px 0;color:#aebfd5;font-size:.88rem}.inbox-summary strong{font-size:1.3rem;color:#edf3fc;margin-right:5px}
+.inbox-layout{display:grid;grid-template-columns:minmax(190px,260px) minmax(0,1fr);gap:22px}.inbox-sidebar{border-right:1px solid #39485e;padding-right:16px;min-width:0}.inbox-sidebar input{margin-bottom:10px}.inbox-main{min-width:0}
+#inbox-articles{max-height:680px;overflow:auto;display:grid;gap:4px}.inbox-article{display:flex;gap:9px;text-align:left;justify-content:space-between;align-items:center;background:transparent;border:0;color:#c7d5e8;font-size:.87rem;border-radius:7px;padding:10px 8px;width:100%}.inbox-article span{overflow-wrap:anywhere;min-width:0}.inbox-article small{white-space:nowrap}.inbox-article[aria-current="true"]{background:#304563;color:white}.inbox-article:hover{background:#26374c}
+.inbox-toolbar{margin:0 0 14px}.inbox-toolbar select{width:auto;min-width:135px}.inbox-toolbar input{flex:1;min-width:150px}
+.inbox-compose{padding:14px;border:1px solid #39485e;border-radius:10px;margin-bottom:12px}.inbox-compose select,.inbox-compose textarea{margin-bottom:9px}.inbox-compose-actions{justify-content:space-between}.inbox-compose-actions button{padding:8px 14px}#inbox-reply-target{display:flex;align-items:center;justify-content:space-between;color:#9accff;font-size:.88rem;gap:6px;margin-bottom:8px}#inbox-reply-target button{padding:4px 8px}
+.inbox-comment{padding:16px 0;border-bottom:1px solid #39485e;min-width:0}.inbox-comment:last-child{border-bottom:0}.inbox-comment-head{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}.inbox-comment-meta{display:flex;gap:8px;align-items:center;flex-wrap:wrap;font-size:.78rem;color:#a7bad3}.inbox-unread{color:#9accff}.inbox-comment-article{display:block;color:#a8c7e9;font-size:.84rem;margin:10px 0;overflow-wrap:anywhere;text-decoration:none}.inbox-comment-article:hover{text-decoration:underline}.inbox-comment p{white-space:pre-wrap;overflow-wrap:anywhere;margin:9px 0;color:#e0e7f1}.inbox-parent{border-left:2px solid #52667e;padding:6px 10px;color:#a7bad3;font-size:.82rem;overflow-wrap:anywhere}.inbox-comment .actions button{padding:6px 10px;font-size:.82rem}.inbox-pagination{justify-content:flex-end;margin-top:12px}.inbox-pagination button{padding:6px 10px;font-size:.85rem}
+@media(max-width:720px){.inbox-layout{grid-template-columns:1fr}.inbox-sidebar{border:0;border-bottom:1px solid #39485e;padding:0 0 10px}#inbox-articles{max-height:200px}.inbox-summary{gap:14px}}
 .about-form-section{padding:18px 0;border-bottom:1px solid #39485e}
 .about-form-section h3{margin:0 0 14px;font-size:1.04rem}
 .about-repeat-row{padding:12px 14px;margin:8px 0;border:1px solid #39485e;border-radius:9px}
@@ -118,7 +129,7 @@ nav{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:16px}nav button[aria-curr
 <button type="button" class="secondary" data-tab="about">關於我</button>
 <button type="button" class="secondary" data-tab="friends">友站</button>
 <button type="button" class="secondary" data-tab="footer">頁尾連結</button>
-<button type="button" class="secondary" data-tab="comments">留言審核</button>
+<button type="button" class="secondary" data-tab="comments">留言管理</button>
 </nav>
 <section id="documents" class="card">
 <div class="two"><div><label for="documents-list">選擇已有內容</label><select id="documents-list"></select></div><div style="display:flex;align-items:end"><button class="secondary" id="new-doc" type="button">新增一篇</button></div></div>
@@ -218,7 +229,21 @@ nav{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:16px}nav button[aria-curr
 <div class="editor-actions"><button id="save-footer" type="submit" disabled>儲存頁尾連結到 D1</button></div>
 </form>
 </section>
-<section id="comments-panel" class="card hidden"><h2>留言管理</h2><p>GitHub／Google 登入的訪客留言會直接公開。你可以隱藏或恢復留言；舊版待審留言仍可個別核准。</p><div id="comments-list"></div></section>
+<section id="comments-panel" class="card hidden">
+<div class="inbox-heading"><h2>留言管理</h2><button class="secondary" type="button" id="inbox-refresh">重新整理</button></div>
+<div class="inbox-account"><div id="inbox-owner"></div><div class="inbox-owner-actions"><button class="secondary" id="inbox-pair" type="button">連結我的留言帳號</button><button class="ghost hidden" id="inbox-unpair" type="button">解除連結</button></div><a class="hidden" id="inbox-pair-link" target="_blank" rel="noopener noreferrer">開啟帳號連結頁面 ↗</a></div>
+<details class="inbox-notification"><summary>手機通知設定</summary><p>有人留言時傳送文章名稱及網址，不包含訪客的帳號或留言內容。請先設定所選服務的 Cloudflare Secrets。</p>
+<div class="inbox-notification-controls"><select id="inbox-channel" aria-label="通知方式"><option value="off">關閉通知</option><option value="line">LINE</option><option value="discord">Discord</option></select><button type="button" id="inbox-save-channel">儲存</button><button class="secondary" type="button" id="inbox-test-channel">傳送測試通知</button></div><small id="inbox-notification-state"></small>
+<details><summary>所需 Secrets</summary><p>LINE：<code>COMMENT_LINE_ACCESS_TOKEN</code>、<code>COMMENT_LINE_USER_ID</code><br>Discord：<code>COMMENT_DISCORD_WEBHOOK</code></p></details></details>
+<div class="inbox-summary" id="inbox-summary"></div>
+<div class="inbox-layout">
+<aside class="inbox-sidebar"><label for="inbox-article-search">文章／作品</label><input id="inbox-article-search" placeholder="搜尋文章名稱"><div id="inbox-articles"></div></aside>
+<div class="inbox-main">
+<div class="inbox-toolbar"><select id="inbox-status" aria-label="留言篩選"><option value="">全部留言</option><option value="unread">未讀</option><option value="unanswered">未回覆</option><option value="approved">已公開</option><option value="hidden">已隱藏</option><option value="pending">待審核</option></select><input id="inbox-search" placeholder="搜尋作者、留言或文章"></div>
+<div class="inbox-compose"><form id="inbox-compose-form"><label for="inbox-compose-article">以我的帳號留言</label><select id="inbox-compose-article" required></select><div class="hidden" id="inbox-reply-target"><span id="inbox-reply-label"></span><button class="ghost" id="inbox-reply-cancel" type="button">取消回覆</button></div><textarea id="inbox-compose-body" maxlength="1600" minlength="2" rows="3" placeholder="寫下留言或回覆…" required></textarea><div class="inbox-compose-actions"><small id="inbox-compose-help">先連結自己的留言帳號</small><button id="inbox-compose-send" type="submit" disabled>送出留言</button></div></form></div>
+<div id="comments-list" aria-live="polite"></div>
+<div class="inbox-pagination"><button class="secondary" id="inbox-prev" type="button">上一頁</button><span id="inbox-page"></span><button class="secondary" id="inbox-next" type="button">下一頁</button></div>
+</div></div></section>
 </section>
 </main>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
@@ -698,23 +723,122 @@ async function loadSettings(){
  const tagInput=document.createElement('textarea');tagInput.id='setting-tags';tagInput.rows=5;
  tagInput.value=(data.status_tags||[]).map(t=>(t.text||'')+','+(t.style||'admissions')).join(String.fromCharCode(10));target.appendChild(tagInput);
 }
-async function loadComments(){
- const data=await api('/api/admin/comments');const target=el('comments-list');target.replaceChildren();
- for(const c of (data.comments||[])){
-  const box=document.createElement('div');box.className='comment';
-  const title=document.createElement('strong');title.textContent='['+({pending:'待審',approved:'公開',hidden:'已隱藏'}[c.status]||c.status)+'] '+c.nickname+(c.auth_provider?' ('+c.auth_provider+')':'')+' · '+c.kind+'/'+c.slug;
-  const msg=document.createElement('p');msg.textContent=c.body;
-  const actions=document.createElement('div');actions.className='actions';
-  for(const status of ['approved','hidden']){
-   const b=document.createElement('button');b.type='button';b.className='secondary';b.textContent=status==='approved'?(c.status==='pending'?'核准':'恢復公開'):'隱藏';
-   b.disabled=c.status===status;
-   b.onclick=async()=>{try{await api('/api/admin/comments','PUT',{id:c.id,status});say('留言狀態已更新');loadComments();}catch(e){say(e.message,true);}};
-   actions.appendChild(b);
+const inbox={kind:'',slug:'',offset:0,docs:[],owner:null,reply:null,seq:0,hasMore:false,notifications:null};
+const inboxNode=(tag,text,cls)=>{const n=document.createElement(tag);if(text!==undefined)n.textContent=text;if(cls)n.className=cls;return n;};
+const inboxKey=d=>d.kind+'/'+d.slug;
+const inboxDocLabel=d=>(d.kind==='work'?'作品':'文章')+' · '+(d.title||d.slug)+(Number(d.draft)?'（草稿）':'');
+const inboxDate=value=>{const date=new Date(value);return Number.isFinite(date.getTime())?date.toLocaleString('zh-TW',{timeZone:'Asia/Taipei',hour12:false}):'';};
+function inboxAvatar(name,url){
+ const fallback=inboxNode('span',(name||'訪客').slice(0,1),'inbox-avatar');
+ try{
+  const parsed=new URL(url);
+  if(parsed.protocol==='https:'&&['avatars.githubusercontent.com','lh3.googleusercontent.com','lh4.googleusercontent.com','lh5.googleusercontent.com','lh6.googleusercontent.com'].includes(parsed.hostname)){
+   const img=inboxNode('img',undefined,'inbox-avatar');img.src=parsed.href;img.alt='';img.width=38;img.height=38;img.referrerPolicy='no-referrer';img.onerror=()=>img.replaceWith(fallback);return img;
   }
-  box.append(title,msg,actions);target.appendChild(box);
- }
- if(!target.children.length)target.textContent='目前沒有留言。';
+ }catch{}
+ return fallback;
 }
+function renderInboxOwner(){
+ const target=el('inbox-owner');target.replaceChildren();
+ const owner=inbox.owner;
+ if(owner){
+  const person=inboxNode('div',undefined,'inbox-person'),info=inboxNode('div');
+  info.append(inboxNode('strong',owner.name),inboxNode('small','已連結 '+(owner.provider==='github'?'GitHub':'Google')+' · 後台留言使用此身分'));
+  person.append(inboxAvatar(owner.name,owner.avatar),info);target.append(person);
+ }else target.append(inboxNode('strong','尚未連結站長留言帳號'),inboxNode('p','連結後即可在後台直接留言、回覆。'));
+ el('inbox-pair').textContent=owner?'切換留言帳號':'連結我的留言帳號';
+ el('inbox-unpair').classList.toggle('hidden',!owner);
+ el('inbox-compose-send').disabled=!owner;
+ el('inbox-compose-help').textContent=owner?'以 '+owner.name+' 的身分公開留言':'先連結自己的留言帳號';
+}
+function renderInboxArticles(){
+ const target=el('inbox-articles');target.replaceChildren();
+ const query=el('inbox-article-search').value.trim().toLowerCase();
+ const items=[{kind:'',slug:'',title:'全部文章與作品',total:inbox.docs.reduce((n,d)=>n+Number(d.total||0),0),unread:inbox.docs.reduce((n,d)=>n+Number(d.unread||0),0)},...inbox.docs.filter(d=>inboxDocLabel(d).toLowerCase().includes(query))];
+ for(const d of items){
+  const b=inboxNode('button',undefined,'inbox-article');b.type='button';b.setAttribute('aria-current',String(inbox.kind===d.kind&&inbox.slug===d.slug));
+  b.append(inboxNode('span',d.kind?inboxDocLabel(d):d.title),inboxNode('small',(Number(d.unread)>0?d.unread+' 未讀 · ':'')+d.total));
+  b.onclick=()=>{inbox.kind=d.kind;inbox.slug=d.slug;inbox.offset=0;if(d.kind&&!Number(d.draft)&&!inbox.reply)el('inbox-compose-article').value=inboxKey(d);loadComments().catch(e=>say(e.message,true));};target.append(b);
+ }
+}
+function renderInboxCompose(){
+ const select=el('inbox-compose-article'),previous=select.value;
+ select.replaceChildren(new Option('選擇要留言的文章／作品',''));
+ for(const d of inbox.docs.filter(d=>!Number(d.draft)))select.append(new Option(inboxDocLabel(d),inboxKey(d)));
+ select.value=inbox.reply?inbox.reply.kind+'/'+inbox.reply.slug:previous||((inbox.kind&&inbox.slug)?inbox.kind+'/'+inbox.slug:'');
+ if(select.selectedIndex<0)select.value='';
+ select.disabled=!!inbox.reply;
+ el('inbox-reply-target').classList.toggle('hidden',!inbox.reply);
+ el('inbox-reply-label').textContent=inbox.reply?'回覆 '+inbox.reply.nickname:'';
+ el('inbox-compose-send').textContent=inbox.reply?'送出回覆':'送出留言';
+}
+function clearInboxReply(){inbox.reply=null;renderInboxCompose();}
+function renderInboxComments(comments){
+ const target=el('comments-list');target.replaceChildren();
+ if(!comments.length){target.append(inboxNode('p','沒有符合條件的留言。'));return;}
+ for(const c of comments){
+  const box=inboxNode('article',undefined,'inbox-comment');
+  const head=inboxNode('div',undefined,'inbox-comment-head'),person=inboxNode('div',undefined,'inbox-person'),info=inboxNode('div');
+  const isOwner=inbox.owner&&inbox.owner.provider===c.auth_provider&&inbox.owner.id===c.auth_user_id;
+  info.append(inboxNode('strong',c.nickname||'訪客'),inboxNode('small',(c.auth_provider==='github'?'GitHub':c.auth_provider==='google'?'Google':'訪客')+(isOwner?' · 站長':'')));
+  person.append(inboxAvatar(c.nickname,c.avatar_url),info);
+  const meta=inboxNode('div',undefined,'inbox-comment-meta');
+  if(!c.read_at)meta.append(inboxNode('span','● 未讀','inbox-unread'));
+  meta.append(inboxNode('span',({approved:'公開',pending:'待審核',hidden:'已隱藏'}[c.status]||c.status)),inboxNode('span',inboxDate(c.created)));
+  if(c.answered)meta.append(inboxNode('span','已回覆'));
+  head.append(person,meta);box.append(head);
+  const article=inboxNode('a',(c.kind==='work'?'作品':'文章')+' · '+(c.article_title||c.slug)+' ↗','inbox-comment-article');
+  article.href='https://eason-blog-web-live.eason456h.workers.dev'+(c.kind==='work'?'/experience/':'/blog/')+encodeURIComponent(c.slug)+'/';article.target='_blank';article.rel='noopener noreferrer';box.append(article);
+  if(c.parent_id){const parent=inboxNode('div','回覆 '+(c.parent_name||'原留言')+'：'+String(c.parent_body||'').slice(0,160),'inbox-parent');box.append(parent);}
+  box.append(inboxNode('p',c.body||''));
+  const actions=inboxNode('div',undefined,'actions');
+  const action=(label,handler,disabled=false)=>{const b=inboxNode('button',label,'secondary');b.type='button';b.disabled=disabled;b.onclick=async()=>{try{b.disabled=true;await handler();}catch(e){say(e.message,true);}finally{b.disabled=disabled;}};actions.append(b);};
+  action('回覆',()=>{inbox.reply=c;renderInboxCompose();el('inbox-compose-body').focus();},!inbox.owner||c.status!=='approved'||!inbox.docs.some(d=>d.kind===c.kind&&d.slug===c.slug&&!Number(d.draft)));
+  action(c.read_at?'標為未讀':'標為已讀',async()=>{await api('/api/admin/comment-inbox','PUT',{id:c.id,action:c.read_at?'unread':'read'});await loadComments();});
+  action(c.status==='approved'?'隱藏':c.status==='pending'?'核准公開':'恢復公開',async()=>{await api('/api/admin/comment-inbox','PUT',{id:c.id,action:c.status==='approved'?'hidden':'approved'});await loadComments();});
+  if(['failed','pending'].includes(c.notification_status))action('重送通知',async()=>{await api('/api/admin/comment-notifications','POST',{id:c.id});say('通知已送出');await loadComments();});
+  box.append(actions);target.append(box);
+ }
+}
+async function loadComments(){
+ const seq=++inbox.seq,params=new URLSearchParams({offset:String(inbox.offset)});
+ if(inbox.kind){params.set('kind',inbox.kind);params.set('slug',inbox.slug);}
+ if(el('inbox-status').value)params.set('status',el('inbox-status').value);
+ if(el('inbox-search').value.trim())params.set('q',el('inbox-search').value.trim());
+ const data=await api('/api/admin/comment-inbox?'+params);
+ if(seq!==inbox.seq||tab!=='comments')return;
+ inbox.docs=data.documents||[];inbox.owner=data.owner||null;inbox.hasMore=!!data.hasMore;inbox.notifications=data.notifications;
+ if(!data.comments.length&&inbox.offset>0){inbox.offset=Math.max(0,inbox.offset-50);return loadComments();}
+ renderInboxOwner();renderInboxArticles();renderInboxCompose();renderInboxComments(data.comments||[]);
+ const summary=el('inbox-summary');summary.replaceChildren();
+ for(const [label,value] of [['全部留言',inbox.docs.reduce((n,d)=>n+Number(d.total||0),0)],['未讀',inbox.docs.reduce((n,d)=>n+Number(d.unread||0),0)],['有留言的文章／作品',inbox.docs.filter(d=>Number(d.total)>0).length]]){const item=inboxNode('span');item.append(inboxNode('strong',String(value)),document.createTextNode(label));summary.append(item);}
+ el('inbox-page').textContent='第 '+(Math.floor(inbox.offset/50)+1)+' 頁';el('inbox-prev').disabled=inbox.offset===0;el('inbox-next').disabled=!inbox.hasMore;
+ const config=data.notifications?.configured||{};for(const option of el('inbox-channel').options)option.disabled=option.value!=='off'&&!config[option.value];
+ el('inbox-channel').value=data.notifications?.channel||'off';
+ el('inbox-notification-state').textContent='LINE '+(config.line?'憑證已設定':'尚未設定')+' · Discord '+(config.discord?'憑證已設定':'尚未設定');
+ el('inbox-test-channel').disabled=!(config[data.notifications?.channel]);
+}
+const refreshInbox=()=>loadComments().catch(e=>say(e.message,true));
+el('inbox-refresh').onclick=refreshInbox;
+el('inbox-article-search').oninput=renderInboxArticles;
+el('inbox-status').onchange=()=>{inbox.offset=0;refreshInbox();};
+let inboxSearchTimer;el('inbox-search').oninput=()=>{clearTimeout(inboxSearchTimer);inboxSearchTimer=setTimeout(()=>{inbox.offset=0;refreshInbox();},220);};
+el('inbox-prev').onclick=()=>{inbox.offset=Math.max(0,inbox.offset-50);refreshInbox();};
+el('inbox-next').onclick=()=>{if(inbox.hasMore){inbox.offset+=50;refreshInbox();}};
+el('inbox-pair').onclick=async()=>{try{const data=await api('/api/admin/comment-owner','POST',{});const a=el('inbox-pair-link');a.href=data.url;a.classList.remove('hidden');a.textContent='開啟帳號連結頁面（10 分鐘內有效）↗';say('請開啟連結頁面，登入並確認要連結的帳號。');}catch(e){say(e.message,true);}};
+el('inbox-unpair').onclick=async()=>{if(!confirm('確定解除站長留言帳號連結？既有留言不會被刪除。'))return;try{await api('/api/admin/comment-owner','DELETE');el('inbox-pair-link').classList.add('hidden');clearInboxReply();await loadComments();}catch(e){say(e.message,true);}};
+window.addEventListener('focus',()=>{if(tab==='comments'&&!el('inbox-pair-link').classList.contains('hidden')){api('/api/admin/comment-owner').then(data=>{inbox.owner=data.owner;renderInboxOwner();refreshInbox();}).catch(()=>{});}});
+el('inbox-reply-cancel').onclick=clearInboxReply;
+el('inbox-compose-form').onsubmit=async event=>{
+ event.preventDefault();if(!inbox.owner)return say('請先連結留言帳號',true);
+ const select=el('inbox-compose-article'),doc=inbox.docs.find(d=>inboxKey(d)===select.value);
+ if(!doc)return say('請選擇文章或作品',true);
+ const body=el('inbox-compose-body').value.trim();if(body.length<2)return say('請輸入留言內容',true);
+ const b=el('inbox-compose-send');b.disabled=true;
+ try{await api('/api/admin/comment-inbox','POST',{kind:doc.kind,slug:doc.slug,body,parent_id:inbox.reply?.id||null});el('inbox-compose-body').value='';clearInboxReply();say('留言已公開');inbox.offset=0;await loadComments();}catch(e){say(e.message,true);}finally{b.disabled=!inbox.owner;}
+};
+el('inbox-save-channel').onclick=async()=>{try{await api('/api/admin/comment-notifications','PUT',{channel:el('inbox-channel').value});say('通知設定已儲存');await loadComments();}catch(e){say(e.message,true);}};
+el('inbox-test-channel').onclick=async()=>{const b=el('inbox-test-channel');b.disabled=true;try{await api('/api/admin/comment-notifications','POST',{});say('測試通知已送出，請確認手機。');}catch(e){say(e.message,true);}finally{b.disabled=false;}};
 el('login-form').addEventListener('submit',async e=>{
  e.preventDefault();
  try{await api('/api/admin/login','POST',{password:el('password').value});el('password').value='';await loggedIn();}
