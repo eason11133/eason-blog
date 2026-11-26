@@ -25,14 +25,13 @@ const avatarUrl = (avatar?: string) => {
   <main class="friends-page">
     <div class="friends-inner">
       <InteriorHeading title="友站" centered={true} animated={true} />
-      {live && <div class="friend-apply-link"><a href="#friend-apply">申請友站 →</a></div>}
       {sites.length > 0 ? (
         <div class="friends-grid" aria-label="友站列表">
           {sites.map(site => (
             <a class="friend-item" href={site.url} target="_blank" rel="noopener noreferrer">
               <span class="friend-avatar" aria-hidden="true">
                 <span>{Array.from(site.name.trim())[0] || '?'}</span>
-                {avatarUrl(site.avatar) && <img src={avatarUrl(site.avatar)} alt="" width="72" height="72" loading="lazy" decoding="async" referrerpolicy="no-referrer" />}
+                {avatarUrl(site.avatar) && <img src={avatarUrl(site.avatar)} alt="" width="52" height="52" loading="lazy" decoding="async" referrerpolicy="no-referrer" />}
               </span>
               <span class="friend-text">
                 <span class="friend-title">{site.name}</span>
@@ -45,8 +44,9 @@ const avatarUrl = (avatar?: string) => {
         <p class="friends-empty">目前還沒有友站。</p>
       )}
       {live && (
-        <section id="friend-apply" class="friend-apply">
-          <h2>申請友站</h2>
+        <details id="friend-apply" class="friend-apply">
+          <summary class="friend-apply-summary">申請友站</summary>
+          <div class="friend-apply-body">
           <p>有自己的網站或部落格，歡迎來交換友站！送出後由我審核，不用登入，也不強制回加本站。</p>
           <details class="friend-info"><summary>本站資訊</summary><p>網站名稱：{siteTitle}<br />網址：<a href={Astro.url.origin}>{Astro.url.origin}</a></p></details>
           <form id="friend-request-form" method="post" action="/api/friend-requests">
@@ -58,7 +58,8 @@ const avatarUrl = (avatar?: string) => {
             <button type="submit">送出申請</button>
             <p class="friend-form-status" role="status" aria-live="polite"></p>
           </form>
-        </section>
+          </div>
+        </details>
       )}
     </div>
   </main>
@@ -74,50 +75,54 @@ const avatarUrl = (avatar?: string) => {
     padding: clamp(108px, 15vh, 150px) clamp(20px, 4vw, 48px) 32px;
     background: transparent;
   }
-  .friends-inner { width: min(100%, 1000px); margin: 0 auto; }
+  .friends-inner { width: min(100%, 680px); margin: 0 auto; }
+  .friends-inner :global(.interior-heading) { margin-bottom: 26px; }
   .friends-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    column-gap: clamp(20px, 5vw, 64px);
-    row-gap: 36px;
-    margin: 48px 0 0;
+    column-gap: 28px;
+    row-gap: 12px;
+    margin: 0;
   }
   .friend-item {
-    display: flex; min-width: 0; min-height: 112px; align-items: center;
-    gap: 18px; padding: 18px 20px; color: #edf3fc; text-decoration: none;
+    display: flex; min-width: 0; min-height: 72px; align-items: center;
+    gap: 12px; padding: 10px 0; color: #edf3fc; text-decoration: none;
     border: 0; border-radius: 12px; background: transparent;
     transition: transform .25s ease, background-color .25s ease;
   }
   .friend-item:hover, .friend-item:focus-visible { transform: translateY(-4px); background: rgba(55, 100, 155, .13); }
   .friend-avatar {
-    position: relative; flex: 0 0 72px; width: 72px; height: 72px;
+    position: relative; flex: 0 0 52px; width: 52px; height: 52px;
     display: grid; place-items: center; overflow: hidden; border-radius: 50%;
-    background: #26374c; color: #e4edfb; font-size: 1.6rem; font-weight: 700;
+    background: #26374c; color: #e4edfb; font-size: 1.15rem; font-weight: 700;
   }
   .friend-avatar img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; border-radius: 50%; background: #26374c; }
   .friend-avatar img[hidden] { display: none; }
-  .friend-text { min-width: 0; display: flex; flex-direction: column; gap: 5px; }
-  .friend-title { font-size: 1.25rem; font-weight: 700; line-height: 1.4; overflow-wrap: anywhere; }
-  .friend-description { color: #b7c8df; line-height: 1.6; overflow-wrap: anywhere; }
-  .friends-empty { color: #a7b9d3; margin: 56px 0 0; text-align: center; }
-  @media (max-width: 720px) {
-    .friends-grid { grid-template-columns: 1fr; row-gap: 16px; margin-top: 36px; }
-    .friend-item { min-height: 96px; padding: 12px 8px; gap: 14px; }
-    .friend-avatar { flex-basis: 60px; width: 60px; height: 60px; }
-    .friends-empty { margin-top: 36px; }
+  .friend-text { min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+  .friend-title { font-size: 1.05rem; font-weight: 700; line-height: 1.4; overflow-wrap: anywhere; }
+  .friend-description { color: #b7c8df; font-size: .9rem; line-height: 1.5; overflow-wrap: anywhere; }
+  .friends-empty { color: #a7b9d3; margin: 22px 0; text-align: center; }
+  @media (max-width: 560px) {
+    .friends-grid { grid-template-columns: 1fr; row-gap: 8px; }
+    .friend-item { min-height: 64px; padding: 8px 0; gap: 12px; }
+    .friend-avatar { flex-basis: 48px; width: 48px; height: 48px; }
   }
-  .friend-apply-link { text-align:right; margin: 18px 0 0; }
-  .friend-apply-link a,.friend-info a { color:#a9c5e8; text-decoration:none; }
-  .friend-apply-link a:hover,.friend-info a:hover { text-decoration:underline; }
-  .friend-apply { max-width: 660px; margin: 44px auto 0; padding: 24px 0 0; border-top: 1px solid rgba(158,186,221,.2); scroll-margin-top: 92px; }
-  .friend-apply h2 { font-size:1.4rem; margin:0 0 .8rem; }
+  .friend-info a { color:#a9c5e8; text-decoration:none; }
+  .friend-info a:hover { text-decoration:underline; }
+  .friend-apply { width:100%; margin:20px 0 0; scroll-margin-top:92px; }
+  .friend-apply-summary { cursor:pointer; color:#a9c5e8; font-size:.9rem; width:fit-content; margin-left:auto; }
+  .friend-apply-summary:hover { color:#edf3fc; }
+  .friend-apply-body { padding:12px 0 0; }
+  .friend-apply-body > p { margin:0 0 12px; font-size:.9rem; }
   .friend-apply p { color:#b7c8df; line-height:1.7; }
   .friend-info { margin: 0 0 18px; color:#a9bbd3; }
   .friend-info summary { cursor:pointer; }
   .friend-info p { overflow-wrap:anywhere; margin:10px 0 0; }
-  #friend-request-form { display:grid; gap:14px; }
+  #friend-request-form { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px 14px; }
+  #friend-request-form label:has(textarea), #friend-request-form label:has(input[name="avatar"]), .friend-form-status { grid-column:1 / -1; }
+  @media(max-width:560px) { #friend-request-form { grid-template-columns:1fr; } }
   #friend-request-form label { display:grid; gap:6px; color:#c6d4e7; font-size:.9rem; }
-  #friend-request-form input,#friend-request-form textarea { box-sizing:border-box; width:100%; min-width:0; background:rgba(12,27,45,.44); border:1px solid rgba(158,186,221,.26); border-radius:9px; color:#e7effa; padding:.7rem .85rem; font:inherit; }
+  #friend-request-form input,#friend-request-form textarea { box-sizing:border-box; width:100%; min-width:0; background:rgba(12,27,45,.44); border:1px solid rgba(158,186,221,.26); border-radius:9px; color:#e7effa; padding:.48rem .65rem; font:inherit; }
   #friend-request-form textarea { resize:vertical; }
   #friend-request-form button { justify-self:start; cursor:pointer; font:inherit; color:#e7effa; background:var(--color-tag-bg); border:1px solid var(--color-border-subtle); padding:.55rem 1rem; border-radius:9px; }
   #friend-request-form button:hover { background:var(--accent); color:white; }
