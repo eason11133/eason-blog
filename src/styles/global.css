@@ -1180,16 +1180,10 @@ hr {
 	scrollbar-color: var(--color-scrollbar) transparent;
 }
 
-/* Dark Mode Image Handling */
+/* Keep article and work images at their original brightness, even in dark mode. */
 [data-theme="dark"] .prose img {
-	/* Reduce brightness and increase contrast for better reading in dark mode */
-	filter: brightness(0.6) contrast(1.2);
-	transition: filter 0.3s ease, transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.3s ease;
-}
-
-[data-theme="dark"] .prose img:hover {
-	/* Reveal original image on hover */
 	filter: none;
+	transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.3s ease;
 }
 
 /* Ensure Lightbox image is always original */
