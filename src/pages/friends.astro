@@ -19,10 +19,9 @@ const avatarUrl = (avatar?: string) => {
   title={'友站 | ' + siteTitle}
   description="Eason 的友站連結。"
   transparentHeader={false}
-  useMainWrapper={false}
   pageId="friends"
 >
-  <main class="friends-page">
+  <section class="friends-page" aria-label="友站列表及申請">
     <div class="friends-inner">
       <InteriorHeading title="友站" centered={true} animated={true} />
       {sites.length > 0 ? (
@@ -62,7 +61,7 @@ const avatarUrl = (avatar?: string) => {
         </details>
       )}
     </div>
-  </main>
+  </section>
 </PageShell>
 
 <style>
@@ -72,7 +71,8 @@ const avatarUrl = (avatar?: string) => {
     width: 100%;
     min-height: 0;
     box-sizing: border-box;
-    padding: clamp(88px, 11vh, 112px) clamp(20px, 4vw, 48px) 32px;
+    margin: 0;
+    padding: var(--interior-page-top, clamp(126px, 17vh, 180px)) clamp(20px, 4vw, 48px) 32px;
     background: transparent;
   }
   .friends-inner { width: min(100%, 680px); margin: 0 auto; }
@@ -130,8 +130,6 @@ const avatarUrl = (avatar?: string) => {
   .friend-honeypot { position:absolute; left:-10000px; width:1px; height:1px; overflow:hidden; }
   .friend-form-status { margin:0; }
   .friend-form-status:empty { display:none; }
-  :global(body[data-page-id="friends"] #main-content) { display:flex; flex-direction:column; }
-  :global(body[data-page-id="friends"] #main-content > .friends-page) { flex:0 0 auto; }
-  :global(body[data-page-id="friends"] #main-content > footer) { margin-top:auto; flex-shrink:0; }
+
   @media (prefers-reduced-motion: reduce) { .friend-item { transition: none; } }
 </style>

@@ -4,6 +4,13 @@
  * Keep the persistent night, stars, cloud, meteor and aurora layers unchanged.
  */
 
+body:is([data-page-id="blog-list"], [data-page-id="friends"]) {
+  --interior-page-top: clamp(126px, 17vh, 180px);
+}
+@media (max-width: 720px) {
+  body:is([data-page-id="blog-list"], [data-page-id="friends"]) { --interior-page-top: 112px; }
+}
+
 html[data-theme="dark"] body[data-page-id]:not([data-page-id="home"]) {
   --interior-width: 880px;
   --interior-color: #e7effa;
@@ -17,7 +24,7 @@ html[data-theme="dark"] body[data-page-id="tag-detail"] .tag-area {
   position: relative;
   z-index: 1;
   min-height: calc(100dvh - 64px) !important;
-  padding: clamp(126px, 17vh, 180px) clamp(20px, 4vw, 48px) 96px !important;
+  padding: var(--interior-page-top, clamp(126px, 17vh, 180px)) clamp(20px, 4vw, 48px) 96px !important;
   background: transparent !important;
 }
 
@@ -181,17 +188,21 @@ html[data-theme="dark"] body[data-page-id="experience"] .experience-body a {
  * above the mountain ridge. Scope this to posts/works; preserve home layout. */
 @media screen {
   body[data-page-id="post"] #main-content,
+  body[data-page-id="friends"] #main-content,
   body[data-page-id="blog-list"] #main-content {
     display: flex;
     flex-direction: column;
   }
   body[data-page-id="post"] #main-content > footer,
+  body[data-page-id="friends"] #main-content > footer,
   body[data-page-id="blog-list"] #main-content > footer {
     margin-top: auto;
     flex-shrink: 0;
   }
+  body[data-page-id="friends"] #main-content > .page-shell-main,
   body[data-page-id="blog-list"] #main-content > .page-shell-main {
     flex: 0 0 auto;
+    margin: 0;
   }
   /* With the viewport-sized scroll container in flex mode, a long article must
      not shrink beneath its content and cause the footer to overlap the text. */
