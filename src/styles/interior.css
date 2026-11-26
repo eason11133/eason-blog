@@ -600,6 +600,9 @@ html[data-theme="dark"] body[data-page-id="blog-list"] .articles-list {
   gap: 18px !important;
   align-items: stretch;
 }
+html[data-theme="dark"] body[data-page-id="friends"] .friends-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
 html[data-theme="dark"] body[data-page-id="friends"] .friends-grid > .friend-item {
   box-sizing: border-box;
   padding: 19px 21px;
@@ -670,11 +673,16 @@ html[data-theme="dark"] body[data-page-id="blog-list"] .articles-list > .scroll-
     grid-template-columns: minmax(0, 1fr);
     gap: 14px !important;
   }
+  html[data-theme="dark"] body[data-page-id="friends"] .friends-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   html[data-theme="dark"] body[data-page-id="friends"] .friends-grid > .friend-item { padding: 18px; }
   html[data-theme="dark"] body[data-page-id="blog-list"] .articles-list > .scroll-reveal {
     min-height: 0;
     padding: 18px !important;
   }
+}
+
+@media screen and (max-width: 560px) {
+  html[data-theme="dark"] body[data-page-id="friends"] .friends-grid { grid-template-columns: minmax(0, 1fr); }
 }
 
 /* Markdown tables on night-sky article and work pages: no black fill. */
