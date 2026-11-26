@@ -7,7 +7,12 @@ import { getCmsFriends, LIVE_CMS_ORIGIN, type CmsFriendSite } from '../lib/cloud
 export const prerender = import.meta.env.PUBLIC_EASON_LIVE !== 'true';
 const live = import.meta.env.PUBLIC_EASON_LIVE === 'true';
 const sites: CmsFriendSite[] = live ? await getCmsFriends() : [];
-const avatarUrl = (avatar?: string) => typeof avatar === 'string' && /^\/media\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(avatar) ? LIVE_CMS_ORIGIN + avatar : '';
+const avatarUrl = (avatar?: string) => {
+  if (typeof avatar !== 'string' || !avatar) return '';
+  if (/^\/media\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(avatar)) return LIVE_CMS_ORIGIN + avatar;
+  try { const url = new URL(avatar); return url.protocol === 'https:' && !url.username && !url.password ? url.href : ''; }
+  catch { return ''; }
+};
 ---
 
 <PageShell
@@ -27,7 +32,7 @@ const avatarUrl = (avatar?: string) => typeof avatar === 'string' && /^\/media\/
             <a class="friend-item" href={site.url} target="_blank" rel="noopener noreferrer">
               <span class="friend-avatar" aria-hidden="true">
                 <span>{Array.from(site.name.trim())[0] || '?'}</span>
-                {avatarUrl(site.avatar) && <img src={avatarUrl(site.avatar)} alt="" width="72" height="72" loading="lazy" decoding="async" />}
+                {avatarUrl(site.avatar) && <img src={avatarUrl(site.avatar)} alt="" width="72" height="72" loading="lazy" decoding="async" referrerpolicy="no-referrer" />}
               </span>
               <span class="friend-text">
                 <span class="friend-title">{site.name}</span>
@@ -48,7 +53,7 @@ const avatarUrl = (avatar?: string) => typeof avatar === 'string' && /^\/media\/
             <label>網站名稱<input name="name" required maxlength="100" placeholder="你的網站名稱" /></label>
             <label>網站網址<input name="url" type="url" required maxlength="1500" placeholder="https://..." /></label>
             <label>簡短介紹<textarea name="description" rows="3" required maxlength="300" placeholder="介紹一下你的網站"></textarea></label>
-            <label>聯絡方式（不公開）<input name="contact" required maxlength="300" placeholder="Email、IG 或其他聯絡方式" /></label>
+            <label>頭像圖片網址（選填）<input name="avatar" type="url" maxlength="1500" placeholder="https://.../avatar.png" pattern="https://.*" /></label>
             <div class="friend-honeypot" aria-hidden="true"><label>請勿填寫<input name="website_check" tabindex="-1" autocomplete="off" /></label></div>
             <button type="submit">送出申請</button>
             <p class="friend-form-status" role="status" aria-live="polite"></p>

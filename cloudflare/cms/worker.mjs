@@ -80,6 +80,18 @@ function sameOriginWrite(req, url) {
   return req.headers.get('Origin') === url.origin;
 }
 // Friend links are stored separately from posts, homepage and about.
+function normalizeFriendAvatar(value, allowLocal=true) {
+  if(value==null||value==='')return '';
+  if(typeof value!=='string'||value.length>1500)return null;
+  value=value.trim();
+  if(!value)return '';
+  if(allowLocal&&/^\/media\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(value))return value;
+  try{
+    const u=new URL(value);
+    if(u.protocol!=='https:'||u.username||u.password||u.port||!u.hostname.includes('.')||/^[\d.]+$/.test(u.hostname)||/\.(localhost|local|internal|test)$/i.test(u.hostname)&&!u.hostname.endsWith('.test'))return null;
+    return u.href.length<=1500?u.href:null;
+  }catch{return null;}
+}
 function normalizeFriendSites(items) {
   if (!Array.isArray(items) || items.length > 60) return null;
   const normalized = [];
@@ -98,8 +110,8 @@ function normalizeFriendSites(items) {
     const url = parsed.toString();
     if (seen.has(url)) return null;
     seen.add(url);
-    const avatar = item.avatar == null ? '' : item.avatar;
-    if (typeof avatar !== 'string' || (avatar && !/^\/media\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(avatar))) return null;
+    const avatar = normalizeFriendAvatar(item.avatar);
+    if (avatar===null) return null;
     normalized.push({ name, url, description, ...(avatar ? { avatar } : {}) });
   }
   return normalized;
@@ -195,9 +207,11 @@ async function handle(req,env,ctx) {
     const input=await jsonBody(req,6000);
     if(!input||typeof input!=='object'||Array.isArray(input))return fail('申請資料不正確');
     if(input.website_check)return fail('申請資料不正確');
-    const site=normalizeFriendSites([{name:input.name,url:input.url,description:input.description}])?.[0];
+    const avatar=normalizeFriendAvatar(input.avatar,false);
+    if(avatar===null)return fail('圖片網址須為有效的 HTTPS 網址');
+    const site=normalizeFriendSites([{name:input.name,url:input.url,description:input.description,avatar}])?.[0];
     const contact=typeof input.contact==='string'?input.contact.trim():'';
-    if(!site||!site.description||!contact||contact.length>300)return fail('請填寫網站名稱、完整網址、介紹與聯絡方式');
+    if(!site||!site.description||contact.length>300)return fail('請填寫網站名稱、完整網址及介紹');
     const existing=await listFriendSites(env.DB);
     if(existing.some(item=>item.url===site.url))return fail('這個網站已經在友站列表中',409);
     const pending=await env.DB.prepare("SELECT id FROM friend_requests WHERE url=? AND status='pending'").bind(site.url).first();
@@ -205,8 +219,8 @@ async function handle(req,env,ctx) {
     const count=await env.DB.prepare("SELECT COUNT(*) AS total FROM friend_requests WHERE status='pending'").first();
     if(Number(count?.total)>=100)return fail('目前待審核申請較多，請稍後再試',429);
     try {
-      await env.DB.prepare("INSERT INTO friend_requests(id,name,url,description,contact,status,created) SELECT ?,?,?,?,?,'pending',? WHERE (SELECT COUNT(*) FROM friend_requests WHERE status='pending')<100 AND NOT EXISTS(SELECT 1 FROM friend_sites,json_each(links_json) WHERE singleton=1 AND json_extract(json_each.value,'$.url')=?)")
-        .bind(crypto.randomUUID(),site.name,site.url,site.description,contact,new Date().toISOString(),site.url).run().then(result=>{if(result.meta?.changes===0)throw new Error('request_not_inserted');});
+      await env.DB.prepare("INSERT INTO friend_requests(id,name,url,description,contact,avatar,status,created) SELECT ?,?,?,?,?,?,'pending',? WHERE (SELECT COUNT(*) FROM friend_requests WHERE status='pending')<100 AND NOT EXISTS(SELECT 1 FROM friend_sites,json_each(links_json) WHERE singleton=1 AND json_extract(json_each.value,'$.url')=?)")
+        .bind(crypto.randomUUID(),site.name,site.url,site.description,contact,avatar,new Date().toISOString(),site.url).run().then(result=>{if(result.meta?.changes===0)throw new Error('request_not_inserted');});
     }catch(error){
       if(/UNIQUE constraint failed/i.test(String(error)))return fail('這個網站已有待審核的申請',409);
       if(String(error).includes('request_not_inserted'))return fail('暫時無法新增申請，請重新整理後再試',409);
@@ -260,7 +274,7 @@ async function handle(req,env,ctx) {
     return json({ok:true});
   }
   if(method==='GET' && path==='/api/admin/friend-requests') {
-    const result=await env.DB.prepare("SELECT id,name,url,description,contact,status,created,reviewed FROM friend_requests WHERE status='pending' ORDER BY created ASC LIMIT 100").all();
+    const result=await env.DB.prepare("SELECT id,name,url,description,contact,avatar,status,created,reviewed FROM friend_requests WHERE status='pending' ORDER BY created ASC LIMIT 100").all();
     return json({requests:result.results||[]});
   }
   if(method==='PUT' && path==='/api/admin/friend-requests') {
@@ -278,7 +292,7 @@ async function handle(req,env,ctx) {
     }
   }
   if(method==='PUT' && path==='/api/admin/friends') {
-    const input=await jsonBody(req,105000);
+    const input=await jsonBody(req,280000);
     const sites=normalizeFriendSites(input?.sites);
     if(!sites)return fail('友站資料有誤：請確認名稱、網址及是否重複（最多 60 筆）');
     await env.DB.prepare(

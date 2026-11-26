@@ -521,10 +521,12 @@ function renderFriendRows(items){
   const picker=document.createElement('input');picker.type='file';picker.accept='image/png,image/jpeg,image/webp,image/gif';picker.setAttribute('aria-label','上傳友站頭像');
   const remove=document.createElement('button');remove.type='button';remove.className='secondary';remove.textContent='移除頭像';
   const label=document.createElement('small');label.textContent='頭像（選填）';
+  const imageUrl=document.createElement('input');imageUrl.type='text';imageUrl.maxLength=1500;imageUrl.placeholder='HTTPS 圖片網址，或上傳圖片';imageUrl.setAttribute('aria-label','頭像圖片網址');imageUrl.value=avatar.value;
+  imageUrl.onchange=()=>{const v=imageUrl.value.trim();try{if(v&&v!==avatar.value){const u=new URL(v);if(u.protocol!=='https:'||u.username||u.password)throw Error('請填 HTTPS 圖片網址');}avatar.value=v;refresh();}catch(err){imageUrl.value=avatar.value;say('請填 HTTPS 圖片網址',true);}};
   const refresh=()=>{
    const initial=Array.from(cols.querySelector('[data-friend-field=name]').value.trim())[0]||'?';
    preview.textContent=initial;
-   if(avatar.value){const img=document.createElement('img');img.alt='';img.onerror=()=>{if(img.isConnected)preview.textContent=initial;};img.src=avatar.value;preview.replaceChildren(img);}
+   if(avatar.value){const img=document.createElement('img');img.alt='';img.referrerPolicy='no-referrer';img.onerror=()=>{if(img.isConnected)preview.textContent=initial;};img.src=avatar.value;preview.replaceChildren(img);}
    remove.disabled=!avatar.value||picker.disabled;
   };
   picker.onchange=async()=>{
@@ -537,12 +539,12 @@ function renderFriendRows(items){
     const url=new URL(result.url);
     if(url.origin!==location.origin||!url.pathname.startsWith('/media/'))throw new Error('上傳沒有回傳正確圖片網址');
     if(!row.isConnected)throw new Error('已離開友站編輯頁，請重新上傳');
-    avatar.value=url.pathname;say('頭像已上傳，請儲存友站');
+    avatar.value=url.pathname;imageUrl.value=avatar.value;say('頭像已上傳，請儲存友站');
    }catch(err){say(err.message,true);}finally{friendUploads--;picker.disabled=false;picker.value='';refresh();}
   };
-  remove.onclick=()=>{avatar.value='';refresh();};
+  remove.onclick=()=>{avatar.value='';imageUrl.value='';refresh();};
   cols.querySelector('[data-friend-field=name]').addEventListener('input',()=>{if(!avatar.value)refresh();});
-  avatarControls.append(preview,label,picker,remove,avatar);row.appendChild(avatarControls);refresh();
+  avatarControls.append(preview,label,imageUrl,picker,remove,avatar);row.appendChild(avatarControls);refresh();
   row.appendChild(cols);
   createField(row,'description','簡短介紹（選填）',item.description,true);
   const actions=document.createElement('div');actions.className='friend-actions';
@@ -573,7 +575,9 @@ async function loadFriendRequests(){
   const link=document.createElement('a');link.textContent=item.url;link.style.color='#9ecaff';
   try{const u=new URL(item.url);if(['https:','http:'].includes(u.protocol)&&!u.username&&!u.password){link.href=u.href;link.target='_blank';link.rel='noopener noreferrer';}}catch{}
   const desc=document.createElement('p');desc.textContent=item.description;
-  const contact=document.createElement('p');contact.textContent='聯絡方式：'+item.contact;
+  const contact=document.createElement('p');contact.textContent=item.contact?'聯絡方式：'+item.contact:'';contact.hidden=!item.contact;
+  const imageLink=document.createElement('a');imageLink.textContent='查看申請者提供的圖片 ↗';imageLink.style.color='#9ecaff';imageLink.target='_blank';imageLink.rel='noopener noreferrer';imageLink.hidden=true;
+  try{const u=new URL(item.avatar);if(u.protocol==='https:'&&!u.username&&!u.password){imageLink.href=u.href;imageLink.hidden=false;}}catch{}
   const date=document.createElement('small');date.textContent='申請時間：'+new Date(item.created).toLocaleString('zh-TW',{timeZone:'Asia/Taipei',hour12:false});
   const actions=document.createElement('div');actions.className='friend-actions';
   for(const status of ['approved','rejected']){
@@ -588,7 +592,7 @@ async function loadFriendRequests(){
    };
    actions.appendChild(b);
   }
-  row.append(title,document.createElement('br'),link,desc,contact,date,actions);target.appendChild(row);
+  row.append(title,document.createElement('br'),link,desc,imageLink,contact,date,actions);target.appendChild(row);
  }
 }
 const footerKeys=['github','email','instagram','discord'];
