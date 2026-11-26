@@ -76,10 +76,14 @@ const avatarUrl = (avatar?: string) => {
     background: transparent;
   }
   .friends-inner { width: min(100%, 680px); margin: 0 auto; }
+  /* Center the actual title text; the blinking cursor must not consume horizontal space. */
+  .friends-inner :global(.interior-heading--centered .typewriter-animation) { position: relative; text-align: left; }
+  .friends-inner :global(.interior-heading--centered .cursor) { position: absolute; }
   .friends-grid {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    column-gap: 28px;
+    grid-template-columns: repeat(2, minmax(0, max-content));
+    justify-content: center;
+    column-gap: 48px;
     row-gap: 12px;
     margin: 0;
   }
@@ -89,6 +93,7 @@ const avatarUrl = (avatar?: string) => {
     border: 0; border-radius: 12px; background: transparent;
     transition: transform .25s ease, background-color .25s ease;
   }
+  .friend-item:only-child { grid-column: 1 / -1; justify-self: center; }
   .friend-item:hover, .friend-item:focus-visible { transform: translateY(-4px); background: rgba(55, 100, 155, .13); }
   .friend-avatar {
     position: relative; flex: 0 0 52px; width: 52px; height: 52px;
@@ -102,14 +107,14 @@ const avatarUrl = (avatar?: string) => {
   .friend-description { color: #b7c8df; font-size: .9rem; line-height: 1.5; overflow-wrap: anywhere; }
   .friends-empty { color: #a7b9d3; margin: 22px 0; text-align: center; }
   @media (max-width: 560px) {
-    .friends-grid { grid-template-columns: 1fr; row-gap: 8px; }
+    .friends-grid { grid-template-columns: minmax(0, 1fr); row-gap: 8px; }
     .friend-item { min-height: 64px; padding: 8px 0; gap: 12px; }
     .friend-avatar { flex-basis: 48px; width: 48px; height: 48px; }
   }
   .friend-info a { color:#a9c5e8; text-decoration:none; }
   .friend-info a:hover { text-decoration:underline; }
   .friend-apply { width:100%; margin:20px 0 0; scroll-margin-top:92px; }
-  .friend-apply-summary { cursor:pointer; color:#a9c5e8; font-size:.9rem; width:fit-content; margin-left:auto; }
+  .friend-apply-summary { cursor:pointer; color:#a9c5e8; font-size:.9rem; width:fit-content; margin-inline:auto; }
   .friend-apply-summary:hover { color:#edf3fc; }
   .friend-apply-body { padding:12px 0 0; }
   .friend-apply-body > p { margin:0 0 12px; font-size:.9rem; }
