@@ -120,6 +120,28 @@ async function listFriendSites(db) {
   const row = await db.prepare('SELECT links_json FROM friend_sites WHERE singleton=1').first();
   return normalizeFriendSites(safeJsonParse(row?.links_json || '[]', [])) || [];
 }
+const friendFormDefaults={"heading":"申請友站","intro":"有自己的網站或部落格，歡迎來交換友站！送出後由我審核，不用登入，也不強制回加本站。","infoLabel":"本站資訊","siteName":"Eason","siteUrl":"","siteDescription":"","siteImage":"","nameLabel":"網站名稱","namePlaceholder":"你的網站名稱","urlLabel":"網站網址","urlPlaceholder":"https://...","descriptionLabel":"簡短介紹","descriptionPlaceholder":"介紹一下你的網站","avatarLabel":"頭像圖片網址（選填）","avatarPlaceholder":"https://.../avatar.png","submitLabel":"送出申請","successMessage":"申請已送出，等我審核後就會出現在友站列表。"};
+const friendFormLimits={"heading":100,"intro":2000,"infoLabel":100,"siteName":100,"siteUrl":1500,"siteDescription":500,"siteImage":1500,"nameLabel":100,"namePlaceholder":200,"urlLabel":100,"urlPlaceholder":200,"descriptionLabel":100,"descriptionPlaceholder":200,"avatarLabel":100,"avatarPlaceholder":200,"submitLabel":100,"successMessage":500};
+function normalizeFriendForm(input){
+  if(!input||typeof input!=='object'||Array.isArray(input))return null;
+  const result={...friendFormDefaults};
+  for(const key of Object.keys(friendFormDefaults)){
+    if(!Object.hasOwn(input,key))continue;
+    if(typeof input[key]!=='string'||input[key].length>friendFormLimits[key])return null;
+    const value=input[key].trim();
+    if(key==='siteUrl'||key==='siteImage'){
+      if(value){try{const u=new URL(value);if(u.protocol!=='https:'||u.username||u.password)return null;result[key]=u.href;}catch{return null;}}
+      else result[key]='';
+    }else if(key.endsWith('Label')||key==='heading'||key==='siteName'||key==='successMessage'){
+      if(!value)return null;result[key]=value;
+    }else result[key]=value;
+  }
+  return result;
+}
+async function getFriendForm(db){
+  const row=await db.prepare('SELECT value_json FROM friend_form_settings WHERE singleton=1').first();
+  return normalizeFriendForm(safeJsonParse(row?.value_json||'{}',{}))||friendFormDefaults;
+}
 async function getFooterLinks(db) {
   const row = await db.prepare('SELECT links_json FROM footer_links WHERE singleton=1').first();
   return normalizeFooterLinks(safeJsonParse(row?.links_json || '{}', {})) ||
@@ -199,6 +221,7 @@ async function handle(req,env,ctx) {
   }
 
   if (method==='GET' && path==='/api/footer-links') return json(await getFooterLinks(env.DB));
+  if (method==='GET' && path==='/api/friend-form') return json(await getFriendForm(env.DB));
   if (method==='GET' && path==='/api/friends') return json({sites:await listFriendSites(env.DB)});
   if (method==='POST' && path==='/api/friend-requests') {
     if(!env.CMS_SESSION_SECRET)return fail('申請功能暫時無法使用',503);
@@ -290,6 +313,12 @@ async function handle(req,env,ctx) {
       if(String(error).includes('friend_list_full'))return fail('友站已達60筆，請先移除一筆',409);
       throw error;
     }
+  }
+  if(method==='PUT' && path==='/api/admin/friend-form'){
+    const data=normalizeFriendForm(await jsonBody(req,20000));
+    if(!data)return fail('請確認欄位文字長度及 HTTPS 網址');
+    await env.DB.prepare('INSERT INTO friend_form_settings(singleton,value_json,updated) VALUES(1,?,?) ON CONFLICT(singleton) DO UPDATE SET value_json=excluded.value_json,updated=excluded.updated').bind(JSON.stringify(data),new Date().toISOString()).run();
+    return json({ok:true});
   }
   if(method==='PUT' && path==='/api/admin/friends') {
     const input=await jsonBody(req,280000);

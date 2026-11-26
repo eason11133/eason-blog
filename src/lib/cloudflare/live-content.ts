@@ -135,3 +135,15 @@ export async function getCmsFooterLinks(): Promise<Partial<CmsFooterLinks>> {
     return links;
   } catch { return {}; }
 }
+
+const friendFormDefaults = {"heading":"申請友站","intro":"有自己的網站或部落格，歡迎來交換友站！送出後由我審核，不用登入，也不強制回加本站。","infoLabel":"本站資訊","siteName":"Eason","siteUrl":"","siteDescription":"","siteImage":"","nameLabel":"網站名稱","namePlaceholder":"你的網站名稱","urlLabel":"網站網址","urlPlaceholder":"https://...","descriptionLabel":"簡短介紹","descriptionPlaceholder":"介紹一下你的網站","avatarLabel":"頭像圖片網址（選填）","avatarPlaceholder":"https://.../avatar.png","submitLabel":"送出申請","successMessage":"申請已送出，等我審核後就會出現在友站列表。"};
+export async function getCmsFriendForm(): Promise<typeof friendFormDefaults> {
+  try {
+    const value=await getJson('/api/friend-form') as Record<string, unknown>;
+    const result={...friendFormDefaults};
+    for(const key of Object.keys(result) as (keyof typeof result)[]) {
+      if(typeof value?.[key]==='string') result[key]=value[key];
+    }
+    return result;
+  } catch { return {...friendFormDefaults}; }
+}

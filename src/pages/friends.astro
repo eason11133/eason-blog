@@ -2,11 +2,14 @@
 import PageShell from '../layouts/PageShell.astro';
 import InteriorHeading from '../components/InteriorHeading.astro';
 import { siteTitle } from '../config';
-import { getCmsFriends, LIVE_CMS_ORIGIN, type CmsFriendSite } from '../lib/cloudflare/live-content';
+import { getCmsFriends, getCmsFriendForm, LIVE_CMS_ORIGIN } from '../lib/cloudflare/live-content';
 
 export const prerender = import.meta.env.PUBLIC_EASON_LIVE !== 'true';
 const live = import.meta.env.PUBLIC_EASON_LIVE === 'true';
-const sites: CmsFriendSite[] = live ? await getCmsFriends() : [];
+const [sites, formSettings] = live ? await Promise.all([getCmsFriends(), getCmsFriendForm()]) : [[], null] as const;
+const safeSiteUrl=(value: string | undefined) => { try { const u=new URL(value || ''); return u.protocol==='https:' && !u.username && !u.password ? u.href : ''; } catch { return ''; } };
+const ownSiteUrl=safeSiteUrl(formSettings?.siteUrl)||Astro.url.origin;
+const ownImageUrl=safeSiteUrl(formSettings?.siteImage);
 const avatarUrl = (avatar?: string) => {
   if (typeof avatar !== 'string' || !avatar) return '';
   if (/^\/media\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(avatar)) return LIVE_CMS_ORIGIN + avatar;
@@ -42,19 +45,19 @@ const avatarUrl = (avatar?: string) => {
       ) : (
         <p class="friends-empty">目前還沒有友站。</p>
       )}
-      {live && (
+      {live && formSettings && (
         <details id="friend-apply" class="friend-apply">
-          <summary class="friend-apply-summary">申請友站</summary>
+          <summary class="friend-apply-summary">{formSettings.heading}</summary>
           <div class="friend-apply-body">
-          <p>有自己的網站或部落格，歡迎來交換友站！送出後由我審核，不用登入，也不強制回加本站。</p>
-          <details class="friend-info"><summary>本站資訊</summary><p>網站名稱：{siteTitle}<br />網址：<a href={Astro.url.origin}>{Astro.url.origin}</a></p></details>
-          <form id="friend-request-form" method="post" action="/api/friend-requests">
-            <label>網站名稱<input name="name" required maxlength="100" placeholder="你的網站名稱" /></label>
-            <label>網站網址<input name="url" type="url" required maxlength="1500" placeholder="https://..." /></label>
-            <label>簡短介紹<textarea name="description" rows="3" required maxlength="300" placeholder="介紹一下你的網站"></textarea></label>
-            <label>頭像圖片網址（選填）<input name="avatar" type="url" maxlength="1500" placeholder="https://.../avatar.png" pattern="https://.*" /></label>
+          {formSettings.intro && <p style="white-space:pre-wrap">{formSettings.intro}</p>}
+          <details class="friend-info"><summary>{formSettings.infoLabel}</summary><p>網站名稱：{formSettings.siteName}<br />網址：<a href={ownSiteUrl}>{ownSiteUrl}</a>{formSettings.siteDescription && <><br />簡介：{formSettings.siteDescription}</>}{ownImageUrl && <><br />頭像：<a href={ownImageUrl} target="_blank" rel="noopener noreferrer">{ownImageUrl}</a></>}</p></details>
+          <form id="friend-request-form" method="post" action="/api/friend-requests" data-success-message={formSettings.successMessage}>
+            <label>{formSettings.nameLabel}<input name="name" required maxlength="100" placeholder={formSettings.namePlaceholder} /></label>
+            <label>{formSettings.urlLabel}<input name="url" type="url" required maxlength="1500" placeholder={formSettings.urlPlaceholder} /></label>
+            <label>{formSettings.descriptionLabel}<textarea name="description" rows="3" required maxlength="300" placeholder={formSettings.descriptionPlaceholder}></textarea></label>
+            <label>{formSettings.avatarLabel}<input name="avatar" type="url" maxlength="1500" placeholder={formSettings.avatarPlaceholder} pattern="https://.*" /></label>
             <div class="friend-honeypot" aria-hidden="true"><label>請勿填寫<input name="website_check" tabindex="-1" autocomplete="off" /></label></div>
-            <button type="submit">送出申請</button>
+            <button type="submit">{formSettings.submitLabel}</button>
             <p class="friend-form-status" role="status" aria-live="polite"></p>
           </form>
           </div>

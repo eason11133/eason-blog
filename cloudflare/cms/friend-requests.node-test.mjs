@@ -54,3 +54,24 @@ test('friend avatar accepts uploaded paths and HTTPS URLs but rejects unsafe sch
  assert.ok(adminHtml.includes('friend-avatar-preview'));
  sqlite.close();
 });
+
+test('friend application copy is editable by admin without modifying friend links',async()=>{
+ const origin='https://cms.test',sqlite=new DatabaseSync(':memory:');
+ for(const file of ['0001_initial.sql','0004_friend_sites.sql','0009_friend_form_settings.sql'])sqlite.exec(sql(file));
+ const db={prepare(q){let args=[];return{bind(...values){args=values;return this;},async first(){return sqlite.prepare(q).get(...args)||null;},async run(){return{meta:{changes:Number(sqlite.prepare(q).run(...args).changes)}};}};}};
+ const env={DB:db,CMS_SESSION_SECRET:'test-only',CMS_ADMIN_PASSWORD:'test-password'};
+ const call=(path,method='GET',body,cookie='')=>worker.fetch(new Request(origin+path,{method,headers:{Origin:origin,Cookie:cookie,'Content-Type':'application/json'},body:body===undefined?undefined:JSON.stringify(body)}),env);
+ const current=await (await call('/api/friend-form')).json();
+ assert.equal(current.heading,'申請友站');
+ assert.equal((await call('/api/admin/friend-form','PUT',{intro:'new'})).status,401);
+ const login=await call('/api/admin/login','POST',{password:'test-password'}),cookie=login.headers.get('Set-Cookie').split(';')[0];
+ const sites=[{name:'Friend',url:'https://example.com/',description:'hello'}];
+ assert.equal((await call('/api/admin/friends','PUT',{sites},cookie)).status,200);
+ assert.equal((await call('/api/admin/friend-form','PUT',{...current,intro:'歡迎交換',siteUrl:'https://example.com/',siteDescription:'我的部落格'},cookie)).status,200);
+ const updated=await (await call('/api/friend-form')).json();
+ assert.equal(updated.intro,'歡迎交換');assert.equal(updated.siteDescription,'我的部落格');
+ assert.deepEqual((await (await call('/api/friends')).json()).sites,sites);
+ assert.equal((await call('/api/admin/friend-form','PUT',{...updated,siteImage:'javascript:alert(1)'},cookie)).status,400);
+ assert.equal((await (await call('/api/friend-form')).json()).intro,'歡迎交換');
+ assert.ok(adminHtml.includes('friend-form-settings'));sqlite.close();
+});

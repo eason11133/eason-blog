@@ -217,6 +217,25 @@ nav{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:16px}nav button[aria-curr
 <section id="settings-panel" class="card hidden"><h2 id="settings-heading"></h2><form id="settings-form"><div id="settings-fields"></div><div class="editor-actions"><button type="submit">儲存設定到 D1</button></div></form></section>
 <section id="friends-panel" class="card hidden">
 <h2>友站管理</h2>
+<details style="margin:0 0 22px"><summary style="cursor:pointer">申請友站設定</summary><form id="friend-form-settings" class="fields" style="margin-top:16px">
+<div class="field"><label for="friend-form-heading">申請區標題</label><input id="friend-form-heading" type="text" maxlength="100" required></div>
+<div class="field span-2"><label for="friend-form-intro">申請說明</label><textarea id="friend-form-intro" rows="3" maxlength="2000"></textarea></div>
+<div class="field"><label for="friend-form-infoLabel">本站資訊標題</label><input id="friend-form-infoLabel" type="text" maxlength="100" required></div>
+<div class="field"><label for="friend-form-siteName">本站名稱</label><input id="friend-form-siteName" type="text" maxlength="100" required></div>
+<div class="field"><label for="friend-form-siteUrl">本站網址（留空使用目前網站網址）</label><input id="friend-form-siteUrl" type="url" maxlength="1500"></div>
+<div class="field span-2"><label for="friend-form-siteDescription">本站簡介</label><textarea id="friend-form-siteDescription" rows="3" maxlength="500"></textarea></div>
+<div class="field"><label for="friend-form-siteImage">本站頭像圖片網址</label><input id="friend-form-siteImage" type="url" maxlength="1500"></div>
+<div class="field"><label for="friend-form-nameLabel">名稱欄位名稱</label><input id="friend-form-nameLabel" type="text" maxlength="100" required></div>
+<div class="field"><label for="friend-form-namePlaceholder">名稱欄位提示</label><input id="friend-form-namePlaceholder" type="text" maxlength="200"></div>
+<div class="field"><label for="friend-form-urlLabel">網址欄位名稱</label><input id="friend-form-urlLabel" type="text" maxlength="100" required></div>
+<div class="field"><label for="friend-form-urlPlaceholder">網址欄位提示</label><input id="friend-form-urlPlaceholder" type="text" maxlength="200"></div>
+<div class="field"><label for="friend-form-descriptionLabel">介紹欄位名稱</label><input id="friend-form-descriptionLabel" type="text" maxlength="100" required></div>
+<div class="field"><label for="friend-form-descriptionPlaceholder">介紹欄位提示</label><input id="friend-form-descriptionPlaceholder" type="text" maxlength="200"></div>
+<div class="field"><label for="friend-form-avatarLabel">圖片欄位名稱（選填）</label><input id="friend-form-avatarLabel" type="text" maxlength="100" required></div>
+<div class="field"><label for="friend-form-avatarPlaceholder">圖片欄位提示</label><input id="friend-form-avatarPlaceholder" type="text" maxlength="200"></div>
+<div class="field"><label for="friend-form-submitLabel">送出按鈕文字</label><input id="friend-form-submitLabel" type="text" maxlength="100" required></div>
+<div class="field"><label for="friend-form-successMessage">成功送出提示</label><input id="friend-form-successMessage" type="text" maxlength="500" required></div>
+<div class="span-2 editor-actions"><button id="save-friend-form" type="submit" disabled>儲存申請設定</button></div></form></details>
 <h3>待審核申請</h3><p>核准後才會公開，聯絡方式不會出現在前台。</p><div id="friend-requests-list"></div><h3>已公開友站</h3>
 <p>可自行上傳友站頭像（選填），再填名稱、網址和介紹。儲存後立即更新前台。</p>
 <form id="friends-form">
@@ -565,6 +584,23 @@ function renderFriendRows(items){
   row.appendChild(actions);target.appendChild(row);
  });
 }
+const friendFormKeys=["heading","intro","infoLabel","siteName","siteUrl","siteDescription","siteImage","nameLabel","namePlaceholder","urlLabel","urlPlaceholder","descriptionLabel","descriptionPlaceholder","avatarLabel","avatarPlaceholder","submitLabel","successMessage"];
+let friendFormSeq=0;
+async function loadFriendForm(){
+ const seq=++friendFormSeq;
+ el('save-friend-form').disabled=true;
+ const data=await api('/api/friend-form');
+ if(seq!==friendFormSeq||tab!=='friends')return;
+ for(const key of friendFormKeys)el('friend-form-'+key).value=data[key]||'';
+ el('save-friend-form').disabled=false;
+}
+el('friend-form-settings').onsubmit=async e=>{
+ e.preventDefault();
+ const button=el('save-friend-form');if(button.disabled)return;
+ button.disabled=true;
+ try{await api('/api/admin/friend-form','PUT',Object.fromEntries(friendFormKeys.map(key=>[key,el('friend-form-'+key).value])));say('申請友站設定已儲存，前台立即更新');}
+ catch(err){say(err.message,true);}finally{button.disabled=false;}
+};
 let savedFriendSnapshot='';
 async function loadFriends(){
  const data=await api('/api/friends');
@@ -620,7 +656,7 @@ function showPanel(next){
  if(['post','work'].includes(tab))loadDocs().catch(e=>say(e.message,true));
  if(['homepage','about'].includes(tab))loadSettings().catch(e=>say(e.message,true));
  if(tab==='comments')loadComments().catch(e=>say(e.message,true));
- if(tab==='friends')loadFriends().catch(e=>say(e.message,true));
+ if(tab==='friends'){loadFriends().catch(e=>say(e.message,true));loadFriendForm().catch(e=>say(e.message,true));}
  if(tab==='footer')loadFooter().catch(e=>say(e.message,true));
 }
 let readAboutForm=null;
