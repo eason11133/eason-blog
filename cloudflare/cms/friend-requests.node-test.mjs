@@ -8,7 +8,7 @@ const sql=name=>readFileSync(new URL('./migrations/'+name,import.meta.url),'utf8
 test('friend approval is atomic, never publishes contact, preserves manual entries',()=>{
  const db=new DatabaseSync(':memory:');
  db.exec(sql('0004_friend_sites.sql'));db.exec(sql('0006_friend_requests.sql'));
- db.prepare('INSERT INTO friend_sites VALUES(1,?,?)').run(JSON.stringify([{name:'Existing',url:'https://existing.test/',description:''}]),'now');
+ db.prepare('INSERT INTO friend_sites VALUES(1,?,?)').run(JSON.stringify([{name:'Existing',url:'https://existing.test/',description:'',avatar:'/media/12345678-1234-1234-1234-123456789abc'}]),'now');
  const insert=db.prepare("INSERT INTO friend_requests(id,name,url,description,contact,created) VALUES(?,?,?,?,?,?)");
  insert.run('1','Friend','https://friend.test/','hello','private@example.test','now');
  insert.run('2','Duplicate','https://existing.test/','hello','private@example.test','now');
@@ -16,7 +16,7 @@ test('friend approval is atomic, never publishes contact, preserves manual entri
  const list=()=>JSON.parse(db.prepare('SELECT links_json FROM friend_sites').get().links_json);
  assert.equal(list().length,1);
  db.exec("UPDATE friend_requests SET status='approved',reviewed='now' WHERE id='1'");
- assert.deepEqual(list(),[{name:'Existing',url:'https://existing.test/',description:''},{name:'Friend',url:'https://friend.test/',description:'hello'}]);
+ assert.deepEqual(list(),[{name:'Existing',url:'https://existing.test/',description:'',avatar:'/media/12345678-1234-1234-1234-123456789abc'},{name:'Friend',url:'https://friend.test/',description:'hello'}]);
  assert.throws(()=>db.exec("UPDATE friend_requests SET status='approved',reviewed='now' WHERE id='2'"),/friend_already_exists/);
  assert.equal(db.prepare("SELECT status FROM friend_requests WHERE id='2'").get().status,'pending');
  db.exec("UPDATE friend_requests SET status='rejected',reviewed='now' WHERE id='3'");
@@ -29,4 +29,25 @@ test('friend request moderation requires administrator and blocks cross-origin w
  assert.equal((await worker.fetch(new Request(origin+'/api/admin/friend-requests'),env)).status,401);
  assert.equal((await worker.fetch(new Request(origin+'/api/friend-requests',{method:'POST',headers:{Origin:'https://other.test'}}),env)).status,403);
  assert.ok(adminHtml.includes('friend-requests-list'));
+});
+
+test('friend avatar is optional and only accepts local uploaded media paths',async()=>{
+ const origin='https://cms.test',avatar='/media/12345678-1234-1234-1234-123456789abc';
+ const sqlite=new DatabaseSync(':memory:');
+ sqlite.exec(sql('0001_initial.sql'));sqlite.exec(sql('0004_friend_sites.sql'));
+ const db={prepare(q){let args=[];return{bind(...values){args=values;return this;},async first(){return sqlite.prepare(q).get(...args)||null;},async run(){return{meta:{changes:Number(sqlite.prepare(q).run(...args).changes)}};}};}};
+ const env={DB:db,CMS_SESSION_SECRET:'test-only',CMS_ADMIN_PASSWORD:'test-password'};
+ const call=(path,method='GET',body,cookie='')=>worker.fetch(new Request(origin+path,{method,headers:{Origin:origin,Cookie:cookie,'Content-Type':'application/json'},body:body===undefined?undefined:JSON.stringify(body)}),env);
+ const login=await call('/api/admin/login','POST',{password:'test-password'});
+ assert.equal(login.status,200);
+ const cookie=login.headers.get('Set-Cookie').split(';')[0];
+ const site={name:'Friend',url:'https://friend.test/',description:'hello'};
+ assert.equal((await call('/api/admin/friends','PUT',{sites:[{...site,avatar}]},cookie)).status,200);
+ assert.deepEqual((await (await call('/api/friends')).json()).sites,[{...site,avatar}]);
+ assert.equal((await call('/api/admin/friends','PUT',{sites:[{...site,avatar:'https://third-party.test/avatar.png'}]},cookie)).status,400);
+ assert.deepEqual((await (await call('/api/friends')).json()).sites,[{...site,avatar}]);
+ assert.equal((await call('/api/admin/friends','PUT',{sites:[{...site,avatar:''}]},cookie)).status,200);
+ assert.deepEqual((await (await call('/api/friends')).json()).sites,[site]);
+ assert.ok(adminHtml.includes('friend-avatar-preview'));
+ sqlite.close();
 });

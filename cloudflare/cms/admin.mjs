@@ -12,6 +12,11 @@ export const adminHtml = `<!doctype html>
 .friend-entry .friend-fields{display:grid;grid-template-columns:1fr 1.5fr;gap:12px}
 .friend-entry .friend-fields label{display:block;margin-bottom:7px}
 .friend-entry .friend-description{margin-top:12px}
+.friend-avatar-controls{display:flex;align-items:center;gap:14px;margin:0 0 14px;flex-wrap:wrap}
+.friend-avatar-preview{width:64px;height:64px;border-radius:50%;background:#26374c;display:grid;place-items:center;overflow:hidden;flex:none;font-weight:700;font-size:1.3rem}
+.friend-avatar-preview img{width:100%;height:100%;object-fit:cover;display:block}
+.friend-avatar-controls input[type=file]{max-width:100%;width:auto;padding:6px;font-size:.85rem}
+.friend-avatar-controls button{padding:6px 11px;font-size:.85rem}
 .friend-entry .friend-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
 .friend-entry .friend-actions button{padding:6px 11px;font-size:.9rem}
 @media(max-width:720px){.friend-entry .friend-fields{grid-template-columns:1fr}}
@@ -212,7 +217,7 @@ nav{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:16px}nav button[aria-curr
 <section id="friends-panel" class="card hidden">
 <h2>友站管理</h2>
 <h3>待審核申請</h3><p>核准後才會公開，聯絡方式不會出現在前台。</p><div id="friend-requests-list"></div><h3>已公開友站</h3>
-<p>新增友站名稱、網址和介紹，儲存後立即更新網站「友站」頁面。</p>
+<p>可自行上傳友站頭像（選填），再填名稱、網址和介紹。儲存後立即更新前台。</p>
 <form id="friends-form">
 <div id="friends-list"></div>
 <div class="editor-actions"><button id="add-friend" type="button" class="secondary">＋ 新增友站</button><button type="submit">儲存友站到 D1</button></div>
@@ -486,8 +491,10 @@ function currentFriendRows(){
   name:row.querySelector('[data-friend-field=name]').value,
   url:row.querySelector('[data-friend-field=url]').value,
   description:row.querySelector('[data-friend-field=description]').value,
+  avatar:row.querySelector('[data-friend-field=avatar]').value,
  }));
 }
+let friendUploads=0;
 function renderFriendRows(items){
  const target=el('friends-list');target.replaceChildren();
  if(!items.length){const note=document.createElement('p');note.textContent='還沒有友站，按下方「新增友站」即可。';target.appendChild(note);return;}
@@ -508,12 +515,40 @@ function renderFriendRows(items){
   const cols=document.createElement('div');cols.className='friend-fields';
   createField(cols,'name','友站名稱',item.name);
   createField(cols,'url','網站網址',item.url);
+  const avatarControls=document.createElement('div');avatarControls.className='friend-avatar-controls';
+  const avatar=document.createElement('input');avatar.type='hidden';avatar.dataset.friendField='avatar';avatar.value=item.avatar||'';
+  const preview=document.createElement('div');preview.className='friend-avatar-preview';
+  const picker=document.createElement('input');picker.type='file';picker.accept='image/png,image/jpeg,image/webp,image/gif';picker.setAttribute('aria-label','上傳友站頭像');
+  const remove=document.createElement('button');remove.type='button';remove.className='secondary';remove.textContent='移除頭像';
+  const label=document.createElement('small');label.textContent='頭像（選填）';
+  const refresh=()=>{
+   const initial=Array.from(cols.querySelector('[data-friend-field=name]').value.trim())[0]||'?';
+   preview.textContent=initial;
+   if(avatar.value){const img=document.createElement('img');img.alt='';img.onerror=()=>{if(img.isConnected)preview.textContent=initial;};img.src=avatar.value;preview.replaceChildren(img);}
+   remove.disabled=!avatar.value||picker.disabled;
+  };
+  picker.onchange=async()=>{
+   const file=picker.files?.[0];if(!file)return;
+   friendUploads++;picker.disabled=true;remove.disabled=true;
+   try{
+    if(!['image/png','image/jpeg','image/webp','image/gif'].includes(file.type)||file.size>4500000)throw new Error('請選擇 4.5MB 以內的 PNG、JPG、WebP 或 GIF');
+    const response=await fetch('/api/admin/media',{method:'POST',credentials:'same-origin',headers:{'Content-Type':file.type},body:file});
+    const result=await response.json();if(!response.ok)throw new Error(result.error||'圖片上傳失敗');
+    const url=new URL(result.url);
+    if(url.origin!==location.origin||!url.pathname.startsWith('/media/'))throw new Error('上傳沒有回傳正確圖片網址');
+    if(!row.isConnected)throw new Error('已離開友站編輯頁，請重新上傳');
+    avatar.value=url.pathname;say('頭像已上傳，請儲存友站');
+   }catch(err){say(err.message,true);}finally{friendUploads--;picker.disabled=false;picker.value='';refresh();}
+  };
+  remove.onclick=()=>{avatar.value='';refresh();};
+  cols.querySelector('[data-friend-field=name]').addEventListener('input',()=>{if(!avatar.value)refresh();});
+  avatarControls.append(preview,label,picker,remove,avatar);row.appendChild(avatarControls);refresh();
   row.appendChild(cols);
   createField(row,'description','簡短介紹（選填）',item.description,true);
   const actions=document.createElement('div');actions.className='friend-actions';
   const action=(label,disabled,callback)=>{
    const button=document.createElement('button');button.className='secondary';button.type='button';
-   button.textContent=label;button.disabled=disabled;button.onclick=callback;actions.appendChild(button);
+   button.textContent=label;button.disabled=disabled;button.onclick=()=>{if(friendUploads){say('請先等頭像上傳完成',true);return;}callback();};actions.appendChild(button);
   };
   action('上移',index===0,()=>{const all=currentFriendRows();[all[index-1],all[index]]=[all[index],all[index-1]];renderFriendRows(all);});
   action('下移',index===items.length-1,()=>{const all=currentFriendRows();[all[index+1],all[index]]=[all[index],all[index+1]];renderFriendRows(all);});
@@ -544,6 +579,7 @@ async function loadFriendRequests(){
   for(const status of ['approved','rejected']){
    const b=document.createElement('button');b.type='button';b.className=status==='rejected'?'secondary':'';b.textContent=status==='approved'?'核准並公開':'拒絕';
    b.onclick=async()=>{
+    if(friendUploads){say('請先等頭像上傳完成',true);return;}
     if(JSON.stringify(currentFriendRows())!==savedFriendSnapshot){say('請先儲存下方友站清單的修改，再審核申請',true);return;}
     if(!confirm(status==='approved'?'確定公開這個友站？':'確定拒絕這筆申請？'))return;
     const buttons=Array.from(actions.querySelectorAll('button'));buttons.forEach(x=>x.disabled=true);
@@ -855,12 +891,13 @@ el('logout').onclick=async()=>{
 document.querySelectorAll('nav [data-tab]').forEach(b=>b.onclick=()=>showPanel(b.dataset.tab));
 el('documents-list').onchange=e=>showDoc(docs.find(d=>d.slug===e.target.value)||null);
 el('new-doc').onclick=()=>{el('documents-list').value='';showDoc(null);};
-el('add-friend').onclick=()=>renderFriendRows([...currentFriendRows(),{name:'',url:'',description:''}]);
+el('add-friend').onclick=()=>{if(friendUploads){say('請先等頭像上傳完成',true);return;}renderFriendRows([...currentFriendRows(),{name:'',url:'',description:'',avatar:''}]);};
 el('friends-form').onsubmit=async e=>{
  e.preventDefault();
  try{
+  if(friendUploads)throw new Error('請先等頭像上傳完成');
   const sites=currentFriendRows().map(site=>({
-   name:site.name.trim(),url:site.url.trim(),description:site.description.trim()
+   name:site.name.trim(),url:site.url.trim(),description:site.description.trim(),avatar:site.avatar
   }));
   if(sites.some(site=>!site.name||!site.url))throw new Error('每個友站都要填名稱和網址');
   await api('/api/admin/friends','PUT',{sites});

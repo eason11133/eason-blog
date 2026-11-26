@@ -102,6 +102,7 @@ export interface CmsFriendSite {
   name: string;
   url: string;
   description: string;
+  avatar?: string;
 }
 
 /** Fetch public friend links from D1 on every live page request. */

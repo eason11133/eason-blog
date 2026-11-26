@@ -98,7 +98,9 @@ function normalizeFriendSites(items) {
     const url = parsed.toString();
     if (seen.has(url)) return null;
     seen.add(url);
-    normalized.push({ name, url, description });
+    const avatar = item.avatar == null ? '' : item.avatar;
+    if (typeof avatar !== 'string' || (avatar && !/^\/media\/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(avatar))) return null;
+    normalized.push({ name, url, description, ...(avatar ? { avatar } : {}) });
   }
   return normalized;
 }

@@ -1,4 +1,10 @@
 export function initFriendsPage() {
+  document.querySelectorAll<HTMLImageElement>('.friend-avatar img').forEach(img=>{
+    if(img.dataset.ready==='true')return;
+    img.dataset.ready='true';
+    img.addEventListener('error',()=>{img.hidden=true;},{once:true});
+    if(img.complete && img.naturalWidth===0)img.hidden=true;
+  });
   const form=document.querySelector<HTMLFormElement>('#friend-request-form');
   if(!form||form.dataset.ready==='true')return;
   form.dataset.ready='true';
