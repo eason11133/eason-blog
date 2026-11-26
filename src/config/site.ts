@@ -39,7 +39,7 @@ export const siteConfig: SiteConfig = {
   siteDescription: 'Eason 的個人網站，分享特殊選才心得與其他文章。',
   locale: 'zh-TW',
   headerGithubRepoUrl: 'https://github.com/eason11133/eason-blog',
-  faviconIco: '/favicon.ico',
+  faviconIco: '/curry-icon-32.png',
 };
 
 export const { siteUrl, siteTitle, siteTitleSuffix, siteDescription, locale, headerGithubRepoUrl, faviconIco } = siteConfig;
