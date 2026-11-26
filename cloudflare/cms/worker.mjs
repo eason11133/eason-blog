@@ -306,6 +306,22 @@ async function handle(req,env,ctx) {
     if(!['post','work'].includes(kind))return fail('Invalid kind');
     return json({items:await listDocs(env.DB,kind,true)});
   }
+  if(method==='DELETE'&&path==='/api/admin/content') {
+    const input=await jsonBody(req,2000),kind=input?.kind,slug=input?.slug;
+    if(!['post','work'].includes(kind)||!validSlug(slug))return fail('無效的文章或作品');
+    const doc=await env.DB.prepare('SELECT slug FROM documents WHERE kind=? AND slug=?').bind(kind,slug).first();
+    if(!doc)return fail('找不到文章或作品',404);
+    // D1 batch is transactional. Remove only the selected document and related records.
+    const results=await env.DB.batch([
+      env.DB.prepare('DELETE FROM documents WHERE kind=? AND slug=?').bind(kind,slug),
+      env.DB.prepare('UPDATE comments SET parent_id=NULL WHERE parent_id IN (SELECT id FROM comments WHERE kind=? AND slug=?)').bind(kind,slug),
+      env.DB.prepare('DELETE FROM comments WHERE kind=? AND slug=?').bind(kind,slug),
+      env.DB.prepare('DELETE FROM page_views WHERE kind=? AND slug=?').bind(kind,slug),
+      env.DB.prepare('DELETE FROM rate_limits WHERE action=?').bind('view:'+kind+':'+slug)
+    ]);
+    if(!results[0]?.meta?.changes)return fail('找不到文章或作品',404);
+    return json({ok:true});
+  }
   if(method==='PUT'&&path==='/api/admin/content') {
     const normalized=normalizeDocument(await jsonBody(req));
     if(!normalized)return fail('文章資料不正確，請檢查標題、網址代碼及日期。');

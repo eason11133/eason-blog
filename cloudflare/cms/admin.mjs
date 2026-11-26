@@ -28,6 +28,7 @@ button{background:#4d89d8;color:white;border:1px solid transparent;border-radius
 button:hover{filter:brightness(1.1)}button:disabled{opacity:.55;cursor:not-allowed}
 button.secondary{background:#273446;border-color:#52667e}
 button.ghost{background:transparent;border:1px solid #50637d}
+button.danger{background:transparent;border:1px solid #a45d66;color:#ffb1b7}button.danger:hover:not(:disabled){background:#572b37;color:#fff}
 input,textarea,select{font:inherit;background:#1b2636;border:1px solid #4b5b70;border-radius:9px;color:#e9edf5;padding:11px;width:100%}
 input:focus-visible,textarea:focus-visible,select:focus-visible,button:focus-visible{outline:2px solid #9accff;outline-offset:2px}
 label{display:block;font-size:.86rem;color:#bbc9da;margin-bottom:7px}
@@ -137,7 +138,7 @@ nav{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:16px}nav button[aria-curr
 <button type="button" class="secondary" data-tab="comments">留言管理</button>
 </nav>
 <section id="documents" class="card">
-<div class="two"><div><label for="documents-list">選擇已有內容</label><select id="documents-list"></select></div><div style="display:flex;align-items:end"><button class="secondary" id="new-doc" type="button">新增一篇</button></div></div>
+<div class="two"><div><label for="documents-list">選擇已有內容</label><select id="documents-list"></select></div><div style="display:flex;align-items:end"><button class="secondary" id="new-doc" type="button">新增一篇</button><button class="danger" id="delete-doc" type="button" disabled style="margin-left:8px">刪除這篇</button></div></div>
 <form id="document-form" class="fields" style="margin-top:18px">
 <div class="field"><label for="doc-title">標題</label><input id="doc-title" required maxlength="200"></div>
 <div class="field"><label for="doc-slug">網址代碼／slug（建立後請勿隨意改）</label><input id="doc-slug" required maxlength="120"></div>
@@ -465,7 +466,10 @@ function fillDateFields(value){
 el('doc-date-now').onclick=()=>fillDateFields();
 el('doc-date-today').onclick=()=>{el('doc-date').value=dateInput().split('T')[0].replaceAll('-','/');};
 
+let docBusy=false,docLoadSeq=0;
 function showDoc(d){
+ el('delete-doc').disabled=docBusy||!d;
+ el('delete-doc').textContent='刪除'+(tab==='work'?'作品':'文章');
  const data=d||{};
  el('doc-title').value=data.title||'';
  el('doc-slug').value=data.slug||'';
@@ -479,7 +483,10 @@ function showDoc(d){
  getEditor().setMarkdown(data.body_markdown||'');
 }
 async function loadDocs(){
- const items=(await api('/api/admin/content?kind='+tab)).items||[];
+ const kind=tab,seq=++docLoadSeq;
+ el('delete-doc').disabled=true;
+ const items=(await api('/api/admin/content?kind='+kind)).items||[];
+ if(tab!==kind||seq!==docLoadSeq)return;
  docs=items;
  const select=el('documents-list');select.replaceChildren();
  const opt=document.createElement('option');opt.value='';opt.textContent='＋ 新增';select.appendChild(opt);
@@ -832,10 +839,11 @@ function renderInboxComments(comments){
   if(c.parent_id){const parent=inboxNode('div','回覆 '+(c.parent_name||'原留言')+'：'+String(c.parent_body||'').slice(0,160),'inbox-parent');box.append(parent);}
   box.append(inboxNode('p',c.body||''));
   const actions=inboxNode('div',undefined,'actions');
-  const action=(label,handler,disabled=false)=>{const b=inboxNode('button',label,'secondary');b.type='button';b.disabled=disabled;b.onclick=async()=>{try{b.disabled=true;await handler();}catch(e){say(e.message,true);}finally{b.disabled=disabled;}};actions.append(b);};
+  const action=(label,handler,disabled=false,danger=false)=>{const b=inboxNode('button',label,danger?'danger':'secondary');b.type='button';b.disabled=disabled;b.onclick=async()=>{try{b.disabled=true;await handler();}catch(e){say(e.message,true);}finally{b.disabled=disabled;}};actions.append(b);};
   action('回覆',()=>{inbox.reply=c;renderInboxCompose();el('inbox-compose-body').focus();},!inbox.owner||c.status!=='approved'||!inbox.docs.some(d=>d.kind===c.kind&&d.slug===c.slug&&!Number(d.draft)));
   action(c.read_at?'標為未讀':'標為已讀',async()=>{await api('/api/admin/comment-inbox','PUT',{id:c.id,action:c.read_at?'unread':'read'});await loadComments();});
   action(c.status==='approved'?'隱藏':c.status==='pending'?'核准公開':'恢復公開',async()=>{await api('/api/admin/comment-inbox','PUT',{id:c.id,action:c.status==='approved'?'hidden':'approved'});await loadComments();});
+  action('刪除',async()=>{if(!confirm('確定永久刪除 '+(c.nickname||'訪客')+' 的這則留言？其他回覆會保留，此操作無法復原。'))return;await api('/api/admin/comment-inbox','DELETE',{id:c.id});if(inbox.reply?.id===c.id)clearInboxReply();say('留言已刪除');await loadComments();},false,true);
   if(['failed','pending'].includes(c.notification_status))action('重送通知',async()=>{await api('/api/admin/comment-notifications','POST',{id:c.id});say('通知已送出');await loadComments();});
   box.append(actions);target.append(box);
  }
@@ -892,9 +900,23 @@ async function loggedIn(){
 el('logout').onclick=async()=>{
  try{await api('/api/admin/logout','POST');location.reload();}catch(e){say(e.message,true);}
 };
-document.querySelectorAll('nav [data-tab]').forEach(b=>b.onclick=()=>showPanel(b.dataset.tab));
+document.querySelectorAll('nav [data-tab]').forEach(b=>b.onclick=()=>{if(!docBusy)showPanel(b.dataset.tab);});
 el('documents-list').onchange=e=>showDoc(docs.find(d=>d.slug===e.target.value)||null);
 el('new-doc').onclick=()=>{el('documents-list').value='';showDoc(null);};
+function setDocBusy(value){
+ docBusy=value;
+ for(const id of ['documents-list','new-doc','save-doc'])el(id).disabled=value;
+ el('delete-doc').disabled=value||!el('documents-list').value;
+}
+el('delete-doc').onclick=async()=>{
+ if(docBusy||!['post','work'].includes(tab))return;
+ const doc=docs.find(d=>d.slug===el('documents-list').value);if(!doc)return;
+ const kind=tab, label=kind==='work'?'作品':'文章';
+ if(!confirm('確定永久刪除'+label+'「'+doc.title+'」？該篇留言、瀏覽紀錄及尚未儲存的修改也會移除，無法復原。'))return;
+ setDocBusy(true);
+ try{await api('/api/admin/content','DELETE',{kind,slug:doc.slug});docs=docs.filter(d=>d.slug!==doc.slug);el('documents-list').value='';showDoc(null);say(label+'已刪除');await loadDocs();}
+ catch(e){say(e.message,true);}finally{setDocBusy(false);}
+};
 el('add-friend').onclick=()=>{if(friendUploads){say('請先等頭像上傳完成',true);return;}renderFriendRows([...currentFriendRows(),{name:'',url:'',description:'',avatar:''}]);};
 el('friends-form').onsubmit=async e=>{
  e.preventDefault();
@@ -911,6 +933,8 @@ el('friends-form').onsubmit=async e=>{
 };
 el('document-form').onsubmit=async e=>{
  e.preventDefault();
+ if(docBusy)return;
+ setDocBusy(true);
  try{
   const payload={
    kind:tab,slug:el('doc-slug').value.trim(),title:el('doc-title').value.trim(),
@@ -924,7 +948,7 @@ el('document-form').onsubmit=async e=>{
   await api('/api/admin/content','PUT',payload);
   say('已儲存至 Cloudflare D1，不需 GitHub / Vercel');
   await loadDocs();el('documents-list').value=payload.slug;showDoc(docs.find(d=>d.slug===payload.slug));
- }catch(err){say(err.message,true);}
+ }catch(err){say(err.message,true);}finally{setDocBusy(false);}
 };
 el('footer-form').onsubmit=async e=>{
  e.preventDefault();

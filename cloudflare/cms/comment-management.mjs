@@ -120,6 +120,16 @@ export async function handleCommentManagement(req,env,url,path,method,h){
    const comments=result.results||[];
    return json({documents:docs.results||[],comments:comments.slice(0,50),hasMore:comments.length>50,owner:await owner(),notifications:{configured:configured(env),channel:(await db.prepare('SELECT channel FROM comment_notification_settings WHERE singleton=1').first())?.channel||'off'}});
  }
+ if(path==='/api/admin/comment-inbox'&&method==='DELETE'){
+   const input=await jsonBody(req,2000),id=input?.id;
+   if(typeof id!=='string'||!id||id.length>128)return fail('無效的留言');
+   const results=await db.batch([
+     db.prepare('UPDATE comments SET parent_id=(SELECT p.parent_id FROM comments p WHERE p.id=?) WHERE parent_id=?').bind(id,id),
+     db.prepare('DELETE FROM comments WHERE id=?').bind(id)
+   ]);
+   if(!results[1]?.meta?.changes)return fail('找不到留言',404);
+   return json({ok:true});
+ }
  if(path==='/api/admin/comment-inbox'&&method==='PUT'){
    const input=await jsonBody(req,2000);
    if(typeof input?.id!=='string'||!['read','unread','approved','hidden'].includes(input.action))return fail('無效操作');
